@@ -1,11 +1,14 @@
 from django.shortcuts import render
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
+from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
+from django.http import HttpResponse
 
 from .models import Account
-from .forms import AccountForm
+from .forms import AccountForm, TaigaAuthForm
 
 
 def index(request):
@@ -34,7 +37,21 @@ class UpdateUserAccountView(LoginRequiredMixin, UpdateView):
     fields = ['tool', 'enabled']
     success_url = reverse_lazy('assessment:user-accounts')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        account = context["object"]
+        if (account and account.tool == "Taiga"):
+            context["taiga_auth_form"] = TaigaAuthForm()
+        return context
+
 
 class DeleteUserAccountView(LoginRequiredMixin, DeleteView):
     model = Account
     success_url = reverse_lazy('assessment:user-accounts')
+
+
+@require_POST
+@login_required
+def taiga_auth(request, pk):
+    password = request.POST['password']
+    return HttpResponse(password)
