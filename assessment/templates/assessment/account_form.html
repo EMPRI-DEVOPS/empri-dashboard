@@ -1,0 +1,18 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+{% if object %}
+<h1>{{ object.tool}}</h1>
+{% else %}
+<h1>New Account</h1>
+{% endif %}
+<form method="post">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="Submit">
+</form>
+{% if object %}
+<a href="{% url 'assessment:account-delete' account.pk %}">Delete account</a>
+{% endif %}
+
+{% endblock %}
