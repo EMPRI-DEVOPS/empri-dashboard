@@ -1,11 +1,12 @@
 from django.db import models
+from django.conf import settings
 
 class Account(models.Model):
 
     ToolType = models.TextChoices('ToolType', 'Taiga Github Mattermost')
 
     user = models.ForeignKey(
-        'auth.User',
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE
     )
     tool = models.CharField(max_length=10, choices=ToolType.choices)
