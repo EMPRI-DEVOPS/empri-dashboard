@@ -34,6 +34,7 @@ class UpdateUserAccountView(LoginRequiredMixin, UpdateView):
     fields = ['tool', 'enabled']
     success_url = reverse_lazy('assessment:user-accounts')
 
+
 class DeleteUserAccountView(LoginRequiredMixin, DeleteView):
     model = Account
     success_url = reverse_lazy('assessment:user-accounts')
