@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
 from django.views.decorators.http import require_POST
@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.http import HttpResponse
+import json
 
 from .models import Account
 from .forms import AccountForm, TaigaAuthForm
@@ -53,5 +54,9 @@ class DeleteUserAccountView(LoginRequiredMixin, DeleteView):
 @require_POST
 @login_required
 def taiga_auth(request, pk):
-    password = request.POST['password']
-    return HttpResponse(password)
+    form = TaigaAuthForm(request.POST)
+    queryset = Account.objects.filter(user=request.user)
+    account = get_object_or_404(queryset, pk=pk)
+    #r = account.do_taiga_auth(form.data)
+    if form.is_valid:
+        return HttpResponse(json.dumps(form.data))
