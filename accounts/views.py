@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
 from django.views.decorators.http import require_POST
@@ -16,6 +16,7 @@ from .forms import AccountForm, TaigaForm
 def index(request):
     return render(request, 'accounts/index.html')
 
+
 class SignUpView(CreateView):
     form_class = UserCreationForm
     success_url = reverse_lazy('login')
@@ -26,7 +27,7 @@ class UserAccountsListView(LoginRequiredMixin, ListView):
     model = Account
 
     def get_queryset(self):
-        return Account.objects.filter(user=self.request.user)
+        return self.request.user.accounts.all()
 
 
 class CreateUserAccountView(LoginRequiredMixin, CreateView):
@@ -40,23 +41,30 @@ class CreateUserAccountView(LoginRequiredMixin, CreateView):
         form.instance.user = self.request.user
         return super().form_valid(form)
 
-@login_required
-def enter_credentials(request, pk):
-    queryset = request.user.accounts
-
 
 class UpdateUserAccountView(LoginRequiredMixin, UpdateView):
     model = Account
     fields = ['tool', 'enabled']
-    success_url = reverse_lazy('accounts:index')
+    #success_url = reverse_lazy('accounts:index')
 
     def get_form_class(self):
-        if self.object.tool == "Taiga":
+        if self.object.tool == "Taiga" and not self.object.credentials:
             return TaigaForm
         else:
             return AccountForm
 
-    #def get_context_data(self, **kwargs):
+    def form_valid(self, form):
+        try:
+            if form.response:
+                account = self.object
+                account.credentials = form.response
+                account.save()
+        except AttributeError:
+            pass
+        return super().form_valid(form)
+        #return self.render_to_response(self.get_context_data(form=form))
+
+    # def get_context_data(self, **kwargs):
     #    context = super().get_context_data(**kwargs)
     #    account = context["object"]
     #    if (account and account.tool == "Taiga"):
@@ -68,13 +76,12 @@ class DeleteUserAccountView(LoginRequiredMixin, DeleteView):
     model = Account
     success_url = reverse_lazy('accounts:index')
 
-
-@require_POST
 @login_required
-def taiga_auth(request, pk):
-    form = TaigaAuthForm(request.POST)
-    queryset = Account.objects.filter(user=request.user)
+def delete_credentials(request, pk):
+    queryset = request.user.accounts
     account = get_object_or_404(queryset, pk=pk)
-    #r = account.do_taiga_auth(form.data)
-    if form.is_valid:
-        return HttpResponse(json.dumps(form.data))
+    if request.method == 'POST':
+        account.credentials = []
+        account.save()
+        return redirect('accounts:detail', pk=pk)
+    return render(request, 'accounts/account_confirm_delete_credentials.html', {'account': account})

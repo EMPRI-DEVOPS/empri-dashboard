@@ -10,5 +10,5 @@ urlpatterns = [
     path('new', views.CreateUserAccountView.as_view(), name='new'),
     path('<int:pk>/', views.UpdateUserAccountView.as_view(), name='detail'),
     path('<int:pk>/delete', views.DeleteUserAccountView.as_view(), name='delete'),
-    path('<int:pk>/taiga_auth', views.taiga_auth, name='taiga-auth')
+    path('<int:pk>/delete-credentials', views.delete_credentials, name='delete-credentials'),
 ]
