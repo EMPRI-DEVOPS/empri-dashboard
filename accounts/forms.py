@@ -21,12 +21,14 @@ class TaigaForm(AccountForm):
         if not super().is_valid():
             return False
         try:
-            auth_url = credentials['url']+"/api/v1/auth"
+            auth_url = self.cleaned_data['url']+"/api/v1/auth"
+            print(auth_url)
             r = requests.post(auth_url, data={
-                            'username': credentials['username'], 'password': credentials['password'], 'type': 'normal'})
+                            'username': self.cleaned_data['username'], 'password': self.cleaned_data['password'], 'type': 'normal'})
             r.raise_for_status()
         except requests.HTTPError as err:
             print(err.response)
-            self.add_error(error=forms.ValidationError(err.response.json()))
+            print(err.response.__str__)
+            self.add_error(field='password',error=forms.ValidationError(err.response.__str__))
             return False
         return True 

@@ -50,12 +50,18 @@ class UpdateUserAccountView(LoginRequiredMixin, UpdateView):
     fields = ['tool', 'enabled']
     success_url = reverse_lazy('accounts:index')
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        account = context["object"]
-        if (account and account.tool == "Taiga"):
-            context["taiga_auth_form"] = TaigaAuthForm()
-        return context
+    def get_form_class(self):
+        if self.object.tool == "Taiga":
+            return TaigaForm
+        else:
+            return AccountForm
+
+    #def get_context_data(self, **kwargs):
+    #    context = super().get_context_data(**kwargs)
+    #    account = context["object"]
+    #    if (account and account.tool == "Taiga"):
+    #        context["taiga_auth_form"] = TaigaAuthForm()
+    #    return context
 
 
 class DeleteUserAccountView(LoginRequiredMixin, DeleteView):
