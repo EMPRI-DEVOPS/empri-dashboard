@@ -7,10 +7,10 @@ from .models import Account
 class AccountForm(forms.ModelForm):
     class Meta:
         model = Account
-        fields = ['tool']
+        fields = ['enabled']
 
 
-class TaigaAuthForm(forms.Form):
+class TaigaForm(AccountForm):
     url = forms.URLField(
         max_length=100, initial='https://svs-dashboard.informatik.uni-hamburg.de')
     username = forms.CharField(label='Username', max_length=100)
@@ -26,6 +26,7 @@ class TaigaAuthForm(forms.Form):
                             'username': credentials['username'], 'password': credentials['password'], 'type': 'normal'})
             r.raise_for_status()
         except requests.HTTPError as err:
+            print(err.response)
             self.add_error(error=forms.ValidationError(err.response.json()))
             return False
         return True 

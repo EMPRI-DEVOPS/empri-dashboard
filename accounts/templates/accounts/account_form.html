@@ -17,7 +17,7 @@
     {% if object and taiga_auth_form %}
     <div class="row py-3">
         <h3>Credentials</h3>
-        <form action="{% url 'assessment:taiga-auth' account.pk %}" method="post">
+        <form action="{% url 'accounts:taiga-auth' account.pk %}" method="post">
             {% csrf_token %}
             {{taiga_auth_form.as_p}}
             <input type="submit" value="Submit" class="btn btn-primary">
@@ -26,7 +26,7 @@
     {% endif %}
     {% if object %}
     <div class="row py-3">
-        <a href="{% url 'assessment:account-delete' account.pk %}">Delete account</a>
+        <a href="{% url 'accounts:account-delete' account.pk %}">Delete account</a>
     </div>
     {% endif %}
 

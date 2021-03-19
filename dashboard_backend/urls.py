@@ -16,11 +16,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from django.views.generic import RedirectView
+from django.contrib.auth.forms import UserCreationForm
+from accounts.views import SignUpView
 
 urlpatterns = [
-    path('assessment/', include('assessment.urls')),
+    path('accounts/', include('accounts.urls')),
     path('admin/', admin.site.urls),
-    path('', RedirectView.as_view(url='assessment/', permanent=True)),
+    path('', RedirectView.as_view(url='accounts/')),
+    path('auth/', include('django.contrib.auth.urls')),
+    path('auth/signup', SignUpView.as_view(), name='signup'),
 ]
 
 # Use static() to add url mapping to serve static files during development (only)
@@ -28,9 +32,3 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-
-#Add Django site authentication urls (for login, logout, password management)
-
-urlpatterns += [
-    path('auth/', include('django.contrib.auth.urls')),
-]

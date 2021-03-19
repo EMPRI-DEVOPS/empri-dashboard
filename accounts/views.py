@@ -6,14 +6,20 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.http import HttpResponse
+from django.contrib.auth.forms import UserCreationForm
 import json
 
 from .models import Account
-from .forms import AccountForm, TaigaAuthForm
+from .forms import AccountForm, TaigaForm
 
 
 def index(request):
-    return render(request, 'assessment/index.html')
+    return render(request, 'accounts/index.html')
+
+class SignUpView(CreateView):
+    form_class = UserCreationForm
+    success_url = reverse_lazy('login')
+    template_name = 'registration/signup.html'
 
 
 class UserAccountsListView(LoginRequiredMixin, ListView):
@@ -26,7 +32,7 @@ class UserAccountsListView(LoginRequiredMixin, ListView):
 class CreateUserAccountView(LoginRequiredMixin, CreateView):
     model = Account
     fields = ['tool']
-    success_url = reverse_lazy('assessment:user-accounts')
+    success_url = reverse_lazy('accounts:user-accounts')
 
     def form_valid(self, form):
         form.instance.user = self.request.user
@@ -36,7 +42,7 @@ class CreateUserAccountView(LoginRequiredMixin, CreateView):
 class UpdateUserAccountView(LoginRequiredMixin, UpdateView):
     model = Account
     fields = ['tool', 'enabled']
-    success_url = reverse_lazy('assessment:user-accounts')
+    success_url = reverse_lazy('accounts:user-accounts')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -48,7 +54,7 @@ class UpdateUserAccountView(LoginRequiredMixin, UpdateView):
 
 class DeleteUserAccountView(LoginRequiredMixin, DeleteView):
     model = Account
-    success_url = reverse_lazy('assessment:user-accounts')
+    success_url = reverse_lazy('accounts:user-accounts')
 
 
 @require_POST
