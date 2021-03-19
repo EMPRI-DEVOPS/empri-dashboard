@@ -18,10 +18,10 @@
       <div class="col-sm-2">
         {% block sidebar %}
         <ul class="sidebar-nav">
-          <li><a href="{% url 'accounts:index' %}">Home</a></li>
+          <li><a href="{% url 'accounts:dashboard' %}">Home</a></li>
           {% if user.is_authenticated %}
           <li>User: {{ user.get_username }}</li>
-          <li><a href="{% url 'accounts:user-accounts' %}">Accounts</a></li>
+          <li><a href="{% url 'accounts:index' %}">Accounts</a></li>
           <li><a href="">Start Self-Assessment</a></li>
           <li><a href="{% url 'logout'%}?next={{request.path}}">Logout</a></li>
           {% else %}

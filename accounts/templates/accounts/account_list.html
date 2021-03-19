@@ -7,12 +7,12 @@
 <ul>
     {% for account in object_list %}
     <li>
-        <a href="{% url 'accounts:account-detail' account.pk %}">{{account.tool }}</a>
+        <a href="{% url 'accounts:detail' account.pk %}">{{account.tool }}</a>
     </li>
     {% endfor %}
 </ul>
 {% else %}
 <p>You have no accounts.</p>
 {% endif %}
-<p><a href="{% url 'accounts:new-account' %}">New Account</a></p>
+<p><a href="{% url 'accounts:new' %}">New Account</a></p>
 {% endblock %}

@@ -4,7 +4,7 @@ from django.views.generic.list import ListView
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.http import HttpResponse
 from django.contrib.auth.forms import UserCreationForm
 import json
@@ -32,17 +32,23 @@ class UserAccountsListView(LoginRequiredMixin, ListView):
 class CreateUserAccountView(LoginRequiredMixin, CreateView):
     model = Account
     fields = ['tool']
-    success_url = reverse_lazy('accounts:user-accounts')
+
+    def get_success_url(self):
+        return reverse('accounts:detail', kwargs={'pk': self.object.pk})
 
     def form_valid(self, form):
         form.instance.user = self.request.user
         return super().form_valid(form)
 
+@login_required
+def enter_credentials(request, pk):
+    queryset = request.user.accounts
+
 
 class UpdateUserAccountView(LoginRequiredMixin, UpdateView):
     model = Account
     fields = ['tool', 'enabled']
-    success_url = reverse_lazy('accounts:user-accounts')
+    success_url = reverse_lazy('accounts:index')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -54,7 +60,7 @@ class UpdateUserAccountView(LoginRequiredMixin, UpdateView):
 
 class DeleteUserAccountView(LoginRequiredMixin, DeleteView):
     model = Account
-    success_url = reverse_lazy('accounts:user-accounts')
+    success_url = reverse_lazy('accounts:index')
 
 
 @require_POST
