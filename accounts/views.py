@@ -5,17 +5,41 @@ from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse, reverse_lazy
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.forms import UserCreationForm
+from rest_framework import viewsets, permissions
+from rest_framework.response import Response
 import json
 
 from .models import Account
 from .forms import AccountForm, TaigaForm
+from .serializers import AccountSerializer
 
 
 def index(request):
     return render(request, 'accounts/index.html')
 
+@login_required
+def accounts_json(request):
+    accounts = request.user.accounts.all()
+    accounts_list = list(accounts)
+    return JsonResponse(accounts_list, safe=False)
+
+class AccountViewSet(viewsets.ModelViewSet):
+    serializer_class = AccountSerializer
+    def get_queryset(self):
+        return self.request.user.accounts.all()
+    
+    #def list(self, request):
+    #    queryset = request.user.accounts.all()
+    #    serializer = AccountSerializer(queryset, many=True)
+    #    return Response(serializer.data)
+
+    #def retrieve(self, request, pk=None):
+    #    queryset = request.user.accounts.all()
+    #    account = get_object_or_404(queryset, pk=pk)
+    #    serializer = AccountSerializer(account)
+    #    return Response(serializer.data)
 
 class SignUpView(CreateView):
     form_class = UserCreationForm

@@ -1,11 +1,24 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import {
+  createRouter,
+  createWebHistory
+} from 'vue-router'
 import Home from '../views/Home.vue'
 
-const routes = [
-  {
+const routes = [{
     path: '/',
     name: 'Home',
     component: Home
+  },
+  {
+    path: '/accounts/',
+    name: 'Accounts',
+    component: () => import('../views/Accounts.vue')
+  },
+  {
+    path: '/accounts/:id',
+    name: 'Account',
+    component: () => import('../views/Account.vue'),
+    props: true
   },
   {
     path: '/issues',
@@ -21,7 +34,10 @@ const routes = [
     path: '/github-auth',
     name: 'GitHub Auth',
     component: () => import('../views/GitHubAuth.vue'),
-    props: route => ({ returnedState: route.query.state, authCode: route.query.code })
+    props: route => ({
+      returnedState: route.query.state,
+      authCode: route.query.code
+    })
   },
   {
     path: '/taiga-login',
@@ -34,12 +50,13 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
+    component: () => import( /* webpackChunkName: "about" */ '../views/About.vue')
   }
 ]
 
 const router = createRouter({
   history: createWebHistory(''),
+  linkActiveClass: 'active',
   routes
 })
 

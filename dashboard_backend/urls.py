@@ -17,14 +17,22 @@ from django.contrib import admin
 from django.urls import include, path, re_path
 from django.views.generic import RedirectView
 from django.contrib.auth.forms import UserCreationForm
+from rest_framework import routers
+
 from accounts.views import SignUpView
+from accounts.views import AccountViewSet
 from core.views import IndexTemplateView
 
+router = routers.DefaultRouter()
+router.register(r'account', AccountViewSet, basename='account')
+
 urlpatterns = [
-    #path('auth/', include('django.contrib.auth.urls')),
-    #path('auth/signup', SignUpView.as_view(), name='signup'),
+    path('api/', include(router.urls)),
+    path('auth/', include('django.contrib.auth.urls')),
+    path('auth/signup', SignUpView.as_view(), name='signup'),
+    path('s_accounts/', include('accounts.urls')),
+    path('api/', include((router.urls, 'app_name'))),
     re_path(r"^.*$", IndexTemplateView.as_view(), name="entry-point"),
-    #path('accounts/', include('accounts.urls')),
     #path('admin/', admin.site.urls),
     #path('', RedirectView.as_view(url='accounts/')),
 ]

@@ -1,4 +1,4 @@
-{% extends "base_generic.html" %}
+{% extends "base-vue.html" %}
 
 {% block content %}
 <div class="gy-5">
@@ -26,7 +26,7 @@
         <div class="col-sm-3">
             <p>Credentials saved!</p>
             <pre>{{ account.credentials }}</pre>
-            <a href="{% url 'accounts:delete-credentials' account.pk %}" class="btn btn-danger">Delete Credentials</a>
+            <a href="{% url 's_accounts:delete-credentials' account.pk %}" class="btn btn-danger">Delete Credentials</a>
         </div>
     </div>
     {% endif %}
@@ -34,7 +34,7 @@
 
     <div class="row py-3">
         <div class="col-sm-3">
-            <a href="{% url 'accounts:delete' account.pk %}" class="btn btn-danger">Delete account</a>
+            <a href="{% url 's_accounts:delete' account.pk %}" class="btn btn-danger">Delete account</a>
         </div>
     </div>
     {% endif %}
