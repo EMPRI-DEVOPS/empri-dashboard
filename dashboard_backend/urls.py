@@ -21,12 +21,12 @@ from accounts.views import SignUpView
 from core.views import IndexTemplateView
 
 urlpatterns = [
-    path('auth/', include('django.contrib.auth.urls')),
-    path('auth/signup', SignUpView.as_view(), name='signup'),
+    #path('auth/', include('django.contrib.auth.urls')),
+    #path('auth/signup', SignUpView.as_view(), name='signup'),
     re_path(r"^.*$", IndexTemplateView.as_view(), name="entry-point"),
-    path('accounts/', include('accounts.urls')),
-    path('admin/', admin.site.urls),
-    path('', RedirectView.as_view(url='accounts/')),
+    #path('accounts/', include('accounts.urls')),
+    #path('admin/', admin.site.urls),
+    #path('', RedirectView.as_view(url='accounts/')),
 ]
 
 # Use static() to add url mapping to serve static files during development (only)

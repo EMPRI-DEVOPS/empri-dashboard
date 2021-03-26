@@ -8,6 +8,11 @@ const routes = [
     component: Home
   },
   {
+    path: '/issues',
+    name: 'GitHub Issue Graph',
+    component: () => import('../views/Issues.vue')
+  },
+  {
     path: '/github-login',
     name: 'GitHub Login',
     component: () => import('../views/GitHubLogin.vue')
@@ -34,8 +39,7 @@ const routes = [
 ]
 
 const router = createRouter({
-  //history: createWebHistory(process.env.BASE_URL),
-  history: createWebHistory(""),
+  history: createWebHistory(''),
   routes
 })
 

@@ -1,6 +1,7 @@
 <template>
   <div id="nav">
     <router-link to="/">Home</router-link> |
+    <router-link to="/issues">Github Issue Graph</router-link> |
     <router-link to="/taiga-login">Taiga Login</router-link> |
     <router-link to="/github-login">GitHub Login</router-link> |
     <router-link to="/about">About</router-link>
