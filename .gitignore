@@ -1,8 +1,7 @@
 .DS_Store
 node_modules
 # Dateien, die von webpack generiert werden:
-/dist
-/static
+static/
 templates/base-vue.html
 
 
@@ -143,4 +142,3 @@ GitHub.sublime-settings
 !.vscode/launch.json 
 !.vscode/extensions.json 
 .history
-node_modules
