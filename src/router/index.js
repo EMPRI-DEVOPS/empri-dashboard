@@ -15,6 +15,11 @@ const routes = [{
     component: () => import('../views/Accounts.vue')
   },
   {
+    path: '/accounts/create',
+    name: 'Create Account',
+    component: () => import('../views/AccountCreate.vue')
+  },
+  {
     path: '/accounts/:id',
     name: 'Account',
     component: () => import('../views/Account.vue'),

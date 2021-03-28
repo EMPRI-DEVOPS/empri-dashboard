@@ -1,30 +1,41 @@
 <template>
   <div class="account">
-    <h1>Account {{ id }}</h1>
+    <div class="container">
+      <h1>Account {{ id }}</h1>
 
-    <span v-if="loading">Loading..</span>
-    <span v-if="error">Error!</span>
+      <button
+        class="btn btn-danger"
+        v-if="!error"
+        @click.prevent="deleteAccount"
+      >
+        Delete
+      </button>
+      <br />
+      <span v-if="loading">Loading..</span>
+      <br />
+      <span v-if="error">{{ error }}</span>
 
-    <pre v-if="!loading">{{ data }}</pre>
+      <pre v-if="!loading">{{ data }}</pre>
+    </div>
   </div>
 </template>
 
 <script>
+import Cookies from "js-cookie";
+
 export default {
   name: "Account",
-  props: ['id'],
+  props: ["id"],
   data() {
     return {
       loading: true,
       data: null,
-      error: false,
+      error: "",
     };
   },
   mounted() {
-    const axios = require("axios");
-
-    axios({
-      url: "/api/account/"+this.id+"/",
+    this.$http({
+      url: "/api/account/" + this.id + "/",
     })
       .then((response) => {
         this.data = response.data;
@@ -32,10 +43,33 @@ export default {
       })
       .catch((error) => {
         //falls ein auth error kommt den nutzer zur loginseite umleiten
+        if (error.response) {
+          if (error.response.status == 404) {
+            this.error = "Not found!";
+          }
+        }
+        if (!this.error) {
+          this.error = "Unknown error!";
+        }
         this.loading = false;
-        this.error = true;
-        console.log(error);
       });
+  },
+  methods: {
+    deleteAccount() {
+      const csrftoken = Cookies.get("csrftoken");
+
+      this.$http({
+        url: "/api/account/" + this.id + "/",
+        method: "DELETE",
+        headers: { "X-CSRFToken": csrftoken },
+      })
+        .then(() => {
+          this.$router.push({ name: "Accounts" });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
   },
 };
 </script>
