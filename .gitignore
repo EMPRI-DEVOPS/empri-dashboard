@@ -3,7 +3,8 @@ node_modules
 # Dateien, die von webpack generiert werden:
 /dist
 /static
-/templates/base-vue.html
+templates/base-vue.html
+
 
 # local env files
 .env.local
