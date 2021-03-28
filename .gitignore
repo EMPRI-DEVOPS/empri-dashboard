@@ -1,3 +1,6 @@
+.snowpack
+build
+node_modules
 # from here https://djangowaves.com/tips-tricks/gitignore-for-a-django-project/ #
 # Django #
 *.log
