@@ -11,7 +11,7 @@ from rest_framework import viewsets, permissions
 from rest_framework.response import Response
 import json
 
-from .models import Account
+from .models import Account, GithubAuthFlow
 from .forms import AccountForm, TaigaForm
 from .serializers import AccountSerializer
 
@@ -24,6 +24,15 @@ def accounts_json(request):
     accounts = request.user.accounts.all()
     accounts_list = list(accounts)
     return JsonResponse(accounts_list, safe=False)
+
+@login_required
+def github_auth(request):
+    state = request.GET['state']
+    code = request.GET['code']
+    github_auth = GithubAuthFlow.objects.get(state_parameter=state)
+    github_auth.get_access_token(code)
+    account = github_auth.account
+    return redirect('/accounts/'+str(account.id))
 
 class AccountViewSet(viewsets.ModelViewSet):
     serializer_class = AccountSerializer

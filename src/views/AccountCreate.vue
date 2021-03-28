@@ -81,7 +81,9 @@ export default {
       })
         .then((response) => {
           this.createdId = response.data.id;
-          this.$router.push({ name: 'Account', params: { id: this.createdId } });
+          if (this.createdId) {
+            this.$router.push({ name: 'Account', params: { id: this.createdId } });
+          }
           this.data = response.data;
         })
         .catch((error) => {

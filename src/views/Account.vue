@@ -3,6 +3,12 @@
     <div class="container">
       <h1>Account {{ id }}</h1>
 
+<div v-if="authLinkUrl">
+        <a class="btn btn-primary" :href="authLinkUrl">Login</a>
+        <br><br>
+</div>
+
+
       <button
         class="btn btn-danger"
         v-if="!error"
@@ -31,6 +37,7 @@ export default {
       loading: true,
       data: null,
       error: "",
+      authLinkUrl: null
     };
   },
   mounted() {
@@ -39,6 +46,9 @@ export default {
     })
       .then((response) => {
         this.data = response.data;
+        if (response.data.github_auth_link) {
+          this.authLinkUrl = response.data.github_auth_link
+        }
         this.loading = false;
       })
       .catch((error) => {

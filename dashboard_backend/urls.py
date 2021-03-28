@@ -21,19 +21,21 @@ from rest_framework import routers
 
 from accounts.views import SignUpView
 from accounts.views import AccountViewSet
+from accounts.views import github_auth
 from core.views import IndexTemplateView
 
 router = routers.DefaultRouter()
 router.register(r'account', AccountViewSet, basename='account')
 
 urlpatterns = [
+    path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
+    path('github-auth', github_auth),
     path('auth/', include('django.contrib.auth.urls')),
     path('auth/signup', SignUpView.as_view(), name='signup'),
     path('s_accounts/', include('accounts.urls')),
     path('api/', include((router.urls, 'app_name'))),
     re_path(r"^.*$", IndexTemplateView.as_view(), name="entry-point"),
-    #path('admin/', admin.site.urls),
     #path('', RedirectView.as_view(url='accounts/')),
 ]
 
