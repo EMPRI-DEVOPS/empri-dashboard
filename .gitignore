@@ -1,4 +1,28 @@
-.snowpack
+.DS_Store
+node_modules
+# Dateien, die von webpack generiert werden:
+/dist
+/static
+/templates/base-vue.html
+
+# local env files
+.env.local
+.env.*.local
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 build
 node_modules
 # from here https://djangowaves.com/tips-tricks/gitignore-for-a-django-project/ #
