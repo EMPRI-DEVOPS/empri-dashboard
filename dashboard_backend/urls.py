@@ -34,7 +34,6 @@ urlpatterns = [
     path('auth/', include('django.contrib.auth.urls')),
     path('auth/signup', SignUpView.as_view(), name='signup'),
     path('s_accounts/', include('accounts.urls')),
-    path('api/', include((router.urls, 'app_name'))),
     re_path(r"^.*$", IndexTemplateView.as_view(), name="entry-point"),
     #path('', RedirectView.as_view(url='accounts/')),
 ]

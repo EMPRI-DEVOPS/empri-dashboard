@@ -31,20 +31,6 @@ const routes = [{
     component: () => import('../views/Issues.vue')
   },
   {
-    path: '/github-login',
-    name: 'GitHub Login',
-    component: () => import('../views/GitHubLogin.vue')
-  },
-  {
-    path: '/github-auth',
-    name: 'GitHub Auth',
-    component: () => import('../views/GitHubAuth.vue'),
-    props: route => ({
-      returnedState: route.query.state,
-      authCode: route.query.code
-    })
-  },
-  {
     path: '/taiga-login',
     name: 'Taiga Login',
     component: () => import('../views/TaigaLogin.vue')
