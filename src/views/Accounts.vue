@@ -1,19 +1,17 @@
 <template>
-  <div class="accounts">
-    <div class="container">
-      <h2>Accounts</h2>
+  <h3>Accounts</h3>
 
-      <span v-if="loading">Loading..</span>
-      <span v-if="error">Error!</span>
-      <account-list-item
-        v-for="account in data"
-        :id="account.id"
-        :tool="account.tool"
-        :key="account.id"
-      />
-      <router-link :to="{ name: 'Create Account' }">Add Account</router-link>
-    </div>
+  <span v-if="loading">Loading..</span>
+  <span v-if="error">Error!</span>
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+  <account-list-item
+    v-for="account in data"
+    :id="account.id"
+    :tool="account.tool"
+    :key="account.id"
+  />
   </div>
+  <router-link :to="{ name: 'Create Account' }">Add Account</router-link>
 </template>
 
 <script>
