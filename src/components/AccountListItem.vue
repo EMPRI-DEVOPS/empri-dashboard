@@ -1,8 +1,11 @@
 <template>
-  <div class="col">
-    <div class="card shadow-sm text-center account-list-item" style="width: 18rem">
+  <div class="col-md-7">
+    <div class="card shadow-sm text-center account-list-item">
       <div class="card-body">
         <h5 class="card-title">{{ tool }}</h5>
+      </div>
+      <div class="card-body">
+      <span class="text-muted">{{hasCredentials}}</span>
       </div>
       <div class="card-body">
         <router-link

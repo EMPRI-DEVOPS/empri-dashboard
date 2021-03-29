@@ -10,7 +10,7 @@ const routes = [{
     component: Home
   },
   {
-    path: '/accounts/',
+    path: '/accounts',
     name: 'Accounts',
     component: () => import('../views/Accounts.vue')
   },
@@ -29,11 +29,6 @@ const routes = [{
     path: '/issues',
     name: 'GitHub Issue Graph',
     component: () => import('../views/Issues.vue')
-  },
-  {
-    path: '/taiga-login',
-    name: 'Taiga Login',
-    component: () => import('../views/TaigaLogin.vue')
   },
   {
     path: '/about',

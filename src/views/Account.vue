@@ -1,27 +1,54 @@
 <template>
-  <h3>Account {{ id }}</h3>
+  <div class="row row-cols-1 g-3 justify-content-md-center">
+    <div class="col-md-7 align-items-center">
+      <div class="card shadow-sm text-center account-list-item">
+        <div class="card-body">
+          <h5 class="card-title">{{ tool }}</h5>
+        </div>
+        <div class="card-body">
+          <span class="text-muted">{{ hasCredentials }}</span>
+          <span v-if="loading">Loading..</span>
+          <taiga-login v-if="tool === 'Taiga'" />
 
-  <div v-if="authLinkUrl">
-    <a class="btn btn-primary" :href="authLinkUrl">Login</a>
-    <br /><br />
+          <span v-if="error">{{ error }}</span>
+
+          <pre v-if="!loading">{{ data }}</pre>
+        </div>
+        <div class="card-body">
+          <div class="btn-group">
+            <router-link
+              class="btn btn-sm btn-outline-secondary"
+              :to="{ name: 'Accounts' }"
+              >Back to overview</router-link
+            >
+            <a
+              v-if="authLinkUrl"
+              class="btn btn-sm btn-outline-primary"
+              :href="authLinkUrl"
+              >Github Login</a
+            >
+
+            <button
+              class="btn btn-sm btn-outline-danger"
+              v-if="!error"
+              @click.prevent="deleteAccount"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-
-  <button class="btn btn-danger" v-if="!error" @click.prevent="deleteAccount">
-    Delete
-  </button>
-  <br />
-  <span v-if="loading">Loading..</span>
-  <br />
-  <span v-if="error">{{ error }}</span>
-
-  <pre v-if="!loading">{{ data }}</pre>
 </template>
 
 <script>
 import Cookies from "js-cookie";
+import TaigaLogin from "../components/TaigaLogin.vue";
 
 export default {
   name: "Account",
+  components: { TaigaLogin },
   props: ["id"],
   data() {
     return {
@@ -30,6 +57,14 @@ export default {
       error: "",
       authLinkUrl: null,
     };
+  },
+  computed: {
+    tool: function () {
+      if (this.data) {
+        return this.data.tool;
+      }
+      return "Account " + this.id;
+    },
   },
   mounted() {
     this.$http({

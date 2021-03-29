@@ -7,7 +7,7 @@
         <label class="col-sm-2 control-label"> Tool </label>
 
         <div class="col-sm-3">
-          <select v-model="selectedTool" class="form-control" name="tool">
+          <select v-model="selectedTool" class="form-select" name="tool">
             <option disabled value="">Select a Tool</option>
             <option v-for="tool in tools" :key="tool.id">
               {{ tool.name }}

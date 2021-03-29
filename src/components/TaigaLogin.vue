@@ -33,7 +33,7 @@
         <p v-show="errors.password">Please enter a password</p>
       </div>
       <div class="form-group">
-        <button type="submit">Submit</button>
+        <button class="btn btn-outline-secondary" type="submit">Submit</button>
       </div>
     </form>
   </div>
@@ -55,20 +55,10 @@ export default {
         request: "",
       },
       response: "",
-      authenticated: true,
+      authenticated: false,
     };
   },
-  mounted() {
-    this.authenticated = sessionStorage.getItem("taigaAuthToken")
-      ? true
-      : false;
-  },
   methods: {
-    deleteToken() {
-      sessionStorage.removeItem("taigaAuthToken");
-      this.authenticated = false;
-      this.response = "";
-    },
     isValidUrl(string) {
       let url;
       try {
@@ -122,7 +112,6 @@ export default {
 form {
   /* Center the form on the page */
   margin: 0 auto;
-  width: 800px;
   /* Form outline */
   padding: 1em;
   border: 1px solid #ccc;
