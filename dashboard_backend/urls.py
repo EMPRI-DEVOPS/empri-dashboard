@@ -15,16 +15,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path, re_path
-from django.views.generic import RedirectView
-from django.contrib.auth.forms import UserCreationForm
 from rest_framework import routers
+from django.conf import settings
+from django.conf.urls.static import static
 
 from accounts.views import SignUpView
 from accounts.views import AccountViewSet
 from accounts.views import github_auth
 from core.views import IndexTemplateView
 
-router = routers.DefaultRouter()
+router = routers.DefaultRouter(trailing_slash=False)
 router.register(r'account', AccountViewSet, basename='account')
 
 urlpatterns = [
@@ -35,9 +35,5 @@ urlpatterns = [
     path('auth/signup', SignUpView.as_view(), name='signup'),
     re_path(r"^.*$", IndexTemplateView.as_view(), name="entry-point"),
 ]
-
-# Use static() to add url mapping to serve static files during development (only)
-from django.conf import settings
-from django.conf.urls.static import static
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

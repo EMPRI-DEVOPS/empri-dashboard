@@ -7,10 +7,9 @@
         </div>
         <div class="card-body">
           <span v-if="loading">Loading..</span>
-          <taiga-login v-if="tool === 'Taiga'" />
+          <taiga-login v-if="tool === 'Taiga' && !credentials" :id="id" />
 
           <span v-if="error">{{ error }}</span>
-
         </div>
         <div class="card-body">
           <div class="btn-group">
@@ -57,16 +56,19 @@ export default {
     };
   },
   computed: {
-    tool: function () {
+    tool() {
       if (this.data) {
         return this.data.tool;
       }
       return "Account " + this.id;
     },
+    credentials() {
+      return this.data ? this.data.credentials : "";
+    },
   },
-  mounted() {
+  created() {
     this.$http({
-      url: "/api/account/" + this.id + "/",
+      url: "/api/account/" + this.id,
     })
       .then((response) => {
         this.data = response.data;
@@ -93,7 +95,7 @@ export default {
       const csrftoken = Cookies.get("csrftoken");
 
       this.$http({
-        url: "/api/account/" + this.id + "/",
+        url: "/api/account/" + this.id,
         method: "DELETE",
         headers: { "X-CSRFToken": csrftoken },
       })

@@ -50,7 +50,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    #'djsnowpack.Middleware',
 ]
 
 ROOT_URLCONF = 'dashboard_backend.urls'
@@ -129,7 +128,6 @@ REST_FRAMEWORK = {
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    #os.path.join(BASE_DIR, "assets"),
     os.path.join(BASE_DIR, "static"),
 ]
 

@@ -67,7 +67,7 @@ export default {
     onSubmit() {
       const csrftoken = Cookies.get("csrftoken");
       this.$http({
-        url: "/api/account/",
+        url: "/api/account",
         method: "POST",
         headers: { "X-CSRFToken": csrftoken },
 

@@ -1,29 +1,16 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.views.generic.list import ListView
-from django.views.decorators.http import require_POST
+"""account views"""
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls import reverse, reverse_lazy
-from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.forms import UserCreationForm
-from rest_framework import viewsets, permissions
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse_lazy
+from django.views.generic.edit import CreateView
+from rest_framework import viewsets
+from rest_framework.decorators import action
 from rest_framework.response import Response
-import json
 
-from .models import Account, GithubAuthFlow
-from .forms import AccountForm, TaigaForm
-from .serializers import AccountSerializer
+from .models import GithubAuthFlow
+from .serializers import AccountSerializer, TaigaAuthSerializer
 
-
-def index(request):
-    return render(request, 'accounts/index.html')
-
-@login_required
-def accounts_json(request):
-    accounts = request.user.accounts.all()
-    accounts_list = list(accounts)
-    return JsonResponse(accounts_list, safe=False)
 
 @login_required
 def github_auth(request):
@@ -34,31 +21,31 @@ def github_auth(request):
     account = github_auth.account
     return redirect('/accounts/'+str(account.id))
 
+
 class AccountViewSet(viewsets.ModelViewSet):
     serializer_class = AccountSerializer
+
     def get_queryset(self):
         return self.request.user.accounts.all()
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-    
-    #def list(self, request):
-    #    queryset = request.user.accounts.all()
-    #    serializer = AccountSerializer(queryset, many=True)
-    #    return Response(serializer.data)
 
-    #def retrieve(self, request, pk=None):
-    #    queryset = request.user.accounts.all()
-    #    account = get_object_or_404(queryset, pk=pk)
-    #    serializer = AccountSerializer(account)
-    #    return Response(serializer.data)
+    @action(methods=['post'], detail=True)
+    def taiga_auth(self, request, pk=None):
+        serializer = TaigaAuthSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        account_queryset = self.request.user.accounts.all()
+        account = get_object_or_404(account_queryset, pk=pk)
+        account.credentials = serializer.response
+        account.save()
+        return Response({'success': True})
+
 
 class SignUpView(CreateView):
     form_class = UserCreationForm
     success_url = reverse_lazy('login')
     template_name = 'registration/signup.html'
-
-
 
 
 @login_required

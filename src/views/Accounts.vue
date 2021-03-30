@@ -44,7 +44,7 @@ export default {
     fetchData() {
       //this.loading = true;
       this.$http({
-        url: "api/account/",
+        url: "api/account",
       })
         .then((response) => {
           this.data = response.data.results;
