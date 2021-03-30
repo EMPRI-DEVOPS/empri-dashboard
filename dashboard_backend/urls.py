@@ -33,9 +33,7 @@ urlpatterns = [
     path('github-auth', github_auth),
     path('auth/', include('django.contrib.auth.urls')),
     path('auth/signup', SignUpView.as_view(), name='signup'),
-    path('s_accounts/', include('accounts.urls')),
     re_path(r"^.*$", IndexTemplateView.as_view(), name="entry-point"),
-    #path('', RedirectView.as_view(url='accounts/')),
 ]
 
 # Use static() to add url mapping to serve static files during development (only)
