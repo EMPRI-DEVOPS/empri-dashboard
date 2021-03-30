@@ -2,7 +2,7 @@
   <div class="col-md-7">
     <div class="card shadow-sm text-center account-list-item">
       <div class="card-body">
-        <h5 class="card-title">{{ tool }} Account</h5>
+        <h5 class="card-title">{{ data.tool }} Account</h5>
         <span v-if="credentials" class="badge rounded-pill bg-success"
           >Activated</span
         ><br>
@@ -16,17 +16,10 @@
       </div>
       <div class="card-body">
         <div class="btn-group">
-          <button
-            v-if="credentials"
-            @click="getData"
-            class="btn btn-sm btn-outline-secondary"
-          >
-            Get Data
-          </button>
 
           <router-link
             class="btn btn-sm btn-outline-secondary"
-            :to="{ name: 'Account', params: { id: id } }"
+            :to="{ name: 'Account', params: { id: data.id } }"
             >Detail</router-link
           >
         </div>
@@ -38,10 +31,9 @@
 <script>
 export default {
   name: "AccountListItem",
-  props: ["tool", "data", "credentials", "id"],
+  props: ["data"],
   data() {
     return {
-      pulledData: null,
       repos: null,
     };
   },
@@ -50,7 +42,10 @@ export default {
       return this.data.username;
     },
     instanceUrl() {
-      return this.data.instance_url;
+      return this.data.instance_url ?? '';
+    },
+    credentials() {
+      return this.data.credentials;
     }
   },
   methods: {

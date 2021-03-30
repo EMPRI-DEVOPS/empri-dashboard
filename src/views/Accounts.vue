@@ -6,10 +6,7 @@
   <div class="row row-cols-1 g-3 justify-content-md-center">
     <account-list-item
       v-for="account in data"
-      :id="account.id"
-      :tool="account.tool"
       :data="account"
-      :credentials="account.credentials"
       :key="account.id"
     />
   </div>
