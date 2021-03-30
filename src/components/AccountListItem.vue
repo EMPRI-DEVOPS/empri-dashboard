@@ -1,22 +1,32 @@
 <template>
   <div class="col-md-7">
-    <div class="card shadow-sm text-center account-list-item">
-      <div class="card-body">
+    <div class="card shadow-sm account-list-item">
+      <div class="card-header text-center">
         <h5 class="card-title">{{ data.tool }} Account</h5>
         <span v-if="credentials" class="badge rounded-pill bg-success"
           >Activated</span
-        ><br>
-        <span v-if="username">Username: {{username}}</span>
-        <br>
-        <span v-if="instanceUrl">URL: {{instanceUrl}}</span>
+        >
+      </div>
+      <div class="card-body">
+        <table class="table table-borderless table-hover">
+          <tbody>
+            <tr v-if="username">
+              <td style="width: 20%">Username</td>
+              <td>{{ username }}</td>
+            </tr>
+            <tr v-if="instanceUrl">
+              <td>URL</td>
+              <td>{{ instanceUrl }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
       <div v-if="pulledData" class="card-body">
         <p v-if="username">Username: {{ username }}</p>
         <p v-for="repo in repos" :key="repo.id">Repo: {{ repo.name }}</p>
       </div>
-      <div class="card-body">
+      <div class="card-footer text-center">
         <div class="btn-group">
-
           <router-link
             class="btn btn-sm btn-outline-secondary"
             :to="{ name: 'Account', params: { id: data.id } }"
@@ -42,11 +52,11 @@ export default {
       return this.data.username;
     },
     instanceUrl() {
-      return this.data.instance_url ?? '';
+      return this.data.instance_url ?? "";
     },
     credentials() {
       return this.data.credentials;
-    }
+    },
   },
   methods: {
     getData() {

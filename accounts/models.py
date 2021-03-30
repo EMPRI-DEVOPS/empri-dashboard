@@ -83,7 +83,6 @@ class GithubAuthFlow(models.Model):
         if 'error' in auth_response_dict:
             raise Exception(auth_response_dict['error'])
 
-        print(auth_response_dict)
         access_token = auth_response_dict['access_token']
         user_response = requests.get("https://api.github.com/user", headers={
             'Authorization': 'token '+access_token

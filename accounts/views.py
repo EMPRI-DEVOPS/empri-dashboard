@@ -17,7 +17,10 @@ def github_auth(request):
     state = request.GET['state']
     code = request.GET['code']
     github_auth = GithubAuthFlow.objects.get(state_parameter=state)
-    github_auth.get_access_token(code)
+    try:
+        github_auth.get_access_token(code)
+    except Exception:
+        pass
     account = github_auth.account
     return redirect('/accounts/'+str(account.id))
 

@@ -1,15 +1,26 @@
 <template>
   <div class="row row-cols-1 g-3 justify-content-md-center">
     <div class="col-md-7 align-items-center">
-      <div class="card shadow-sm text-center account-list-item">
-        <div class="card-body">
-          <h5 class="card-title">{{ tool }}</h5>
+      <div class="card shadow-sm account-list-item">
+        <div class="card-header text-center">
+          <h5 class="card-title">{{ tool }} Account</h5>
           <span v-if="credentials" class="badge rounded-pill bg-success"
             >Activated</span
-          ><br />
-          <span v-if="username">Username: {{ username }}</span>
-          <br />
-          <span v-if="instanceUrl">URL: {{ instanceUrl }}</span>
+          >
+        </div>
+        <div class="card-body">
+          <table class="table table-borderless table-hover">
+            <tbody>
+              <tr v-if="username">
+                <td style="width: 20%">Username</td>
+                <td>{{ username }}</td>
+              </tr>
+              <tr v-if="instanceUrl">
+                <td>URL</td>
+                <td>{{ instanceUrl }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
         <div class="card-body">
           <span v-if="loading">Loading..</span>
@@ -21,7 +32,7 @@
 
           <span v-if="error">{{ error }}</span>
         </div>
-        <div class="card-body">
+      <div class="card-footer text-center">
           <div class="btn-group">
             <router-link
               class="btn btn-sm btn-outline-secondary"
@@ -84,10 +95,10 @@ export default {
       return this.data ? this.data.credentials : "";
     },
     username() {
-      return this.data ? this.data.username ?? '' : '';
+      return this.data ? this.data.username ?? "" : "";
     },
     instanceUrl() {
-      return this.data ? this.data.instance_url ?? '' : '';
+      return this.data ? this.data.instance_url ?? "" : "";
     },
   },
   created() {
@@ -128,8 +139,8 @@ export default {
         headers: { "X-CSRFToken": csrftoken },
         data: {
           credentials: null,
-          username: '',
-          instance_url: ''
+          username: "",
+          instance_url: "",
         },
       })
         .then((response) => {

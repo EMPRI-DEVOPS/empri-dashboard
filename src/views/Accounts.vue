@@ -1,9 +1,7 @@
 <template>
-  <h3>Accounts</h3>
-
   <span v-if="loading">Loading..</span>
   <span v-if="error">Error!</span>
-  <div class="row row-cols-1 g-3 justify-content-md-center">
+  <div class="row row-cols-1 g-4 justify-content-md-center">
     <account-list-item
       v-for="account in data"
       :data="account"
