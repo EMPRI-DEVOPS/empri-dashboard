@@ -123,6 +123,9 @@ export default {
       })
         .then((response) => {
           this.data = response.data;
+          if (response.data.github_auth_link) {
+            this.authLinkUrl = response.data.github_auth_link;
+          }
         })
         .catch((error) => {
           console.log(error);

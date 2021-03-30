@@ -46,14 +46,6 @@ class Account(models.Model):
                 urlencode(query), ''))
         return None
 
-    def do_taiga_auth(self, credentials: dict):
-        auth_url = credentials['url']+"/api/v1/auth"
-        response = requests.post(auth_url, data={
-            'username': credentials['username'],
-            'password': credentials['password'], 'type': 'normal'})
-        response.raise_for_status()
-        return response.json()
-
 
 class GithubAuthFlow(models.Model):
     """model for saving the github auth flow parameters"""
