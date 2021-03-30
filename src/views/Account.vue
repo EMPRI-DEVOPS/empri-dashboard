@@ -6,13 +6,11 @@
           <h5 class="card-title">{{ tool }}</h5>
         </div>
         <div class="card-body">
-          <span class="text-muted">{{ hasCredentials }}</span>
           <span v-if="loading">Loading..</span>
           <taiga-login v-if="tool === 'Taiga'" />
 
           <span v-if="error">{{ error }}</span>
 
-          <pre v-if="!loading">{{ data }}</pre>
         </div>
         <div class="card-body">
           <div class="btn-group">

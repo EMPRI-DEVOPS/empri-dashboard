@@ -59,58 +59,7 @@ class SignUpView(CreateView):
     template_name = 'registration/signup.html'
 
 
-class UserAccountsListView(LoginRequiredMixin, ListView):
-    model = Account
 
-    def get_queryset(self):
-        return self.request.user.accounts.all()
-
-
-class CreateUserAccountView(LoginRequiredMixin, CreateView):
-    model = Account
-    fields = ['tool']
-
-    def get_success_url(self):
-        return reverse('accounts:detail', kwargs={'pk': self.object.pk})
-
-    def form_valid(self, form):
-        form.instance.user = self.request.user
-        return super().form_valid(form)
-
-
-class UpdateUserAccountView(LoginRequiredMixin, UpdateView):
-    model = Account
-    fields = ['tool', 'enabled']
-    #success_url = reverse_lazy('accounts:index')
-
-    def get_form_class(self):
-        if self.object.tool == "Taiga" and not self.object.credentials:
-            return TaigaForm
-        else:
-            return AccountForm
-
-    def form_valid(self, form):
-        try:
-            if form.response:
-                account = self.object
-                account.credentials = form.response
-                account.save()
-        except AttributeError:
-            pass
-        return super().form_valid(form)
-        #return self.render_to_response(self.get_context_data(form=form))
-
-    # def get_context_data(self, **kwargs):
-    #    context = super().get_context_data(**kwargs)
-    #    account = context["object"]
-    #    if (account and account.tool == "Taiga"):
-    #        context["taiga_auth_form"] = TaigaAuthForm()
-    #    return context
-
-
-class DeleteUserAccountView(LoginRequiredMixin, DeleteView):
-    model = Account
-    success_url = reverse_lazy('accounts:index')
 
 @login_required
 def delete_credentials(request, pk):

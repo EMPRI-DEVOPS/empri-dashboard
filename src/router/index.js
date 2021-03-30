@@ -26,6 +26,11 @@ const routes = [{
     props: true
   },
   {
+    path: '/assessment',
+    name: 'Assessment',
+    component: () => import('../views/Assessment.vue'),
+  },
+  {
     path: '/issues',
     name: 'GitHub Issue Graph',
     component: () => import('../views/Issues.vue')

@@ -2,35 +2,61 @@
   <div v-show="authenticated">
     <p>Authentifiziert!</p>
     <button @click="deleteToken">Token löschen</button>
-    <pre v-show="response">{{ response }}</pre>
   </div>
   <div v-show="!authenticated">
-    <form @submit.prevent="processForm">
+    <form @submit.prevent="processForm" class="needs-validation" novalidate>
       <p v-show="errors.request">Auth error: {{ errors.request }}</p>
-      <div class="form-group">
-        <label for="url"> Url: </label>
-        <input type="url" list="servers" name="url" id="url" v-model="url" />
-        <datalist id="servers">
-          <option v-for="server in taigaServers" :key="server">
-            {{ server }}
-          </option>
-        </datalist>
-        <p v-show="errors.url">Invalid URL</p>
+      <div class="row mb-3">
+        <label for="url" class="col-sm-3 col-form-label">Url</label>
+        <div class="col-sm-9">
+          <input
+            class="form-control"
+            type="url"
+            list="servers"
+            name="url"
+            id="url"
+            v-model="url"
+            :class="{ 'is-invalid': errors.url }"
+            required
+          />
+          <datalist id="servers">
+            <option v-for="server in taigaServers" :key="server">
+              {{ server }}
+            </option>
+          </datalist>
+          <div class="invalid-feedback">Invalid URL</div>
+        </div>
       </div>
-      <div class="form-group">
-        <label for="username"> Username: </label>
-        <input id="username" name="username" v-model="username" />
-        <p v-show="errors.username">Please enter a username</p>
+      <div class="row mb-3">
+        <label for="username" class="col-sm-3 col-form-label">Username</label>
+        <div class="col-sm-9">
+          <input
+            id="username"
+            name="username"
+            v-model="username"
+            class="form-control"
+            :class="{ 'is-invalid': errors.username }"
+            required
+          />
+          <div class="invalid-feedback">Please enter a username</div>
+        </div>
       </div>
-      <div class="form-group">
-        <label for="password"> Password: </label>
-        <input
-          id="password"
-          type="password"
-          name="password"
-          v-model="password"
-        />
-        <p v-show="errors.password">Please enter a password</p>
+      <div class="row mb-3">
+        <label for="password" class="col-sm-3 col-form-label">
+          Password:
+        </label>
+        <div class="col-sm-9">
+          <input
+            id="password"
+            type="password"
+            name="password"
+            v-model="password"
+            class="form-control"
+            :class="{ 'is-invalid': errors.password }"
+            required
+          />
+          <div class="invalid-feedback">Please enter a password</div>
+        </div>
       </div>
       <div class="form-group">
         <button class="btn btn-outline-secondary" type="submit">Submit</button>
@@ -106,25 +132,4 @@ export default {
 </script>
 
 <style scoped>
-.form-group {
-  padding: 1em;
-}
-form {
-  /* Center the form on the page */
-  margin: 0 auto;
-  /* Form outline */
-  padding: 1em;
-  border: 1px solid #ccc;
-  border-radius: 1em;
-}
-label {
-  /* Uniform size & alignment */
-  display: inline-block;
-  width: 90px;
-  text-align: right;
-  padding-right: 5px;
-}
-input {
-  width: 400px;
-}
 </style>
