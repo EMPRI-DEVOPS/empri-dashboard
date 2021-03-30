@@ -1,4 +1,5 @@
--taiga login X
--github daten ziehen
--account daten ziehen bevor die account view geladen wird
--login/signup seiten template
+- taiga login DONE
+- github daten ziehen
+- account daten ziehen bevor die account view geladen wird
+- new account view verbessern
+- login/signup seiten template

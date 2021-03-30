@@ -4,7 +4,7 @@
   <div class="row row-cols-1 g-4 justify-content-md-center">
     <account-list-item
       v-for="account in data"
-      :data="account"
+      :account="account"
       :key="account.id"
     />
   </div>

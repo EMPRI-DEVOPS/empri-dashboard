@@ -2,7 +2,7 @@
   <div class="col-md-7">
     <div class="card shadow-sm account-list-item">
       <div class="card-header text-center">
-        <h5 class="card-title">{{ data.tool }} Account</h5>
+        <h5 class="card-title">{{ account.tool }} Account</h5>
         <span v-if="credentials" class="badge rounded-pill bg-success"
           >Activated</span
         >
@@ -11,25 +11,21 @@
         <table class="table table-borderless table-hover">
           <tbody>
             <tr v-if="username">
-              <td style="width: 20%">Username</td>
+              <th style="width: 20%">Username</th>
               <td>{{ username }}</td>
             </tr>
             <tr v-if="instanceUrl">
-              <td>URL</td>
+              <th>URL</th>
               <td>{{ instanceUrl }}</td>
             </tr>
           </tbody>
         </table>
       </div>
-      <div v-if="pulledData" class="card-body">
-        <p v-if="username">Username: {{ username }}</p>
-        <p v-for="repo in repos" :key="repo.id">Repo: {{ repo.name }}</p>
-      </div>
       <div class="card-footer text-center">
         <div class="btn-group">
           <router-link
             class="btn btn-sm btn-outline-secondary"
-            :to="{ name: 'Account', params: { id: data.id } }"
+            :to="{ name: 'Account', params: { id: account.id } }"
             >Detail</router-link
           >
         </div>
@@ -41,21 +37,16 @@
 <script>
 export default {
   name: "AccountListItem",
-  props: ["data"],
-  data() {
-    return {
-      repos: null,
-    };
-  },
+  props: ["account"],
   computed: {
     username() {
-      return this.data.username;
+      return this.account.username;
     },
     instanceUrl() {
-      return this.data.instance_url ?? "";
+      return this.account.instance_url ?? "";
     },
     credentials() {
-      return this.data.credentials;
+      return this.account.credentials;
     },
   },
   methods: {
