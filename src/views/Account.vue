@@ -4,10 +4,17 @@
       <div class="card shadow-sm text-center account-list-item">
         <div class="card-body">
           <h5 class="card-title">{{ tool }}</h5>
+          <span v-if="credentials" class="badge rounded-pill bg-success"
+            >Activated</span
+          >
         </div>
         <div class="card-body">
           <span v-if="loading">Loading..</span>
-          <taiga-login v-if="tool === 'Taiga' && !credentials" :id="id" />
+          <taiga-login
+            v-if="tool === 'Taiga' && !credentials"
+            :id="id"
+            @authenticated="fetchData"
+          />
 
           <span v-if="error">{{ error }}</span>
         </div>
@@ -19,11 +26,19 @@
               >Back to overview</router-link
             >
             <a
-              v-if="authLinkUrl"
+              v-if="authLinkUrl && !credentials"
               class="btn btn-sm btn-outline-primary"
               :href="authLinkUrl"
               >Github Login</a
             >
+
+            <button
+              v-if="credentials"
+              class="btn btn-sm btn-outline-warning"
+              @click="deleteCredentials"
+            >
+              Delete credentials
+            </button>
 
             <button
               class="btn btn-sm btn-outline-danger"
@@ -67,30 +82,53 @@ export default {
     },
   },
   created() {
-    this.$http({
-      url: "/api/account/" + this.id,
-    })
-      .then((response) => {
-        this.data = response.data;
-        if (response.data.github_auth_link) {
-          this.authLinkUrl = response.data.github_auth_link;
-        }
-        this.loading = false;
-      })
-      .catch((error) => {
-        //falls ein auth error kommt den nutzer zur loginseite umleiten
-        if (error.response) {
-          if (error.response.status == 404) {
-            this.error = "Not found!";
-          }
-        }
-        if (!this.error) {
-          this.error = "Unknown error!";
-        }
-        this.loading = false;
-      });
+    this.fetchData();
   },
   methods: {
+    fetchData() {
+      this.$http({
+        url: "/api/account/" + this.id,
+      })
+        .then((response) => {
+          this.data = response.data;
+          if (response.data.github_auth_link) {
+            this.authLinkUrl = response.data.github_auth_link;
+          }
+          this.loading = false;
+        })
+        .catch((error) => {
+          //falls ein auth error kommt den nutzer zur loginseite umleiten
+          if (error.response) {
+            if (error.response.status == 404) {
+              this.error = "Not found!";
+            }
+          }
+          if (!this.error) {
+            this.error = "Unknown error!";
+          }
+          this.loading = false;
+        });
+    },
+    deleteCredentials() {
+      const csrftoken = Cookies.get("csrftoken");
+      this.loading = true;
+
+      this.$http({
+        url: "/api/account/" + this.id,
+        method: "PATCH",
+        headers: { "X-CSRFToken": csrftoken },
+        data: {
+          credentials: null,
+        },
+      })
+        .then((response) => {
+          this.data = response.data;
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+        .then(() => (this.loading = false));
+    },
     deleteAccount() {
       const csrftoken = Cookies.get("csrftoken");
 
