@@ -6,13 +6,12 @@ from .models import Account
 
 class AccountSerializer(serializers.ModelSerializer):
     github_auth_link = serializers.ReadOnlyField()
-    credentials = serializers.JSONField(allow_null=True)
 
     class Meta:
         model = Account
-        fields = ['id', 'enabled', 'tool', 'credentials', 'github_auth_link']
+        fields = ['id', 'enabled', 'tool', 'credentials', 'username', 'instance_url', 'github_auth_link']
         depth = 1
-        read_only_fields = ['id', 'github_auth_link', 'credentials']
+        read_only_fields = ['id', 'github_auth_link']
 
 
 class TaigaAuthSerializer(serializers.Serializer):

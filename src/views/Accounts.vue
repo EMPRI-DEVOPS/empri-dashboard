@@ -8,6 +8,7 @@
       v-for="account in data"
       :id="account.id"
       :tool="account.tool"
+      :data="account"
       :credentials="account.credentials"
       :key="account.id"
     />

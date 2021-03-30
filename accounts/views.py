@@ -38,6 +38,8 @@ class AccountViewSet(viewsets.ModelViewSet):
         account_queryset = self.request.user.accounts.all()
         account = get_object_or_404(account_queryset, pk=pk)
         account.credentials = serializer.response
+        account.username = serializer.response['username']
+        account.instance_url = serializer.validated_data['url']
         account.save()
         return Response({'success': True})
 

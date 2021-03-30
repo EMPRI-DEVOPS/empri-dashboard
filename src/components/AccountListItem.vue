@@ -2,14 +2,17 @@
   <div class="col-md-7">
     <div class="card shadow-sm text-center account-list-item">
       <div class="card-body">
-        <h5 class="card-title">{{ tool }}</h5>
+        <h5 class="card-title">{{ username }} on {{ tool }}</h5>
         <span v-if="credentials" class="badge rounded-pill bg-success"
           >Activated</span
-        >
+        ><br>
+        <span v-if="username">Username: {{username}}</span>
+        <br>
+        <span v-if="instanceUrl">URL: {{instanceUrl}}</span>
       </div>
-      <div v-if="data" class="card-body">
-        <p v-if="username">Username: {{username}}</p>
-        <p v-for="repo in repos" :key=repo.id>Repo: {{repo.name}}</p> 
+      <div v-if="pulledData" class="card-body">
+        <p v-if="username">Username: {{ username }}</p>
+        <p v-for="repo in repos" :key="repo.id">Repo: {{ repo.name }}</p>
       </div>
       <div class="card-body">
         <div class="btn-group">
@@ -35,13 +38,20 @@
 <script>
 export default {
   name: "AccountListItem",
-  props: ["tool", "credentials", "id"],
+  props: ["tool", "data", "credentials", "id"],
   data() {
     return {
-      data: null,
-      username: null,
+      pulledData: null,
       repos: null,
     };
+  },
+  computed: {
+    username() {
+      return this.data.username;
+    },
+    instanceUrl() {
+      return this.data.instance_url;
+    }
   },
   methods: {
     getData() {
@@ -51,7 +61,7 @@ export default {
           Authorization: `token ${this.credentials.access_token}`,
         },
       }).then((response) => {
-        this.data = response.data;
+        this.pulledData = response.data;
         this.username = response.data.login;
         this.$http({
           url: `https://api.github.com/users/${this.username}/repos`,

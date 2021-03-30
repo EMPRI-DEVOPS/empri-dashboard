@@ -6,7 +6,10 @@
           <h5 class="card-title">{{ tool }}</h5>
           <span v-if="credentials" class="badge rounded-pill bg-success"
             >Activated</span
-          >
+          ><br />
+          <span v-if="username">Username: {{ username }}</span>
+          <br />
+          <span v-if="instanceUrl">URL: {{ instanceUrl }}</span>
         </div>
         <div class="card-body">
           <span v-if="loading">Loading..</span>
@@ -80,6 +83,12 @@ export default {
     credentials() {
       return this.data ? this.data.credentials : "";
     },
+    username() {
+      return this.data ? this.data.username ?? '' : '';
+    },
+    instanceUrl() {
+      return this.data ? this.data.instance_url ?? '' : '';
+    },
   },
   created() {
     this.fetchData();
@@ -119,6 +128,8 @@ export default {
         headers: { "X-CSRFToken": csrftoken },
         data: {
           credentials: null,
+          username: '',
+          instance_url: ''
         },
       })
         .then((response) => {

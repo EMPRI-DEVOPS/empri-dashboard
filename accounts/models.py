@@ -17,6 +17,8 @@ class Account(models.Model):
     tool = models.CharField(max_length=10, choices=ToolType.choices)
     enabled = models.BooleanField(default=True)
     credentials = models.JSONField(blank=True, null=True)
+    username = models.CharField(max_length=100, blank=True, default='')
+    instance_url = models.URLField(max_length=100, blank=True, default='')
 
     def __str__(self):
         return str(self.tool)
