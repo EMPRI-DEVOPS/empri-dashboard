@@ -70,19 +70,28 @@ class GithubAuthFlow(models.Model):
 
     def get_access_token(self, code):
         """pulls the access token from github"""
-        r = requests.post("https://github.com/login/oauth/access_token", data={
+        auth_response = requests.post("https://github.com/login/oauth/access_token", data={
             'client_id': settings.GITHUB_CLIENT_ID,
             'client_secret': settings.GITHUB_CLIENT_SECRET,
             'code': code
         }, headers={'Accept': 'application/json'})
-        r.raise_for_status()
+        auth_response.raise_for_status()
         try:
-            response_dict = r.json()
+            auth_response_dict = auth_response.json()
         except ValueError:
-            raise Exception(r.content)
-        if 'error' in response_dict:
-            raise Exception(response_dict.error)
-        self.account.credentials = r.json()
+            raise Exception(auth_response.content)
+        if 'error' in auth_response_dict:
+            raise Exception(auth_response_dict['error'])
+
+        print(auth_response_dict)
+        access_token = auth_response_dict['access_token']
+        user_response = requests.get("https://api.github.com/user", headers={
+            'Authorization': 'token '+access_token
+        })
+        user_response.raise_for_status()
+        user_response_dict = user_response.json()
+        self.account.username = user_response_dict['login']
+        self.account.credentials = auth_response_dict
         self.account.save()
 
     def __str__(self):

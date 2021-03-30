@@ -2,7 +2,7 @@
   <div class="col-md-7">
     <div class="card shadow-sm text-center account-list-item">
       <div class="card-body">
-        <h5 class="card-title">{{ username }} on {{ tool }}</h5>
+        <h5 class="card-title">{{ tool }} Account</h5>
         <span v-if="credentials" class="badge rounded-pill bg-success"
           >Activated</span
         ><br>
