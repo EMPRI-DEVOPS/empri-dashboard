@@ -31,13 +31,13 @@ export default {
   },
   watch: {
     // call again the method if the route changes
-    $route: "fetchData",
+    $route: "fetchAccounts",
   },
   created() {
-    this.fetchData();
+    this.fetchAccounts();
   },
   methods: {
-    fetchData() {
+    fetchAccounts() {
       //this.loading = true;
       this.$http({
         url: "api/account",
