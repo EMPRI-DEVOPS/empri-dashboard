@@ -32,6 +32,18 @@
     </div>
   </div>
 
+  <div v-if="statusMessage" class="row py-4 justify-content-center">
+    <div class="col-md-7">
+      <div class="card shadow-sm account-list-item">
+        <div class="card-header text-center">
+          <h5 class="card-title">{{ statusMessage }}</h5>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <events-by-day-chart v-if="eventsByDay" :events="eventsByDay" />
+
   <div v-if="repos" class="row py-4 justify-content-center">
     <div class="col-md-7">
       <div class="card shadow-sm account-list-item">
@@ -72,10 +84,11 @@
 </template>
 
 <script>
+import EventsByDayChart from "../components/EventsByDayChart.vue";
 import { GithubAccount } from "../modules/github-account";
 
 export default {
-  components: {},
+  components: { EventsByDayChart },
   name: "Assessment",
   data() {
     return {
@@ -84,6 +97,8 @@ export default {
       error: false,
       githubUsername: "",
       repos: null,
+      statusMessage: "",
+      eventsByDay: [],
     };
   },
   watch: {
@@ -126,10 +141,28 @@ export default {
         } else {
           this.githubUsername = account1.username;
         }
-        account1.pullData().then((response) => {
-          console.log(response);
-          this.repos = account1.getRepos();
-          console.log(this.repos);
+        this.statusMessage = `Pulling data for ${this.githubUsername}...`;
+
+        account1.pullData().then((events) => {
+          console.log(events);
+          this.statusMessage = "";
+
+          this.eventsByDay = [];
+          events.forEach((event) => {
+            const date = new Date(event.timestamp);
+            const day = date.toLocaleDateString();
+            const obj = this.eventsByDay.filter((o) => o.day === day)[0];
+            if (obj) {
+              obj.events += 1;
+            } else {
+              this.eventsByDay.push({
+                day: day,
+                events: 1,
+              });
+            }
+          });
+
+          console.log(this.eventsByDay);
         });
       });
     },

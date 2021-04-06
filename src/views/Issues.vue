@@ -82,6 +82,7 @@ export default {
               obj.issues += 1;
             }
           });
+          console.log(payload);
 
           this.issues = payload;
         })

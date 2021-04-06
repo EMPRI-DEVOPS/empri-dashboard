@@ -22,12 +22,7 @@ class GithubAccount {
         return response.data;
     }
 
-    getRepos() {
-        return this.repos
-    }
-
-    async pullData() {
-
+    async pullRepos() {
         const repoNames = await this.octokit.paginate(
             "GET /users/{username}/repos", {
                 username: this.username
@@ -52,6 +47,15 @@ class GithubAccount {
                 ),
             }
         });
+    }
+
+    getRepos() {
+        return this.repos
+    }
+
+    async pullData() {
+
+
 
         //"Search text is required when searching commits. Searches that use qualifiers only are not allowed. Were you searching for something else?
         /*
@@ -67,8 +71,15 @@ class GithubAccount {
 
         const events = await this.octokit
             .paginate("GET /users/{username}/events", {
-                username: this.username,
-            });
+                    username: this.username,
+                },
+                (response) => response.data.map((event) => {
+                    return {
+                        id: event.id,
+                        type: event.type,
+                        timestamp: event.created_at
+                    }
+                }));
 
         return events;
 
