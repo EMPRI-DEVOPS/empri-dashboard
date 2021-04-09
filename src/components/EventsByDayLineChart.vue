@@ -1,42 +1,45 @@
 <template>
-  <div class="col-md-12">
-    <svg width="100%" :height="height" :viewbox="`0 0 ${width} ${height}`">
-      <text class="title" x="500" y="40" text-anchor="middle">
-        {{ title }}
-      </text>
-      <g
-        id="events-by-day-line-chart"
-        :transform="`translate(${margin}, ${margin})`"
-      >
-        <g class="yAxis" fill="none" text-anchor="end"></g>
-        <g
-          class="xAxis"
-          :transform="`translate(0, ${boundedHeight})`"
-          fill="none"
-          text-anchor="middle"
-        ></g> 
-        <path
-          class="line"
-          fill="none"
-          stroke="steelblue"
-          stroke-width="1.5"
-        ></path>
-      </g>
-    </svg>
+  <div class="row py-4 justify-content-center">
+    <div ref="div" class="col-md-10">
+      <card :title="title">
+        <svg width="100%" :height="height" :viewbox="`0 0 ${width} ${height}`">
+          <g
+            id="events-by-day-line-chart"
+            :transform="`translate(${margin}, ${margin})`"
+          >
+            <g class="yAxis" fill="none" text-anchor="end"></g>
+            <g
+              class="xAxis"
+              :transform="`translate(0, ${boundedHeight})`"
+              fill="none"
+              text-anchor="middle"
+            ></g>
+            <path
+              class="line"
+              fill="none"
+              stroke="steelblue"
+              stroke-width="1.5"
+            ></path>
+          </g>
+        </svg>
+      </card>
+    </div>
   </div>
 </template>
 
 <script>
 import * as d3 from "d3";
+import Card from "./Card.vue";
 
 export default {
+  components: { Card },
   props: ["events"],
   data() {
     return {
-      width: 1000,
-      height: 600,
+      width: 700,
+      height: 400,
       margin: 60,
-      title: "User interactions by day..",
+      title: "User interactions by day",
       dateParser: d3.timeParse("%d.%m.%Y"),
       xAccessor: (d) => this.dateParser(d.day),
       yAccessor: (d) => d.events,
@@ -46,6 +49,9 @@ export default {
     events() {
       this.updateChart();
     },
+  },
+  mounted() {
+    this.width = this.$refs.div.offsetWidth;
   },
   computed: {
     boundedWidth() {

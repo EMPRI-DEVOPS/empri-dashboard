@@ -1,6 +1,4 @@
 <template>
-  <h3>Assessment</h3>
-
   <span v-if="loading">Loading..</span>
   <span v-if="error">Error!</span>
 
@@ -161,9 +159,8 @@ export default {
               });
             }
           });
-          this.eventsByDay.sort((a,b) => b.day - a.day);
-        });
       });
+        });
     },
   },
 };
