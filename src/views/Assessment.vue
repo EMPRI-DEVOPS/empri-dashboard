@@ -42,7 +42,7 @@
     </div>
   </div>
 
-  <events-by-day-chart v-if="eventsByDay" :events="eventsByDay" />
+  <events-by-day-line-chart v-if="eventsByDay" :events="eventsByDay" />
 
   <div v-if="repos" class="row py-4 justify-content-center">
     <div class="col-md-7">
@@ -84,11 +84,12 @@
 </template>
 
 <script>
-import EventsByDayChart from "../components/EventsByDayChart.vue";
+import {timeFormat} from "d3";
+import EventsByDayLineChart from '../components/EventsByDayLineChart.vue';
 import { GithubAccount } from "../modules/github-account";
 
 export default {
-  components: { EventsByDayChart },
+  components: { EventsByDayLineChart },
   name: "Assessment",
   data() {
     return {
@@ -144,25 +145,23 @@ export default {
         this.statusMessage = `Pulling data for ${this.githubUsername}...`;
 
         account1.pullData().then((events) => {
-          console.log(events);
           this.statusMessage = "";
 
           this.eventsByDay = [];
           events.forEach((event) => {
             const date = new Date(event.timestamp);
-            const day = date.toLocaleDateString();
+            const day = timeFormat("%d.%m.%Y")(date);
             const obj = this.eventsByDay.filter((o) => o.day === day)[0];
             if (obj) {
               obj.events += 1;
             } else {
-              this.eventsByDay.push({
+              this.eventsByDay.unshift({
                 day: day,
                 events: 1,
               });
             }
           });
-
-          console.log(this.eventsByDay);
+          this.eventsByDay.sort((a,b) => b.day - a.day);
         });
       });
     },

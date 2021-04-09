@@ -1,6 +1,5 @@
 <template>
-  <div>
-    <svg></svg>
+  <div id="events-by-day-bar-chart">
   </div>
 </template>
 
@@ -36,7 +35,8 @@ export default {
   },
   mounted() {
     this.svg = d3
-      .select("svg")
+      .select("#events-by-day-bar-chart")
+      .append("svg")
       .attr("width", this.width)
       .attr("height", this.height);
   },
@@ -67,7 +67,7 @@ export default {
 
       this.chart
         .append("g")
-        .call(d3.axisLeft(yScale).ticks(d3.max(eventsByDay, yAccessor)));
+        .call(d3.axisLeft(yScale).ticks(10));
 
       const xScale = d3
         .scaleBand()

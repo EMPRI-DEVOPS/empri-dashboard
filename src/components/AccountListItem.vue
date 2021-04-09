@@ -1,27 +1,24 @@
 <template>
   <div class="col-md-7">
-    <div class="card shadow-sm account-list-item">
-      <div class="card-header text-center">
-        <h5 class="card-title">{{ account.tool }} Account</h5>
-        <span v-if="credentials" class="badge rounded-pill bg-success"
-          >Activated</span
-        >
-      </div>
-      <div class="card-body">
-        <table class="table table-borderless table-hover">
-          <tbody>
-            <tr v-if="username">
-              <th style="width: 20%">Username</th>
-              <td>{{ username }}</td>
-            </tr>
-            <tr v-if="instanceUrl">
-              <th>URL</th>
-              <td>{{ instanceUrl }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="card-footer text-center">
+    <card :title="`${account.tool} Acount`">
+      <template v-slot:header>
+        <span v-if="credentials" class="badge rounded-pill bg-success">
+          Activated
+        </span>
+      </template>
+      <table class="table table-borderless table-hover">
+        <tbody>
+          <tr v-if="username">
+            <th style="width: 20%">Username</th>
+            <td>{{ username }}</td>
+          </tr>
+          <tr v-if="instanceUrl">
+            <th>URL</th>
+            <td>{{ instanceUrl }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <template v-slot:footer>
         <div class="btn-group">
           <router-link
             class="btn btn-sm btn-outline-secondary"
@@ -29,13 +26,15 @@
             >Detail</router-link
           >
         </div>
-      </div>
-    </div>
+      </template>
+    </card>
   </div>
 </template>
 
 <script>
+import Card from "./Card.vue";
 export default {
+  components: { Card },
   name: "AccountListItem",
   props: ["account"],
   computed: {
