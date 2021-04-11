@@ -39,7 +39,7 @@ export default {
       width: 700,
       height: 400,
       margin: 60,
-      title: "User interactions by day",
+      title: "User interactions per day",
       dateParser: d3.timeParse("%d.%m.%Y"),
       xAccessor: (d) => this.dateParser(d.day),
       yAccessor: (d) => d.events,
@@ -52,6 +52,7 @@ export default {
   },
   mounted() {
     this.width = this.$refs.div.offsetWidth;
+    this.updateChart();
   },
   computed: {
     boundedWidth() {

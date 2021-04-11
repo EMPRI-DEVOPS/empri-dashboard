@@ -7,25 +7,27 @@
 
     <div class="row py-4 justify-content-center">
       <div class="col-md-7">
-        <div class="row mb-3">
-          <label for="username" class="col-sm-3 col-form-label"
-            >Github Username</label
-          >
+        <form @submit.prevent="start">
+          <div class="row mb-3">
+            <label for="username" class="col-sm-3 col-form-label"
+              >Github Username</label
+            >
 
-          <div class="col-md-7">
-            <input
-              name="username"
-              v-model="githubUsername"
-              class="col-md-7 form-control"
-            />
+            <div class="col-md-7">
+              <input
+                name="username"
+                v-model="githubUsername"
+                class="col-md-7 form-control"
+              />
+            </div>
           </div>
-        </div>
-        <button
-          class="col-md-12 btn btn-lg btn-outline-secondary"
-          @click="start"
-        >
-          Start
-        </button>
+          <button
+            type="submit"
+            class="col-md-12 btn btn-lg btn-outline-secondary"
+          >
+            Start
+          </button>
+        </form>
       </div>
     </div>
   </div>
@@ -40,7 +42,7 @@
     </div>
   </div>
 
-  <events-by-day-line-chart v-if="eventsByDay" :events="eventsByDay" />
+  <events-by-day-line-chart v-if="eventsByDay.length" :events="eventsByDay" />
 
   <div v-if="repos" class="row py-4 justify-content-center">
     <div class="col-md-7">
@@ -82,8 +84,8 @@
 </template>
 
 <script>
-import {timeFormat} from "d3";
-import EventsByDayLineChart from '../components/EventsByDayLineChart.vue';
+import { timeFormat } from "d3";
+import EventsByDayLineChart from "../components/EventsByDayLineChart.vue";
 import { GithubAccount } from "../modules/github-account";
 
 export default {
@@ -130,9 +132,10 @@ export default {
           console.log(error);
         });
     },
-    start() {
+    async start() {
       this.repos = null;
-      this.githubAccounts.forEach((githubAccount) => {
+
+      this.githubAccounts.forEach(async (githubAccount) => {
         let account1 = new GithubAccount(githubAccount);
 
         if (this.githubUsername) {
@@ -142,25 +145,37 @@ export default {
         }
         this.statusMessage = `Pulling data for ${this.githubUsername}...`;
 
-        account1.pullData().then((events) => {
-          this.statusMessage = "";
-
-          this.eventsByDay = [];
-          events.forEach((event) => {
-            const date = new Date(event.timestamp);
-            const day = timeFormat("%d.%m.%Y")(date);
-            const obj = this.eventsByDay.filter((o) => o.day === day)[0];
-            if (obj) {
-              obj.events += 1;
-            } else {
-              this.eventsByDay.unshift({
-                day: day,
-                events: 1,
-              });
-            }
-          });
-      });
+        let events = [];
+        try {
+          for await (const eventPage of account1.getEvents()) {
+            events = [...events, ...eventPage];
+            this.statusMessage = `Pulled ${events.length} events for ${this.githubUsername}..`;
+          }
+        } catch (e) {
+          this.statusMessage = e;
+          return;
+        }
+        if (!events.length) {
+          this.statusMessage = `No Events found for ${this.githubUsername}`;
+          return;
+        }
+        this.statusMessage = "Processing..";
+        this.eventsByDay = [];
+        events.forEach((event) => {
+          const date = new Date(event.timestamp);
+          const day = timeFormat("%d.%m.%Y")(date);
+          const obj = this.eventsByDay.filter((o) => o.day === day)[0];
+          if (obj) {
+            obj.events += 1;
+          } else {
+            this.eventsByDay.unshift({
+              day: day,
+              events: 1,
+            });
+          }
         });
+        this.statusMessage = "";
+      });
     },
   },
 };

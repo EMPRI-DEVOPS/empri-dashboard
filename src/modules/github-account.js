@@ -53,6 +53,31 @@ class GithubAccount {
         return this.repos
     }
 
+    async *getEvents() {
+        this.octokit.hook.error("request", async (error) => {
+            if (error.status === 404) {
+                throw `User ${this.username} not found!`;
+            }
+
+            throw error;
+        });
+
+        for await (const response of this.octokit.paginate.iterator(
+            "GET /users/{username}/events", {
+                username: this.username,
+                per_page: 50
+            })) {
+            //console.log(response.headers);
+            yield response.data.map((event) => {
+                return {
+                    id: event.id,
+                    type: event.type,
+                    timestamp: event.created_at
+                }
+            })
+        }
+    }
+
     async pullData() {
 
 
@@ -72,6 +97,7 @@ class GithubAccount {
         const events = await this.octokit
             .paginate("GET /users/{username}/events", {
                     username: this.username,
+                    per_page: 50
                 },
                 (response) => response.data.map((event) => {
                     return {
