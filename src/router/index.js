@@ -31,11 +31,6 @@ const routes = [{
     component: () => import('../views/Assessment.vue'),
   },
   {
-    path: '/issues',
-    name: 'GitHub Issue Graph',
-    component: () => import('../views/Issues.vue')
-  },
-  {
     path: '/about',
     name: 'About',
     // route level code-splitting

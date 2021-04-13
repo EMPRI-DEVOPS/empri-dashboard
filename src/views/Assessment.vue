@@ -43,44 +43,6 @@
   </div>
 
   <events-by-day-line-chart v-if="eventsByDay.length" :events="eventsByDay" />
-
-  <div v-if="repos" class="row py-4 justify-content-center">
-    <div class="col-md-7">
-      <div class="card shadow-sm account-list-item">
-        <div class="card-header text-center">
-          <h5 class="card-title">Github Account Info</h5>
-        </div>
-        <div class="card-body">
-          <table class="table table-borderless table-hover">
-            <tbody>
-              <tr v-if="githubUsername">
-                <th style="width: 20%">Username</th>
-                <td>{{ githubUsername }}</td>
-              </tr>
-            </tbody>
-          </table>
-          <h5>Repos</h5>
-          <table class="table table-borderless table-hover">
-            <tbody>
-              <tr>
-                <th>Name</th>
-                <th>Commits</th>
-                <th>Issues</th>
-              </tr>
-              <tr v-for="(repo, repoName) in repos" :key="repoName">
-                <td>{{ repoName }}</td>
-                <td>{{ repo.commits.length }}</td>
-                <td>{{ repo.issues.length }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="card-footer text-center">
-          <div class="btn-group"></div>
-        </div>
-      </div>
-    </div>
-  </div>
 </template>
 
 <script>
@@ -97,7 +59,6 @@ export default {
       data: [],
       error: false,
       githubUsername: "",
-      repos: null,
       statusMessage: "",
       eventsByDay: [],
     };

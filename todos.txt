@@ -1,5 +1,3 @@
-- taiga login DONE
-- github daten ziehen DONE
 - heatmap
 - account daten ziehen bevor die account view geladen wird
 - die account view und assessment view müssen umleiten wenn der user nicht eingeloggt ist
@@ -8,4 +6,5 @@
 - fehler wenn man zwei mal den selben Account verbindet
 - login/signup seiten template
 - bootstrap 5 über npm einbauen
+- delete account confirmation
 - https://github.com/jazzband/django-configurations einbauen
