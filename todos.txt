@@ -2,5 +2,6 @@
 - github daten ziehen DONE
 - heatmap
 - account daten ziehen bevor die account view geladen wird
+- die account view und assessment view müssen umleiten wenn der user nicht eingeloggt ist
 - new account view verbessern
 - login/signup seiten template
