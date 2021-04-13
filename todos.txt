@@ -4,4 +4,8 @@
 - account daten ziehen bevor die account view geladen wird
 - die account view und assessment view müssen umleiten wenn der user nicht eingeloggt ist
 - new account view verbessern
+- 404 Seite
+- fehler wenn man zwei mal den selben Account verbindet
 - login/signup seiten template
+- bootstrap 5 über npm einbauen
+- https://github.com/jazzband/django-configurations einbauen
