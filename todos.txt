@@ -4,7 +4,8 @@
 - new account view verbessern
 - 404 Seite
 - fehler wenn man zwei mal den selben Account verbindet
-- login/signup seiten template
+- login/signup seiten aufhübschen
 - bootstrap 5 über npm einbauen
 - delete account confirmation
+- loading anzeige aufhübschen
 - https://github.com/jazzband/django-configurations einbauen
