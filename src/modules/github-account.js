@@ -1,6 +1,9 @@
 import {
     Octokit
 } from "@octokit/rest";
+import {
+    graphql
+} from "@octokit/graphql";
 
 class GithubAccount {
     constructor(account) {
@@ -8,10 +11,17 @@ class GithubAccount {
 
         const accessToken = account.credentials.access_token;
 
-        this.octokit = new Octokit({
+        this.rest = new Octokit({
             auth: accessToken,
             userAgent: 'PSAD',
         });
+
+        this.graphql = graphql.defaults({
+            headers: {
+                authorization: `Bearer ${accessToken}`
+            }
+        });
+
     }
 
     async commits(repo) {
@@ -23,7 +33,7 @@ class GithubAccount {
     }
 
     async pullRepos() {
-        const repoNames = await this.octokit.paginate(
+        const repoNames = await this.rest.paginate(
             "GET /users/{username}/repos", {
                 username: this.username
             },
@@ -33,13 +43,13 @@ class GithubAccount {
         this.repos = {};
         repoNames.forEach(async (repoName) => {
             this.repos[repoName] = {
-                commits: await this.octokit.paginate(
+                commits: await this.rest.paginate(
                     "GET /repos/{owner}/{repo}/commits", {
                         owner: this.username,
                         repo: repoName
                     }
                 ),
-                issues: await this.octokit.paginate(
+                issues: await this.rest.paginate(
                     "GET /repos/{owner}/{repo}/issues", {
                         owner: this.username,
                         repo: repoName
@@ -53,8 +63,99 @@ class GithubAccount {
         return this.repos
     }
 
+    async *repositoriesContributedTo() {
+        let totalCount = 1;
+
+        let loadedCount = 0;
+        let endCursor = "";
+
+        while (loadedCount < totalCount) {
+            let response = await this.graphql(
+                `
+                query contribRepos($username: String!, $afterCursor: String="") {
+                    user(login: $username) {
+                        repositoriesContributedTo(includeUserRepositories: true, first:30, after: $afterCursor) {
+                            totalCount
+                            pageInfo {
+                                endCursor
+                            }
+                            nodes {
+                                name
+                                nameWithOwner
+                                owner {
+                                    login
+                                }
+                            }
+                        }
+                    }
+                }
+                `, {
+                    username: this.username,
+                    afterCursor: endCursor ? endCursor : null
+                }
+            );
+            totalCount = response.user.repositoriesContributedTo.totalCount;
+            endCursor = response.user.repositoriesContributedTo.pageInfo.endCursor;
+            let repos = response.user.repositoriesContributedTo.nodes;
+            loadedCount += repos.length;
+            yield {
+                totalCount: totalCount,
+                repos: repos
+            };
+        }
+    }
+
+    async repoCommits(owner, name, login) {
+        let response = await this.graphql(
+            `
+            query repoCommits($owner: String!, $name: String!) {
+                repository(owner: $owner, name:$name) {
+                    name
+                    defaultBranchRef {
+                        target {
+                            ... on Commit {
+                                history {
+                                    totalCount
+                                    nodes {
+                                        author {
+                                            name
+                                            user {
+                                                login
+                                            }
+                                        }
+                                        message
+                                        committedDate
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            `, {
+                name: name,
+                owner: owner
+            }
+        );
+        if (!response.repository.defaultBranchRef) {
+            return [];
+        }
+        const commits = response.repository.defaultBranchRef.target.history.nodes;
+        const userCommits = commits.filter((commit) => {
+            if (!commit.author.user) {
+                return false;
+            }
+            return commit.author.user.login === login;
+        });
+        return userCommits.map((commit) => ({
+            timestamp: commit.committedDate,
+            message: commit.message,
+            repo: name
+        }));
+    }
+
     async *getEvents() {
-        this.octokit.hook.error("request", async (error) => {
+        this.rest.hook.error("request", async (error) => {
             if (error.status === 404) {
                 throw `User ${this.username} not found!`;
             }
@@ -62,12 +163,11 @@ class GithubAccount {
             throw error;
         });
 
-        for await (const response of this.octokit.paginate.iterator(
+        for await (const response of this.rest.paginate.iterator(
             "GET /users/{username}/events", {
                 username: this.username,
                 per_page: 50
             })) {
-            //console.log(response.headers);
             yield response.data.map((event) => {
                 return {
                     id: event.id,
@@ -94,7 +194,7 @@ class GithubAccount {
         );
         */
 
-        const events = await this.octokit
+        const events = await this.rest
             .paginate("GET /users/{username}/events", {
                     username: this.username,
                     per_page: 50
@@ -108,16 +208,6 @@ class GithubAccount {
                 }));
 
         return events;
-
-
-        /*
-        this.commits = await Promise.all(this.repos.map(async (repo) => {
-            return await this.commits(repo.name);
-        }));
-
-        console.log(this.commits);
-        return;
-        */
     }
 }
 

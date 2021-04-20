@@ -23,7 +23,8 @@ class Account(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['user', 'tool', 'username', 'instance_url'], name='unique_account')
+            models.UniqueConstraint(
+                fields=['user', 'tool', 'username', 'instance_url'], name='unique_account')
         ]
 
     def __str__(self):

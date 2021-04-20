@@ -106,6 +106,19 @@ export default {
         }
         this.statusMessage = `Pulling data for ${this.githubUsername}...`;
 
+        const repos = await this.pullRepos(account1);
+
+        let commits = [];
+
+        for (var i = 0; i < repos.length; i++) {
+          let repo = repos[i];
+          let repoCommits = await account1.repoCommits(repo.owner.login, repo.name, this.githubUsername);
+          commits = [...commits, ...repoCommits];
+          this.statusMessage = `Found ${commits.length} commits -- ${i+1}/${repos.length}`
+        }
+
+        console.log(commits);
+
         let events = [];
         try {
           for await (const eventPage of account1.getEvents()) {
@@ -137,6 +150,17 @@ export default {
         });
         this.statusMessage = "";
       });
+    },
+    async pullRepos(account) {
+      let repositoriesContributedTo = [];
+      for await (const repoPage of account.repositoriesContributedTo()) {
+        repositoriesContributedTo = [
+          ...repositoriesContributedTo,
+          ...repoPage.repos,
+        ];
+        this.statusMessage = `Pulled ${repositoriesContributedTo.length}/${repoPage.totalCount} repos where ${this.githubUsername} has contributed to..`;
+      }
+      return repositoriesContributedTo;
     },
   },
 };

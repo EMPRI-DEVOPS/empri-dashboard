@@ -1,7 +1,9 @@
-- contribution graphQL API testen
-- repos in denen ein user aktiv ist sammeln
+- repoCommits paginieren
+- repoCommits Zeitraum festlegen
+- commits Graph
 - events by time-window graph
 - events by weekday graph
+- 0 data points in events per day graph zufügen
 - heatmap graph
 - account daten ziehen bevor die account view geladen wird
 - die account view und assessment view müssen umleiten wenn der user nicht eingeloggt ist
@@ -13,3 +15,4 @@
 - delete account confirmation
 - loading anzeige aufhübschen
 - https://github.com/jazzband/django-configurations einbauen
+- https://github.com/kimmobrunfeldt/git-hours/ angucken
