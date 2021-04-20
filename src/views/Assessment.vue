@@ -106,6 +106,7 @@ export default {
         }
         this.statusMessage = `Pulling data for ${this.githubUsername}...`;
 
+        /*
         const repos = await this.pullRepos(account1);
 
         let commits = [];
@@ -118,6 +119,7 @@ export default {
         }
 
         console.log(commits);
+        */
 
         let events = [];
         try {

@@ -41,17 +41,20 @@ export default {
       margin: 60,
       title: "User interactions per day",
       dateParser: d3.timeParse("%d.%m.%Y"),
-      xAccessor: (d) => this.dateParser(d.day),
+      xAccessor: (d) => d.day,
       yAccessor: (d) => d.events,
+      preparedData: []
     };
   },
   watch: {
     events() {
+      this.prepareData();
       this.updateChart();
     },
   },
   mounted() {
     this.width = this.$refs.div.offsetWidth;
+    this.prepareData();
     this.updateChart();
   },
   computed: {
@@ -64,7 +67,7 @@ export default {
     xScale() {
       return d3
         .scaleTime()
-        .domain(d3.extent(this.events, this.xAccessor))
+        .domain(d3.extent(this.preparedData, this.xAccessor))
         .range([0, this.boundedWidth])
         .nice();
     },
@@ -72,7 +75,7 @@ export default {
       return d3
         .scaleLinear()
         .range([this.boundedHeight, 0])
-        .domain([0, d3.max(this.events, this.yAccessor)]);
+        .domain([0, d3.max(this.preparedData, this.yAccessor)]);
     },
   },
   methods: {
@@ -92,7 +95,7 @@ export default {
 
       chart
         .select(".line")
-        .datum(this.events)
+        .datum(this.preparedData)
         .transition()
         .duration(3000)
         .attr(
@@ -103,6 +106,20 @@ export default {
             .y((e) => this.yScale(this.yAccessor(e)))
         );
     },
+    prepareData() {
+      this.preparedData = [];
+      const timeExtent = d3.extent(this.events, (d) => this.dateParser(d.day));
+      const timeRange = d3.timeDay.range(timeExtent[0], timeExtent[1]);
+      timeRange.forEach((day) => {
+        const dayData = this.events.find(ed => {
+          return this.dateParser(ed.day).toString() === day.toString()
+        });
+        this.preparedData.push({
+          day: day,
+          events: dayData ? dayData.events : 0
+        });
+      })
+    }
   },
 };
 </script>
