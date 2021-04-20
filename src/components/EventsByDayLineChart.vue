@@ -41,9 +41,7 @@ export default {
       margin: 60,
       title: "User interactions per day",
       dateParser: d3.timeParse("%d.%m.%Y"),
-      xAccessor: (d) => d.day,
-      yAccessor: (d) => d.events,
-      preparedData: []
+      preparedData: [],
     };
   },
   watch: {
@@ -67,15 +65,21 @@ export default {
     xScale() {
       return d3
         .scaleTime()
-        .domain(d3.extent(this.preparedData, this.xAccessor))
+        .domain(d3.extent(this.preparedData, (d) => d.day))
+        .range([0, this.boundedWidth]);
+    },
+    xBand() {
+      return d3
+        .scaleBand()
+        .domain(this.preparedData.map((d) => d.day))
         .range([0, this.boundedWidth])
-        .nice();
+        .padding(0.1);
     },
     yScale() {
       return d3
         .scaleLinear()
         .range([this.boundedHeight, 0])
-        .domain([0, d3.max(this.preparedData, this.yAccessor)]);
+        .domain([0, d3.max(this.preparedData, (d) => d.events)]);
     },
   },
   methods: {
@@ -93,8 +97,24 @@ export default {
         .duration(3000)
         .call(d3.axisBottom(this.xScale));
 
+      let rects = chart.selectAll("rect").data(this.preparedData);
+
+      // Bars
+      rects
+        .enter()
+        .append("rect")
+        .merge(rects)
+        .attr("x", (e) => this.xBand(e.day))
+        .attr("y", (e) => this.yScale(e.events))
+        .attr("width", this.xBand.bandwidth())
+        .attr("height", (e) => this.boundedHeight - this.yScale(e.events))
+        .attr("fill", "#69b3a2");
+
+      rects.exit().remove();
+
       chart
         .select(".line")
+        .raise() // nach vorne bringen
         .datum(this.preparedData)
         .transition()
         .duration(3000)
@@ -102,24 +122,26 @@ export default {
           "d",
           d3
             .line()
-            .x((e) => this.xScale(this.xAccessor(e)))
-            .y((e) => this.yScale(this.yAccessor(e)))
+            .x((e) => this.xBand(e.day) + this.xBand.bandwidth() / 2)
+            .y((e) => this.yScale(e.events))
+            .curve(d3.curveMonotoneX)
         );
     },
     prepareData() {
       this.preparedData = [];
       const timeExtent = d3.extent(this.events, (d) => this.dateParser(d.day));
-      const timeRange = d3.timeDay.range(timeExtent[0], timeExtent[1]);
-      timeRange.forEach((day) => {
-        const dayData = this.events.find(ed => {
-          return this.dateParser(ed.day).toString() === day.toString()
+      let allDays = d3.timeDay.range(timeExtent[0], timeExtent[1]);
+      allDays.forEach((day, index) => {
+        const dayData = this.events.find((ed) => {
+          return this.dateParser(ed.day).toString() === day.toString();
         });
-        this.preparedData.push({
+        allDays[index] = {
           day: day,
-          events: dayData ? dayData.events : 0
-        });
-      })
-    }
+          events: dayData ? dayData.events : 0,
+        };
+      });
+      this.preparedData = allDays;
+    },
   },
 };
 </script>
