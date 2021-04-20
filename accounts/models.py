@@ -7,6 +7,7 @@ from django.conf import settings
 
 
 class Account(models.Model):
+    id = models.AutoField(primary_key=True)
     ToolType = models.TextChoices('ToolType', 'Taiga Github Mattermost')
 
     user = models.ForeignKey(
@@ -19,6 +20,11 @@ class Account(models.Model):
     credentials = models.JSONField(blank=True, null=True)
     username = models.CharField(max_length=100, blank=True, default='')
     instance_url = models.URLField(max_length=100, blank=True, default='')
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'tool', 'username', 'instance_url'], name='unique_account')
+        ]
 
     def __str__(self):
         return str(self.tool)
