@@ -131,16 +131,12 @@ export default {
       this.preparedData = [];
       const timeExtent = d3.extent(this.events, (d) => this.dateParser(d.day));
       let allDays = d3.timeDay.range(timeExtent[0], timeExtent[1]);
-      allDays.forEach((day, index) => {
+      this.preparedData = allDays.map((day) => {
         const dayData = this.events.find((ed) => {
           return this.dateParser(ed.day).toString() === day.toString();
         });
-        allDays[index] = {
-          day: day,
-          events: dayData ? dayData.events : 0,
-        };
+        return { events: dayData ? dayData.events : 0, day: day };
       });
-      this.preparedData = allDays;
     },
   },
 };
