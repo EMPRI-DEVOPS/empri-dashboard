@@ -17,6 +17,7 @@
               <input
                 name="username"
                 v-model="githubUsername"
+                :disabled="pullingData"
                 class="col-md-7 form-control"
               />
             </div>
@@ -24,6 +25,7 @@
           <button
             type="submit"
             class="col-md-12 btn btn-lg btn-outline-secondary"
+            :disabled="pullingData"
           >
             Start
           </button>
@@ -42,27 +44,34 @@
     </div>
   </div>
 
-  <events-by-day-line-chart
-    v-if="userInteractions.length"
-    :events="userInteractions"
-  />
+  <div v-if="!pullingData" class="row g-2">
+    <div class="col-xl-8" v-if="userInteractions.length">
+      <events-by-day-line-chart :events="userInteractions" />
+    </div>
+    <div class="col-xl-4" v-if="githubCommits.length">
+      <github-commits-per-repo :commits="githubCommits" />
+    </div>
+  </div>
 </template>
 
 <script>
 import EventsByDayLineChart from "../components/EventsByDayLineChart.vue";
+import GithubCommitsPerRepo from "../components/GithubCommitsPerRepo.vue";
 import { GithubAccount } from "../modules/github-account";
 
 export default {
-  components: { EventsByDayLineChart },
+  components: { EventsByDayLineChart, GithubCommitsPerRepo },
   name: "Assessment",
   data() {
     return {
       loading: true,
       data: [],
       error: false,
+      pullingData: false,
       githubUsername: "",
       statusMessage: "",
       userInteractions: [],
+      githubCommits: [],
     };
   },
   watch: {
@@ -96,7 +105,8 @@ export default {
         });
     },
     async start() {
-      this.repos = null;
+      this.userInteractions = [];
+      this.pullingData = true;
 
       this.githubAccounts.forEach(async (githubAccount) => {
         let account1 = new GithubAccount(githubAccount);
@@ -106,33 +116,13 @@ export default {
         } else {
           this.githubUsername = account1.username;
         }
-        this.statusMessage = `Pulling data for ${this.githubUsername}...`;
-
         const { userId, repos } = await this.pullRepos(account1);
-
-        let commits = [];
         const since = new Date(
           new Date().setFullYear(new Date().getFullYear() - 1)
         );
-
-        for (let i = 0; i < repos.length; i++) {
-          let repo = repos[i];
-          for await (const repoCommitsPage of account1.repoCommits(
-            repo.owner.login,
-            repo.name,
-            userId,
-            since
-          )) {
-            commits = [...commits, ...repoCommitsPage];
-            this.statusMessage = `Found ${commits.length} commits -- Scanning ${
-              repo.nameWithOwner
-            } ${i + 1}/${repos.length}`;
-          }
-        }
-
-        this.userInteractions = [...this.userInteractions, ...commits];
-
+        await this.pullCommits(account1, repos, userId, since);
         this.statusMessage = "";
+        this.pullingData = false;
       });
     },
     async pullRepos(account) {
@@ -147,6 +137,25 @@ export default {
         this.statusMessage = `Pulled ${repositoriesContributedTo.length}/${repoPage.totalCount} repos where ${this.githubUsername} has contributed to..`;
       }
       return { userId: userId, repos: repositoriesContributedTo };
+    },
+    async pullCommits(account, repos, userId, since) {
+      let commits = [];
+      for (let i = 0; i < repos.length; i++) {
+        let repo = repos[i];
+        for await (const repoCommitsPage of account.repoCommits(
+          repo.owner.login,
+          repo.name,
+          userId,
+          since
+        )) {
+          commits = [...commits, ...repoCommitsPage];
+          this.statusMessage = `Found ${commits.length} commits -- Scanning ${
+            repo.nameWithOwner
+          } ${i + 1}/${repos.length}`;
+        }
+      }
+      this.githubCommits = commits;
+      this.userInteractions = [...this.userInteractions, ...commits];
     },
   },
 };

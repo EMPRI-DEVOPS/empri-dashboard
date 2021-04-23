@@ -172,7 +172,7 @@ class GithubAccount {
             yield response.repository.defaultBranchRef.target.history.nodes.map((commit) => ({
                 timestamp: commit.committedDate,
                 message: commit.message,
-                repo: name
+                repo: `${owner}/${name}`
             }));
         }
     }

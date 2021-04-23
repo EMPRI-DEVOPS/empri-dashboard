@@ -1,29 +1,27 @@
 <template>
-  <div ref="div" class="row py-4 justify-content-center">
-    <div ref="div">
-      <card :title="title">
-        <svg width="100%" :height="height" :viewbox="`0 0 ${width} ${height}`">
+  <div ref="div">
+    <card :title="title">
+      <svg width="100%" :height="height" :viewbox="`0 0 ${width} ${height}`">
+        <g
+          id="events-by-day-line-chart"
+          :transform="`translate(${margin}, ${margin})`"
+        >
+          <g class="yAxis" fill="none" text-anchor="end"></g>
           <g
-            id="events-by-day-line-chart"
-            :transform="`translate(${margin}, ${margin})`"
-          >
-            <g class="yAxis" fill="none" text-anchor="end"></g>
-            <g
-              class="xAxis"
-              :transform="`translate(0, ${boundedHeight})`"
-              fill="none"
-              text-anchor="middle"
-            ></g>
-            <path
-              class="line"
-              fill="none"
-              stroke="steelblue"
-              stroke-width="2.5"
-            ></path>
-          </g>
-        </svg>
-      </card>
-    </div>
+            class="xAxis"
+            :transform="`translate(0, ${boundedHeight})`"
+            fill="none"
+            text-anchor="middle"
+          ></g>
+          <path
+            class="line"
+            fill="none"
+            stroke="steelblue"
+            stroke-width="2.5"
+          ></path>
+        </g>
+      </svg>
+    </card>
   </div>
 </template>
 
@@ -38,7 +36,7 @@ export default {
     return {
       width: 700,
       height: 400,
-      margin: 60,
+      margin: 22,
       title: "User interactions per day",
       dateParser: d3.timeParse("%d.%m.%Y"),
     };
