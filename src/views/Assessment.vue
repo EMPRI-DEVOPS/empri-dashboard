@@ -55,6 +55,9 @@
       <div class="col-xl-6">
         <events-per-weekday-chart :events="userInteractions" />
       </div>
+      <div class="col-xl-6">
+        <events-per-time-window-chart :events="userInteractions" />
+      </div>
     </div>
   </div>
 </template>
@@ -62,6 +65,7 @@
 <script>
 import EventsByDayLineChart from "../components/EventsByDayLineChart.vue";
 import EventsPerWeekdayChart from "../components/EventsPerWeekdayChart.vue";
+import EventsPerTimeWindowChart from "../components/EventsPerTimeWindowChart.vue";
 import GithubCommitsPerRepo from "../components/GithubCommitsPerRepo.vue";
 import { GithubAccount } from "../modules/github-account";
 
@@ -70,6 +74,7 @@ export default {
     EventsByDayLineChart,
     GithubCommitsPerRepo,
     EventsPerWeekdayChart,
+    EventsPerTimeWindowChart,
   },
   name: "Assessment",
   data() {

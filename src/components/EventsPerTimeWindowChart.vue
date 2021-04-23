@@ -3,7 +3,7 @@
     <card :title="title">
       <svg width="100%" :height="height" :viewbox="`0 0 ${width} ${height}`">
         <g
-          id="events-per-weekday-chart"
+          id="events-per-time-window-chart"
           :transform="`translate(${margin.left}, ${margin.top})`"
         >
           <g class="yAxis" fill="none" text-anchor="end"></g>
@@ -33,19 +33,11 @@ export default {
       margin: {
         top: 10,
         bottom: 30,
-        left: 70,
-        right: 15,
+        left: 40,
+        right: 22,
       },
-      title: "User interactions per weekday",
-      weekdays: [
-        "Sunday",
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-      ],
+      title: "User interactions per time window",
+      timeWindows: ["0-6", "6-9", "9-12", "12-15", "15-18", "18-0"],
     };
   },
   watch: {
@@ -59,27 +51,27 @@ export default {
   },
   computed: {
     processedData() {
-      let eventsPerWeekday = this.weekdays.map((weekday) => ({
-        weekday: weekday,
+      let eventsPerTimeWindow = this.timeWindows.map((timeWindow) => ({
+        timeWindow: timeWindow,
         events: 0,
       }));
       for (let i = 0; i < this.events.length; i++) {
         const event = this.events[i];
         const date = new Date(event.timestamp);
-        const weekday = this.weekdays[date.getDay()];
-        const weekdayObj = eventsPerWeekday.filter(
-          (e) => e.weekday === weekday
+        const timeWindow = this.getTimeWindowOfDate(date);
+        const timeWindowObj = eventsPerTimeWindow.filter(
+          (e) => e.timeWindow === timeWindow
         )[0];
-        if (weekdayObj) {
-          weekdayObj.events++;
+        if (timeWindowObj) {
+          timeWindowObj.events++;
           continue;
         }
-        eventsPerWeekday.unshift({
-          weekday: weekday,
+        eventsPerTimeWindow.unshift({
+          timeWindow: timeWindow,
           events: 1,
         });
       }
-      return eventsPerWeekday;
+      return eventsPerTimeWindow;
     },
     boundedWidth() {
       return this.width - this.margin.left - this.margin.right;
@@ -97,13 +89,35 @@ export default {
       return d3
         .scaleBand()
         .range([0, this.boundedHeight])
-        .domain(this.processedData.map((w) => w.weekday))
+        .domain(this.processedData.map((w) => w.timeWindow))
         .padding(0.3);
     },
   },
   methods: {
+    /**
+     * @param {Date} date
+     */
+    getTimeWindowOfDate(date) {
+      const hours = date.getHours();
+      if (hours < 6) {
+        return "0-6";
+      }
+      if (hours < 9) {
+        return "6-9";
+      }
+      if (hours < 12) {
+        return "9-12";
+      }
+      if (hours < 15) {
+        return "12-15";
+      }
+      if (hours < 18) {
+        return "15-18";
+      }
+      return "18-0";
+    },
     updateChart() {
-      const chart = d3.select("#events-per-weekday-chart");
+      const chart = d3.select("#events-per-time-window-chart");
       chart.select(".yAxis").call(d3.axisLeft(this.yScale).ticks(10));
 
       chart
@@ -121,7 +135,7 @@ export default {
         .append("rect")
         .merge(rects)
         .attr("x", this.xScale(0))
-        .attr("y", (e) => this.yScale(e.weekday))
+        .attr("y", (e) => this.yScale(e.timeWindow))
         .attr("width", (e) => this.xScale(e.events))
         .attr("height", this.yScale.bandwidth())
         .attr("fill", "#69b3a2");

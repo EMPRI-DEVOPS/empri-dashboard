@@ -36,7 +36,7 @@ export default {
         left: 50,
         right: 15
       },
-      title: "Github Commits per Repo",
+      title: "Github commits per repo",
     };
   },
   watch: {
