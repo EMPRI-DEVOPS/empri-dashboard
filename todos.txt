@@ -1,6 +1,6 @@
-- repoCommits paginieren
-- repoCommits Zeitraum festlegen
 - commits Graph
+- schauen was sonst noch alles für datensätze gezogen werden können
+- - issue comments
 - events by time-window graph
 - events by weekday graph
 - heatmap graph

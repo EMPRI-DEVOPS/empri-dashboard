@@ -106,20 +106,27 @@ export default {
         }
         this.statusMessage = `Pulling data for ${this.githubUsername}...`;
 
-        /*
-        const repos = await this.pullRepos(account1);
+        const {userId, repos} = await this.pullRepos(account1);
 
         let commits = [];
+        const since = new Date(new Date().setFullYear(new Date().getFullYear() - 1));
+        console.log(since.toISOString());
 
         for (var i = 0; i < repos.length; i++) {
           let repo = repos[i];
-          let repoCommits = await account1.repoCommits(repo.owner.login, repo.name, this.githubUsername);
+          let repoCommits = await account1.repoCommits(
+            repo.owner.login,
+            repo.name,
+            userId,
+            since
+          );
           commits = [...commits, ...repoCommits];
-          this.statusMessage = `Found ${commits.length} commits -- ${i+1}/${repos.length}`
+          this.statusMessage = `Found ${commits.length} commits -- Scanning ${repo.nameWithOwner} ${i + 1}/${
+            repos.length
+          }`;
         }
 
         console.log(commits);
-        */
 
         let events = [];
         try {
@@ -155,14 +162,16 @@ export default {
     },
     async pullRepos(account) {
       let repositoriesContributedTo = [];
+      let userId;
       for await (const repoPage of account.repositoriesContributedTo()) {
+        userId = repoPage.userId;
         repositoriesContributedTo = [
           ...repositoriesContributedTo,
           ...repoPage.repos,
         ];
         this.statusMessage = `Pulled ${repositoriesContributedTo.length}/${repoPage.totalCount} repos where ${this.githubUsername} has contributed to..`;
       }
-      return repositoriesContributedTo;
+      return { userId: userId, repos: repositoriesContributedTo };
     },
   },
 };

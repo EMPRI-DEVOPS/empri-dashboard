@@ -63,6 +63,10 @@ class GithubAccount {
         return this.repos
     }
 
+    async getUserId() {
+
+    }
+
     async *repositoriesContributedTo() {
         let totalCount = 1;
 
@@ -74,6 +78,7 @@ class GithubAccount {
                 `
                 query contribRepos($username: String!, $afterCursor: String="") {
                     user(login: $username) {
+                        id
                         repositoriesContributedTo(includeUserRepositories: true, first:30, after: $afterCursor) {
                             totalCount
                             pageInfo {
@@ -99,55 +104,73 @@ class GithubAccount {
             let repos = response.user.repositoriesContributedTo.nodes;
             loadedCount += repos.length;
             yield {
+                userId: response.user.id,
                 totalCount: totalCount,
                 repos: repos
             };
         }
     }
 
-    async repoCommits(owner, name, login) {
-        let response = await this.graphql(
-            `
-            query repoCommits($owner: String!, $name: String!) {
-                repository(owner: $owner, name:$name) {
-                    name
-                    defaultBranchRef {
-                        target {
-                            ... on Commit {
-                                history {
-                                    totalCount
-                                    nodes {
-                                        author {
-                                            name
-                                            user {
-                                                login
-                                            }
+    /**
+     * 
+     * @param {*} owner 
+     * @param {*} name 
+     * @param {*} userId 
+     * @param {Date} since 
+     * @returns 
+     */
+    async repoCommits(owner, name, userId, since) {
+        let hasNextPage = true;
+        let commits = [];
+        let afterCursor = null;
+        while (hasNextPage) {
+            let response = await this.graphql(
+                `
+                query repoCommits($owner: String!, $name: String!, $userId: String!, $since: GitTimestamp!, $after: String) {
+                    repository(owner: $owner, name:$name) {
+                        name
+                        defaultBranchRef {
+                            target {
+                                ... on Commit {
+                                    history (after: $after, first: 20, author: {id: $userId}, since: $since) {
+                                        totalCount
+                                        pageInfo {
+                                            endCursor
+                                            hasNextPage
                                         }
-                                        message
-                                        committedDate
+                                        nodes {
+                                            author {
+                                                name
+                                                email
+                                                user {
+                                                    login
+                                                }
+                                            }
+                                            message
+                                            committedDate
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                 }
+                `, {
+                    name: name,
+                    owner: owner,
+                    userId: userId,
+                    since: since.toISOString(),
+                    after: afterCursor
+                }
+            );
+            if (!response.repository.defaultBranchRef) {
+                return [];
             }
-            `, {
-                name: name,
-                owner: owner
-            }
-        );
-        if (!response.repository.defaultBranchRef) {
-            return [];
+            commits = [...commits, ...response.repository.defaultBranchRef.target.history.nodes];
+            hasNextPage = response.repository.defaultBranchRef.target.history.pageInfo.hasNextPage;
+            afterCursor = response.repository.defaultBranchRef.target.history.pageInfo.endCursor;
         }
-        const commits = response.repository.defaultBranchRef.target.history.nodes;
-        const userCommits = commits.filter((commit) => {
-            if (!commit.author.user) {
-                return false;
-            }
-            return commit.author.user.login === login;
-        });
-        return userCommits.map((commit) => ({
+        return commits.map((commit) => ({
             timestamp: commit.committedDate,
             message: commit.message,
             repo: name

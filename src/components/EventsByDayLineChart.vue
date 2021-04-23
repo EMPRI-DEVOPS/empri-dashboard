@@ -18,7 +18,7 @@
               class="line"
               fill="none"
               stroke="steelblue"
-              stroke-width="1.5"
+              stroke-width="2.5"
             ></path>
           </g>
         </svg>
@@ -130,7 +130,7 @@ export default {
     prepareData() {
       this.preparedData = [];
       const timeExtent = d3.extent(this.events, (d) => this.dateParser(d.day));
-      let allDays = d3.timeDay.range(timeExtent[0], timeExtent[1]);
+      const allDays = d3.timeDay.range(timeExtent[0], timeExtent[1]);
       this.preparedData = allDays.map((day) => {
         const dayData = this.events.find((ed) => {
           return this.dateParser(ed.day).toString() === day.toString();
