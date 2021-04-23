@@ -5,11 +5,11 @@
 - account daten ziehen bevor die account view geladen wird
 - die account view und assessment view müssen umleiten wenn der user nicht eingeloggt ist
 - new account view verbessern
-- 404 Seite
 - fehler wenn man zwei mal den selben Account verbindet
 - login/signup seiten aufhübschen
 - bootstrap 5 über npm einbauen
 - delete account confirmation
 - loading anzeige aufhübschen
+- responsive burger menu implementieren
 - https://github.com/jazzband/django-configurations einbauen
 - https://github.com/kimmobrunfeldt/git-hours/ angucken
