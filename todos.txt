@@ -1,8 +1,6 @@
-- commits Graph
 - schauen was sonst noch alles für datensätze gezogen werden können
 - - issue comments
 - events by time-window graph
-- events by weekday graph
 - heatmap graph
 - Zeitbereich Eingabe (?)
 - account daten ziehen bevor die account view geladen wird

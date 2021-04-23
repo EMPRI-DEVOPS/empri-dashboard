@@ -44,23 +44,33 @@
     </div>
   </div>
 
-  <div v-if="!pullingData" class="row g-2">
-    <div class="col-xl-8" v-if="userInteractions.length">
-      <events-by-day-line-chart :events="userInteractions" />
-    </div>
-    <div class="col-xl-4" v-if="githubCommits.length">
-      <github-commits-per-repo :commits="githubCommits" />
+  <div v-if="!pullingData && userInteractions.length">
+    <div class="row g-2">
+      <div class="col-xl-8" v-if="userInteractions.length">
+        <events-by-day-line-chart :events="userInteractions" />
+      </div>
+      <div class="col-xl-4" v-if="githubCommits.length">
+        <github-commits-per-repo :commits="githubCommits" />
+      </div>
+      <div class="col-xl-6">
+        <events-per-weekday-chart :events="userInteractions" />
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import EventsByDayLineChart from "../components/EventsByDayLineChart.vue";
+import EventsPerWeekdayChart from "../components/EventsPerWeekdayChart.vue";
 import GithubCommitsPerRepo from "../components/GithubCommitsPerRepo.vue";
 import { GithubAccount } from "../modules/github-account";
 
 export default {
-  components: { EventsByDayLineChart, GithubCommitsPerRepo },
+  components: {
+    EventsByDayLineChart,
+    GithubCommitsPerRepo,
+    EventsPerWeekdayChart,
+  },
   name: "Assessment",
   data() {
     return {
