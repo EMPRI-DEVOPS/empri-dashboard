@@ -4,6 +4,7 @@
 - events by time-window graph
 - events by weekday graph
 - heatmap graph
+- Zeitbereich Eingabe (?)
 - account daten ziehen bevor die account view geladen wird
 - die account view und assessment view müssen umleiten wenn der user nicht eingeloggt ist
 - new account view verbessern

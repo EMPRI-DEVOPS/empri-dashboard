@@ -1,6 +1,6 @@
 <template>
-  <div class="row py-4 justify-content-center">
-    <div ref="div" class="col-md-10">
+  <div ref="div" class="row py-4 justify-content-center">
+    <div ref="div">
       <card :title="title">
         <svg width="100%" :height="height" :viewbox="`0 0 ${width} ${height}`">
           <g
@@ -41,21 +41,45 @@ export default {
       margin: 60,
       title: "User interactions per day",
       dateParser: d3.timeParse("%d.%m.%Y"),
-      preparedData: [],
     };
   },
   watch: {
     events() {
-      this.prepareData();
       this.updateChart();
     },
   },
   mounted() {
     this.width = this.$refs.div.offsetWidth;
-    this.prepareData();
     this.updateChart();
   },
   computed: {
+    preparedData() {
+      let eventsByDay = [];
+
+      for (let i = 0; i < this.events.length; i++) {
+        const event = this.events[i];
+        const date = new Date(event.timestamp);
+        const day = d3.timeFormat("%d.%m.%Y")(date);
+        const obj = eventsByDay.filter((o) => o.day === day)[0];
+        if (obj) {
+          obj.events += 1;
+        } else {
+          eventsByDay.unshift({
+            day: day,
+            events: 1,
+          });
+        }
+      }
+
+      const timeExtent = d3.extent(eventsByDay, (d) => this.dateParser(d.day));
+      const allDays = d3.timeDay.range(timeExtent[0], timeExtent[1]);
+      return allDays.map((day) => {
+        const dayData = eventsByDay.find((ed) => {
+          return this.dateParser(ed.day).toString() === day.toString();
+        });
+        return { events: dayData ? dayData.events : 0, day: day };
+      });
+    },
     boundedWidth() {
       return this.width - 2 * this.margin;
     },
@@ -126,17 +150,6 @@ export default {
             .y((e) => this.yScale(e.events))
             .curve(d3.curveMonotoneX)
         );
-    },
-    prepareData() {
-      this.preparedData = [];
-      const timeExtent = d3.extent(this.events, (d) => this.dateParser(d.day));
-      const allDays = d3.timeDay.range(timeExtent[0], timeExtent[1]);
-      this.preparedData = allDays.map((day) => {
-        const dayData = this.events.find((ed) => {
-          return this.dateParser(ed.day).toString() === day.toString();
-        });
-        return { events: dayData ? dayData.events : 0, day: day };
-      });
     },
   },
 };

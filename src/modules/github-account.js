@@ -79,7 +79,7 @@ class GithubAccount {
                 query contribRepos($username: String!, $afterCursor: String="") {
                     user(login: $username) {
                         id
-                        repositoriesContributedTo(includeUserRepositories: true, first:30, after: $afterCursor) {
+                        repositoriesContributedTo(includeUserRepositories: true, first:100, after: $afterCursor) {
                             totalCount
                             pageInfo {
                                 endCursor
@@ -119,9 +119,8 @@ class GithubAccount {
      * @param {Date} since 
      * @returns 
      */
-    async repoCommits(owner, name, userId, since) {
+    async *repoCommits(owner, name, userId, since) {
         let hasNextPage = true;
-        let commits = [];
         let afterCursor = null;
         while (hasNextPage) {
             let response = await this.graphql(
@@ -132,7 +131,7 @@ class GithubAccount {
                         defaultBranchRef {
                             target {
                                 ... on Commit {
-                                    history (after: $after, first: 20, author: {id: $userId}, since: $since) {
+                                    history (after: $after, first: 100, author: {id: $userId}, since: $since) {
                                         totalCount
                                         pageInfo {
                                             endCursor
@@ -164,17 +163,18 @@ class GithubAccount {
                 }
             );
             if (!response.repository.defaultBranchRef) {
-                return [];
+                hasNextPage = false;
+                yield [];
+                break;
             }
-            commits = [...commits, ...response.repository.defaultBranchRef.target.history.nodes];
             hasNextPage = response.repository.defaultBranchRef.target.history.pageInfo.hasNextPage;
             afterCursor = response.repository.defaultBranchRef.target.history.pageInfo.endCursor;
+            yield response.repository.defaultBranchRef.target.history.nodes.map((commit) => ({
+                timestamp: commit.committedDate,
+                message: commit.message,
+                repo: name
+            }));
         }
-        return commits.map((commit) => ({
-            timestamp: commit.committedDate,
-            message: commit.message,
-            repo: name
-        }));
     }
 
     async *getEvents() {

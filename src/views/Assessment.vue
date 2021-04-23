@@ -42,11 +42,13 @@
     </div>
   </div>
 
-  <events-by-day-line-chart v-if="eventsByDay.length" :events="eventsByDay" />
+  <events-by-day-line-chart
+    v-if="userInteractions.length"
+    :events="userInteractions"
+  />
 </template>
 
 <script>
-import { timeFormat } from "d3";
 import EventsByDayLineChart from "../components/EventsByDayLineChart.vue";
 import { GithubAccount } from "../modules/github-account";
 
@@ -60,7 +62,7 @@ export default {
       error: false,
       githubUsername: "",
       statusMessage: "",
-      eventsByDay: [],
+      userInteractions: [],
     };
   },
   watch: {
@@ -106,57 +108,30 @@ export default {
         }
         this.statusMessage = `Pulling data for ${this.githubUsername}...`;
 
-        const {userId, repos} = await this.pullRepos(account1);
+        const { userId, repos } = await this.pullRepos(account1);
 
         let commits = [];
-        const since = new Date(new Date().setFullYear(new Date().getFullYear() - 1));
-        console.log(since.toISOString());
+        const since = new Date(
+          new Date().setFullYear(new Date().getFullYear() - 1)
+        );
 
-        for (var i = 0; i < repos.length; i++) {
+        for (let i = 0; i < repos.length; i++) {
           let repo = repos[i];
-          let repoCommits = await account1.repoCommits(
+          for await (const repoCommitsPage of account1.repoCommits(
             repo.owner.login,
             repo.name,
             userId,
             since
-          );
-          commits = [...commits, ...repoCommits];
-          this.statusMessage = `Found ${commits.length} commits -- Scanning ${repo.nameWithOwner} ${i + 1}/${
-            repos.length
-          }`;
+          )) {
+            commits = [...commits, ...repoCommitsPage];
+            this.statusMessage = `Found ${commits.length} commits -- Scanning ${
+              repo.nameWithOwner
+            } ${i + 1}/${repos.length}`;
+          }
         }
 
-        console.log(commits);
+        this.userInteractions = [...this.userInteractions, ...commits];
 
-        let events = [];
-        try {
-          for await (const eventPage of account1.getEvents()) {
-            events = [...events, ...eventPage];
-            this.statusMessage = `Pulled ${events.length} events for ${this.githubUsername}..`;
-          }
-        } catch (e) {
-          this.statusMessage = e;
-          return;
-        }
-        if (!events.length) {
-          this.statusMessage = `No Events found for ${this.githubUsername}`;
-          return;
-        }
-        this.statusMessage = "Processing..";
-        this.eventsByDay = [];
-        events.forEach((event) => {
-          const date = new Date(event.timestamp);
-          const day = timeFormat("%d.%m.%Y")(date);
-          const obj = this.eventsByDay.filter((o) => o.day === day)[0];
-          if (obj) {
-            obj.events += 1;
-          } else {
-            this.eventsByDay.unshift({
-              day: day,
-              events: 1,
-            });
-          }
-        });
         this.statusMessage = "";
       });
     },
