@@ -1,19 +1,21 @@
 <template>
-  <span v-if="loading">Loading..</span>
-  <span v-if="error">Error!</span>
-  <div class="row row-cols-1 g-4 justify-content-md-center">
-    <account-list-item
-      v-for="account in data"
-      :account="account"
-      :key="account.id"
-    />
-  </div>
-  <div class="row py-4 justify-content-center">
-    <router-link
-      class="col-md-7 btn btn-outline-secondary"
-      :to="{ name: 'Create Account' }"
-      >Add Account</router-link
-    >
+  <div>
+    <span v-if="loading">Loading..</span>
+    <span v-if="error">Error!</span>
+    <div class="row row-cols-1 g-4 justify-content-md-center">
+      <account-list-item
+        v-for="account in data"
+        :account="account"
+        :key="account.id"
+      />
+    </div>
+    <div class="row py-4 justify-content-center">
+      <router-link
+        class="col-md-7 btn btn-outline-secondary"
+        :to="{ name: 'Create Account' }"
+        >Add Account</router-link
+      >
+    </div>
   </div>
 </template>
 

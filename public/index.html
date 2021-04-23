@@ -48,7 +48,11 @@
     </header>
     <main>
       <div class="container py-5">
-        <router-view></router-view>
+        <router-view v-slot="{ Component }">
+          <transition name="slide-fade">
+            <component :is="Component" />
+          </transition>
+        </router-view>
         {%block content%}{%  endblock %}
       </div>
     </main>

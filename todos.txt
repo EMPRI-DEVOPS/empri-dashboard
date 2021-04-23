@@ -4,7 +4,6 @@
 - Zeitbereich Eingabe (?)
 - account daten ziehen bevor die account view geladen wird
 - die account view und assessment view müssen umleiten wenn der user nicht eingeloggt ist
-- new account view verbessern
 - fehler wenn man zwei mal den selben Account verbindet
 - login/signup seiten aufhübschen
 - bootstrap 5 über npm einbauen

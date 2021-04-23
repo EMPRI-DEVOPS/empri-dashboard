@@ -1,62 +1,64 @@
 <template>
-  <span v-if="loading">Loading..</span>
-  <span v-if="error">Error!</span>
+  <div>
+    <span v-if="loading">Loading..</span>
+    <span v-if="error">Error!</span>
 
-  <div class="row row-cols-1 g-3 justify-content-md-center text-center">
-    <span>{{ githubAccounts.length }} github access token(s)</span>
+    <div class="row row-cols-1 g-3 justify-content-md-center text-center">
+      <span>{{ githubAccounts.length }} github access token(s)</span>
 
-    <div class="row py-4 justify-content-center">
-      <div class="col-md-7">
-        <form @submit.prevent="start">
-          <div class="row mb-3">
-            <label for="username" class="col-sm-3 col-form-label"
-              >Github Username</label
-            >
+      <div class="row py-4 justify-content-center">
+        <div class="col-md-7">
+          <form @submit.prevent="start">
+            <div class="row mb-3">
+              <label for="username" class="col-sm-3 col-form-label"
+                >Github Username</label
+              >
 
-            <div class="col-md-7">
-              <input
-                name="username"
-                v-model="githubUsername"
-                :disabled="pullingData"
-                class="col-md-7 form-control"
-              />
+              <div class="col-md-7">
+                <input
+                  name="username"
+                  v-model="githubUsername"
+                  :disabled="pullingData"
+                  class="col-md-7 form-control"
+                />
+              </div>
             </div>
-          </div>
-          <button
-            type="submit"
-            class="col-md-12 btn btn-lg btn-outline-secondary"
-            :disabled="pullingData"
-          >
-            Start
-          </button>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <div v-if="statusMessage" class="row py-4 justify-content-center">
-    <div class="col-md-7">
-      <div class="card shadow-sm account-list-item">
-        <div class="card-header text-center">
-          <h5 class="card-title">{{ statusMessage }}</h5>
+            <button
+              type="submit"
+              class="col-md-12 btn btn-lg btn-outline-secondary"
+              :disabled="pullingData"
+            >
+              Start
+            </button>
+          </form>
         </div>
       </div>
     </div>
-  </div>
 
-  <div v-if="!pullingData && userInteractions.length">
-    <div class="row g-2">
-      <div class="col-xl-8" v-if="userInteractions.length">
-        <events-by-day-line-chart :events="userInteractions" />
+    <div v-if="statusMessage" class="row py-4 justify-content-center">
+      <div class="col-md-7">
+        <div class="card shadow-sm account-list-item">
+          <div class="card-header text-center">
+            <h5 class="card-title">{{ statusMessage }}</h5>
+          </div>
+        </div>
       </div>
-      <div class="col-xl-4" v-if="githubCommits.length">
-        <github-commits-per-repo :commits="githubCommits" />
-      </div>
-      <div class="col-xl-6">
-        <events-per-weekday-chart :events="userInteractions" />
-      </div>
-      <div class="col-xl-6">
-        <events-per-time-window-chart :events="userInteractions" />
+    </div>
+
+    <div v-if="!pullingData && userInteractions.length">
+      <div class="row g-2">
+        <div class="col-xl-8" v-if="userInteractions.length">
+          <events-by-day-line-chart :events="userInteractions" />
+        </div>
+        <div class="col-xl-4" v-if="githubCommits.length">
+          <github-commits-per-repo :commits="githubCommits" />
+        </div>
+        <div class="col-xl-6">
+          <events-per-weekday-chart :events="userInteractions" />
+        </div>
+        <div class="col-xl-6">
+          <events-per-time-window-chart :events="userInteractions" />
+        </div>
       </div>
     </div>
   </div>
