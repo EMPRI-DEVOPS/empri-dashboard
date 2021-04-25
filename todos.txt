@@ -3,7 +3,11 @@
 - gedanken machen über weitere visualisierungen
 - heatmap
 - Zeitbereich Eingabe (?)
-- account daten ziehen bevor die account view geladen wird
+- github user Zeitzone inferieren
+- github commits per repo sollte lieber horizontal werden
+- horizontale charts könnten lieber lollipop charts werden
+- untersuchen wie man vermeiden könnte die selben commits mehrfach zu ziehen mittels hash-prüfung
+- account daten ziehen bevor die account view geladen wird (vue router navigation guards)
 - die account view und assessment view müssen umleiten wenn der user nicht eingeloggt ist
 - bessere Fehlerbehandlung bei allen DRF aufrufen
 - Integrity Violation bei Account Create/Update auffangen
@@ -11,5 +15,6 @@
 - delete account confirmation
 - loading anzeige aufhübschen
 - responsive burger menu implementieren
+- PDF export des Assessments
 - https://github.com/jazzband/django-configurations einbauen
 - https://github.com/kimmobrunfeldt/git-hours/ angucken

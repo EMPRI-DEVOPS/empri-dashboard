@@ -50,7 +50,9 @@
       <div class="container py-5">
         <router-view v-slot="{ Component }">
           <transition name="slide-fade">
-            <component :is="Component" />
+            <keep-alive>
+              <component :is="view" />
+            </keep-alive>
           </transition>
         </router-view>
         {%block content%}{%  endblock %}
