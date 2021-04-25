@@ -2,6 +2,13 @@
 
 <html {% block html_tag_attributes %} style="height:100%" {{ block.super }}{% endblock %}>
 
+{% block head %} {{ block.super}}
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans&display=swap" rel="stylesheet">
+<link href="/static/css/chunk-vendors.css" rel="stylesheet">
+<link href="/static/css/app.css" rel="stylesheet">
+{%endblock%}
+
 <body {% block body_tag_attributes %} class="bg-light text-center d-flex align-items-center p-4" style="height:100%;"
     {{ block.super }}{% endblock %}>
     {% block body %}{{ block.super }}{% endblock %}

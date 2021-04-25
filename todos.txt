@@ -11,10 +11,10 @@
 - die account view und assessment view müssen umleiten wenn der user nicht eingeloggt ist
 - bessere Fehlerbehandlung bei allen DRF aufrufen
 - Integrity Violation bei Account Create/Update auffangen
-- bootstrap 5 über npm einbauen
 - delete account confirmation
 - loading anzeige aufhübschen
 - responsive burger menu implementieren
 - PDF export des Assessments
+- schauen wie sich das bootstrap css kleiner kompilieren lässt
 - https://github.com/jazzband/django-configurations einbauen
 - https://github.com/kimmobrunfeldt/git-hours/ angucken
