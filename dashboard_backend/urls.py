@@ -18,10 +18,8 @@ from rest_framework import routers
 from django.conf import settings
 from django.conf.urls.static import static
 
-from accounts.views import SignUpView
-from accounts.views import AccountViewSet
-from accounts.views import github_auth
-from core.views import IndexTemplateView
+from accounts.views import AccountViewSet, github_auth
+from core.views import IndexTemplateView, SignUpView
 
 router = routers.DefaultRouter(trailing_slash=False)
 router.register(r'account', AccountViewSet, basename='account')

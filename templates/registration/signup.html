@@ -1,15 +1,52 @@
-{% extends "base-vue.html" %}
+{% extends "base-auth.html" %}
 
 {% block content %}
 
-{% if form.errors %}
-<p>Your username and password didn't match. Please try again.</p>
-{% endif %}
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Sign Up</button>
-</form>
+<div class="mx-auto flex-column card shadow-sm" style="width: 100%; max-width: 500px;">
+    <form method="post" action="{% url 'signup' %}" class="{% if form.errors%} was-validated {% endif %}">
+        <div class="card-header text-center">
+            <h5 v-if="title" class="card-title">Sign up</h5>
+        </div>
+        <div class="card-body">
+            {% if form.errors %}
+            {{ form.non_field_errors }}
+            {% endif %}
+            {% csrf_token %}
+
+            <div class="row mb-3">
+                <label for="{{form.username.id_for_label}}" class="col-sm-3 col-form-label">Username</label>
+                <div class="col-sm-9">
+                    <input name="{{form.username.html_name}}" type="username" class="form-control"
+                        id="{{form.username.id_for_label}}" required>
+                </div>
+                {{ form.username.errors }}
+            </div>
+            <div class="row mb-3">
+                <label for="{{form.password1.id_for_label}}" class="col-sm-3 col-form-label">Password</label>
+                <div class="col-sm-9">
+                    <input name="{{form.password1.html_name}}" type="password" class="form-control"
+                        id="{{form.password1.id_for_label}}" required>
+                </div>
+                {{ form.password1.errors }}
+            </div>
+            <div class="row mb-3">
+                <label for="{{form.password2.id_for_label}}" class="col-sm-3 col-form-label">Password
+                    confirmation</label>
+                <div class="col-sm-9">
+                    <input name="{{form.password2.html_name}}" type="password" class="form-control"
+                        id="{{form.password2.id_for_label}}" required>
+                </div>
+                {{ form.password2.errors }}
+            </div>
+
+        </div>
+        <div class="card-footer text-center">
+            <div class="btn-group">
+                <button class="btn btn-lg btn-outline-secondary" type="submit">Sign up</button>
+            </div>
+        </div>
+    </form>
+</div>
 
 {% endblock %}

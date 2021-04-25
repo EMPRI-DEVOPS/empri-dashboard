@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+<html {% block html_tag_attributes %} style="height:100%" {{ block.super }}{% endblock %}>
+
+<body {% block body_tag_attributes %} class="bg-light text-center d-flex align-items-center p-4" style="height:100%;"
+    {{ block.super }}{% endblock %}>
+    {% block body %}{{ block.super }}{% endblock %}
+
+
+    {% block content %}
+    {% endblock %}
+
+</body>
+
+</html>

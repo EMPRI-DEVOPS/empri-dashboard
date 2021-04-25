@@ -1,5 +1,5 @@
 <template>
-  <div class="card shadow-sm account-list-item">
+  <div class="card shadow-sm">
     <div class="card-header text-center">
       <h5 v-if="title" class="card-title">{{ title }}</h5>
       <slot name="header"></slot>
