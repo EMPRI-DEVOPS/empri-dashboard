@@ -5,7 +5,8 @@
 - Zeitbereich Eingabe (?)
 - account daten ziehen bevor die account view geladen wird
 - die account view und assessment view müssen umleiten wenn der user nicht eingeloggt ist
-- fehler wenn man zwei mal den selben Account verbindet
+- bessere Fehlerbehandlung bei allen DRF aufrufen
+- Integrity Violation bei Account Create/Update auffangen
 - bootstrap 5 über npm einbauen
 - delete account confirmation
 - loading anzeige aufhübschen

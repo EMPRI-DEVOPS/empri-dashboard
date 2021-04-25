@@ -65,23 +65,18 @@
         </div>
       </div>
     </div>
-    <div class="col-md-7">
-      <github-data-tester v-if="tool === 'Github' && credentials" :account="account" />
-    </div>
   </div>
 </template>
 
 <script>
 import Cookies from "js-cookie";
 import TaigaLogin from "../components/TaigaLogin.vue";
-import GithubDataTester from "../components/GithubDataTester.vue";
 
 export default {
   name: "Account",
-  components: { TaigaLogin, GithubDataTester },
+  components: { TaigaLogin },
   props: ["id"],
   data() {
-    GithubDataTester;
     return {
       loading: true,
       account: null,

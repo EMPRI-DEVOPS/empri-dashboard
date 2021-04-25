@@ -47,27 +47,6 @@ export default {
     credentials() {
       return this.account.credentials;
     },
-  },
-  methods: {
-    getData() {
-      this.$http({
-        url: "https://api.github.com/user",
-        headers: {
-          Authorization: `token ${this.credentials.access_token}`,
-        },
-      }).then((response) => {
-        this.pulledData = response.data;
-        this.username = response.data.login;
-        this.$http({
-          url: `https://api.github.com/users/${this.username}/repos`,
-          headers: {
-            Authorization: `token ${this.credentials.access_token}`,
-          },
-        }).then((response) => {
-          this.repos = response.data;
-        });
-      });
-    },
-  },
+  }
 };
 </script>
