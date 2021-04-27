@@ -1,10 +1,11 @@
 <template>
-  <card :title="`${account.tool} Account`">
-    <template v-slot:header>
+  <card>
+    <h5 class="card-title d-flex justify-content-between mb-3">
+      {{ `${account.tool} Account` }}
       <span v-if="account.credentials" class="badge rounded-pill bg-success">
         Activated
       </span>
-    </template>
+    </h5>
     <table class="table table-borderless table-hover">
       <tbody>
         <tr v-if="account.username">
