@@ -6,9 +6,13 @@
   <form method="post" action="{% url 'login' %}" class="{% if form.errors%} was-validated {% endif %}">
 
     <div class="card-header text-center">
-      <h5 v-if="title" class="card-title">Please sign in</h5>
+      <div class="btn-group">
+        <a class="btn btn-outline-secondary active" href="{% url 'login'%}">Login</a>
+        <a class="btn btn-outline-secondary" href="{% url 'signup'%}">Sign up</a>
+      </div>
     </div>
     <div class="card-body">
+      <p>Please sign in</p>
       {% csrf_token %}
       {% if form.errors %} <p>Your username and password didn't match. Please try again.</p>
       {% endif %}
@@ -20,20 +24,17 @@
             id="{{form.username.id_for_label}}" required>
         </div>
       </div>
-      <div class="row mb-3">
+      <div class="row mb-4">
         <label for="{{form.password.id_for_label}}" class="col-sm-3 col-form-label">Password</label>
         <div class="col-sm-9">
           <input name="{{form.password.html_name}}" type="password" class="form-control"
             id="{{form.password.id_for_label}}" required>
         </div>
       </div>
-
-    </div>
-    <div class="card-footer text-center">
-      <div class="btn-group">
-
+      <div class="d-grid">
         <button class="btn btn-lg btn-outline-secondary" type="submit">Sign in</button>
       </div>
     </div>
   </form>
+
 </div> {% endblock %}
