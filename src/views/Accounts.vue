@@ -1,59 +1,72 @@
 <template>
-  <div>
+  <div class="container">
     <span v-if="loading">Loading..</span>
     <span v-if="error">Error!</span>
-    <div class="row row-cols-1 g-4 justify-content-md-center">
-      <account-list-item
-        v-for="account in data"
-        :account="account"
-        :key="account.id"
-      />
-    </div>
-    <div class="row py-4 justify-content-center">
-      <router-link
-        class="col-md-7 btn btn-outline-secondary"
-        :to="{ name: 'Create Account' }"
-        >Add Account</router-link
+    <div class="row row-cols-1 g-4">
+      <h5>User Account Settings</h5>
+      <div v-for="account in accounts" :key="account.id" class="col-lg-7">
+        <account-list-item :account="account" @deleted="fetchAccounts" />
+      </div>
+      <div class="col-lg-7" v-show="accountCreate">
+        <account-create
+          @closed="accountCreate = !accountCreate"
+          @created="
+            fetchAccounts();
+            accountCreate = false;
+          "
+        />
+      </div>
+      <button
+        v-show="!accountCreate"
+        class="col-lg-7 btn bg-white btn-outline-secondary"
+        @click="accountCreate = !accountCreate"
       >
+        Add Account
+      </button>
     </div>
   </div>
 </template>
 
 <script>
+import { ref } from "vue";
 import AccountListItem from "../components/AccountListItem.vue";
+import AccountCreate from "../components/AccountCreate.vue";
+import { getAccounts } from "../api/accounts";
 export default {
-  components: { AccountListItem },
+  components: { AccountListItem, AccountCreate },
   name: "Accounts",
-  data() {
+
+  setup() {
+    const accounts = ref();
+    const setAccounts = (val) => (accounts.value = val);
     return {
-      loading: true,
-      data: null,
-      error: false,
+      accounts,
+      setAccounts,
+      loading: ref(false),
+      error: ref(false),
+      accountCreate: ref(false),
     };
   },
-  watch: {
-    // call again the method if the route changes
-    $route: "fetchAccounts",
-  },
-  created() {
-    this.fetchAccounts();
+  beforeRouteEnter(to, from, next) {
+    getAccounts(to.params.id)
+      .then((accounts) => {
+        next((vm) => vm.setAccounts(accounts));
+      })
+      .catch(() => window.location.replace("/auth/login/"));
   },
   methods: {
     fetchAccounts() {
-      //this.loading = true;
-      this.$http({
-        url: "api/account",
-      })
-        .then((response) => {
-          this.data = response.data.results;
-          this.loading = false;
+      this.loading = true;
+      getAccounts()
+        .then((accounts) => {
+          this.setAccounts(accounts);
         })
         .catch((error) => {
           //falls ein auth error kommt den nutzer zur loginseite umleiten
-          this.loading = false;
           this.error = true;
           console.log(error);
-        });
+        })
+        .finally(() => (this.loading = false));
     },
   },
 };

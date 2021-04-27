@@ -1,13 +1,11 @@
 <template>
   <div class="card shadow-sm">
-    <div class="card-header text-center">
-      <h5 v-if="title" class="card-title">{{ title }}</h5>
-      <slot name="header"></slot>
-    </div>
     <div class="card-body">
+      <h6 v-if="title" class="card-title">{{ title }}</h6>
+      <slot name="header"></slot>
       <slot />
     </div>
-    <div class="card-footer text-center">
+    <div class="card-footer">
       <slot name="footer"></slot>
     </div>
   </div>
@@ -15,6 +13,11 @@
 
 <script>
 export default {
-  props: ["title"],
+  props: {
+    title: {
+      type: String,
+      default: "",
+    },
+  },
 };
 </script>

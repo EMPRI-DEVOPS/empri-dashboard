@@ -2,22 +2,12 @@ import {
   createRouter,
   createWebHistory
 } from 'vue-router'
-import Home from '../views/Home.vue'
 
-const routes = [{
-    path: '/',
-    name: 'Home',
-    component: Home
-  },
+const routes = [
   {
     path: '/accounts',
     name: 'Accounts',
     component: () => import('../views/Accounts.vue')
-  },
-  {
-    path: '/accounts/create',
-    name: 'Create Account',
-    component: () => import('../views/AccountCreate.vue')
   },
   {
     path: '/accounts/:id',
@@ -26,7 +16,7 @@ const routes = [{
     props: true
   },
   {
-    path: '/assessment',
+    path: '/',
     name: 'Assessment',
     component: () => import('../views/Assessment.vue'),
   },

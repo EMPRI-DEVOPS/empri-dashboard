@@ -15,47 +15,30 @@
   <div id="app">
     <header>
 
-      <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-          <router-link class="navbar-brand" to="{% url 'entry-point' %}"><strong>PSAD</strong></router-link>
+      <nav class="navbar navbar-expand navbar-dark bg-dark shadow p-0">
+        <router-link class="navbar-brand px-3" to="{% url 'entry-point' %}"><strong>PSAD</strong></router-link>
 
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
-            aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <div class="navbar-nav me-auto mb-2 mb-lg-0">
-              {% if user.is_authenticated %}
-
-              <router-link class="nav-link" to="/accounts">Accounts</router-link>
-              <router-link class="nav-link" to="/assessment">Self-Assessment</router-link>
-
-              {% endif %}
-            </div>
-            <div class="navbar-nav">
-              {% if user.is_authenticated %}
-              <span class="navbar-text">User: {{ user.get_username }}</span>
-              <a class="nav-link" href="{% url 'logout'%}">Logout</a>
-              {% else %}
-              <a class="nav-link" href="{% url 'login'%}">Login</a>
-              <a class="nav-link" href="{% url 'signup'%}">Signup</a>
-              {% endif %}
-            </div>
-          </div>
+        <div class="navbar-nav me-auto mb-0">
+        </div>
+        <div class="navbar-nav">
+          {% if user.is_authenticated %}
+          <router-link class="nav-link" to="/accounts">User: {{ user.get_username }}</router-link>
+          <a class="nav-link" href="{% url 'logout'%}">Logout</a>
+          {% else %}
+          <a class="nav-link" href="{% url 'login'%}">Login</a>
+          <a class="nav-link" href="{% url 'signup'%}">Signup</a>
+          {% endif %}
         </div>
       </nav>
     </header>
-    <main>
-      <div class="container py-5">
-        <router-view v-slot="{ Component }">
-          <transition name="slide-fade">
-            <keep-alive>
-              <component :is="Component" />
-            </keep-alive>
-          </transition>
-        </router-view>
-      </div>
+    <main class="p-2">
+      <router-view v-slot="{ Component }">
+        <transition name="slide-fade">
+          <keep-alive>
+            <component :is="Component" />
+          </keep-alive>
+        </transition>
+      </router-view>
     </main>
   </div>
 </body>

@@ -3,10 +3,8 @@
     <span v-if="loading">Loading..</span>
     <span v-if="error">Error!</span>
 
-    <div class="row row-cols-1 g-3 justify-content-md-center text-center">
-      <span>{{ githubAccounts.length }} github access token(s)</span>
-
-      <div class="row py-4 justify-content-center">
+    <div class="row row-cols-1 g-3">
+      <div class="row py-4">
         <div class="col-md-7">
           <form @submit.prevent="start">
             <div class="row mb-3">
@@ -65,11 +63,13 @@
 </template>
 
 <script>
+import { ref } from "vue";
 import EventsByDayLineChart from "../components/EventsByDayLineChart.vue";
 import EventsPerWeekdayChart from "../components/EventsPerWeekdayChart.vue";
 import EventsPerTimeWindowChart from "../components/EventsPerTimeWindowChart.vue";
 import GithubCommitsPerRepo from "../components/GithubCommitsPerRepo.vue";
 import { GithubAccount } from "../modules/github-account";
+import { getAccounts } from "../api/accounts";
 
 export default {
   components: {
@@ -81,9 +81,7 @@ export default {
   name: "Assessment",
   data() {
     return {
-      loading: true,
       data: [],
-      error: false,
       pullingData: false,
       githubUsername: "",
       statusMessage: "",
@@ -91,36 +89,32 @@ export default {
       githubCommits: [],
     };
   },
-  watch: {
-    // call again the method if the route changes
-    $route: "fetchAccounts",
+  beforeRouteEnter(to, from, next) {
+    getAccounts(to.params.id)
+      .then((accounts) => {
+        next((vm) => vm.setAccounts(accounts));
+      })
+      .catch(() => window.location.replace("/auth/login/"));
+  },
+  setup() {
+    const accounts = ref();
+    const setAccounts = (val) => (accounts.value = val);
+    return {
+      accounts,
+      setAccounts,
+      loading: ref(false),
+      error: ref(false),
+      accountCreate: ref(false),
+    };
   },
   computed: {
     githubAccounts: function () {
-      return this.data.filter(
+      return this.accounts.filter(
         (account) => account.tool === "Github" && account.credentials
       );
     },
   },
-  created() {
-    this.fetchAccounts();
-  },
   methods: {
-    fetchAccounts() {
-      this.$http({
-        url: "api/account",
-      })
-        .then((response) => {
-          this.data = response.data.results;
-          this.loading = false;
-        })
-        .catch((error) => {
-          //falls ein auth error kommt den nutzer zur loginseite umleiten
-          this.loading = false;
-          this.error = true;
-          console.log(error);
-        });
-    },
     async start() {
       this.userInteractions = [];
       this.pullingData = true;

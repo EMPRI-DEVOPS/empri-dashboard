@@ -1,14 +1,16 @@
 <template>
-  <div class="row row-cols-1 g-4 justify-content-md-center">
-    <div class="col-md-7">
-      <div class="card shadow-sm account-list-item">
-        <div class="card-header text-center">
-          <h5 class="card-title">{{ tool }} Account</h5>
-          <span v-if="credentials" class="badge rounded-pill bg-success"
-            >Activated</span
-          >
-        </div>
-        <div class="card-body">
+  <div v-if="account" class="container">
+    <div class="row row-cols-1 g-4">
+      <div class="col-lg-7">
+        <card :title="`${account.tool} Account`">
+          <template v-slot:header>
+            <span
+              v-if="account.credentials"
+              class="badge rounded-pill bg-success"
+            >
+              Activated
+            </span>
+          </template>
           <table class="table table-borderless table-hover">
             <tbody>
               <tr v-if="username">
@@ -21,48 +23,47 @@
               </tr>
             </tbody>
           </table>
-        </div>
-        <div class="card-body">
-          <span v-if="loading">Loading..</span>
           <taiga-login
             v-if="tool === 'Taiga' && !credentials"
             :id="id"
             @authenticated="fetchData"
           />
-
           <span v-if="error">{{ error }}</span>
-        </div>
-        <div class="card-footer text-center">
-          <div class="btn-group">
-            <router-link
-              class="btn btn-sm btn-outline-secondary"
-              :to="{ name: 'Accounts' }"
-              >Back to overview</router-link
-            >
-            <a
-              v-if="authLinkUrl && !credentials"
-              class="btn btn-sm btn-outline-primary"
-              :href="authLinkUrl"
-              >Github Login</a
-            >
 
-            <button
-              v-if="credentials"
-              class="btn btn-sm btn-outline-warning"
-              @click="deleteCredentials"
-            >
-              Delete credentials
-            </button>
+          <template v-slot:footer>
+            <div class="btn-group">
+              <div class="btn-group">
+                <router-link
+                  class="btn btn-outline-secondary"
+                  :to="{ name: 'Accounts' }"
+                  >Back to overview</router-link
+                >
+                <a
+                  v-if="account.github_auth_link && !credentials"
+                  class="btn btn-outline-primary"
+                  :href="account.github_auth_link"
+                  >Github Login</a
+                >
 
-            <button
-              class="btn btn-sm btn-outline-danger"
-              v-if="!error"
-              @click.prevent="deleteAccount"
-            >
-              Delete
-            </button>
-          </div>
-        </div>
+                <button
+                  v-if="credentials"
+                  class="btn btn-outline-warning"
+                  @click="deleteCredentials"
+                >
+                  Delete credentials
+                </button>
+
+                <button
+                  class="btn btn-outline-danger"
+                  v-if="!error"
+                  @click.prevent="deleteAccount"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </template>
+        </card>
       </div>
     </div>
   </div>
@@ -72,13 +73,15 @@
 import Cookies from "js-cookie";
 import TaigaLogin from "../components/TaigaLogin.vue";
 
+import { getAccount } from "../api/accounts";
+import Card from "../components/Card.vue";
+
 export default {
   name: "Account",
-  components: { TaigaLogin },
+  components: { TaigaLogin, Card },
   props: ["id"],
   data() {
     return {
-      loading: true,
       account: null,
       error: "",
       authLinkUrl: null,
@@ -101,33 +104,17 @@ export default {
       return this.account ? this.account.instance_url ?? "" : "";
     },
   },
-  created() {
-    this.fetchData();
+  beforeRouteEnter(to, from, next) {
+    getAccount(to.params.id).then((account) => {
+      next((vm) => vm.setAccount(account));
+    });
   },
   methods: {
+    setAccount(account) {
+      this.account = account;
+    },
     fetchData() {
-      this.$http({
-        url: "/api/account/" + this.id,
-      })
-        .then((response) => {
-          this.account = response.data;
-          if (response.data.github_auth_link) {
-            this.authLinkUrl = response.data.github_auth_link;
-          }
-          this.loading = false;
-        })
-        .catch((error) => {
-          //falls ein auth error kommt den nutzer zur loginseite umleiten
-          if (error.response) {
-            if (error.response.status == 404) {
-              this.error = "Not found!";
-            }
-          }
-          if (!this.error) {
-            this.error = "Unknown error!";
-          }
-          this.loading = false;
-        });
+      getAccount(this.account.id).then((account) => this.setAccount(account));
     },
     deleteCredentials() {
       const csrftoken = Cookies.get("csrftoken");
