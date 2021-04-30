@@ -1,39 +1,72 @@
 <template>
   <div>
     <div class="container mb-3">
-      <div class="row justify-content-center">
-        <div class="card col-xl-5 col-lg-6 col-md-8 col-sm-10">
+      <div v-if="!canStart" class="row justify-content-center">
+        <div v-if="!canStart" class="card col-lg-5">
           <div class="card-body">
-            <div v-if="!canStart">
-              <router-link to="accounts"
-                >Connect your Github account to get started..</router-link
-              >
-            </div>
-            <form v-else @submit.prevent="start">
-              <div class="row mb-3">
-                <label for="username" class="col-sm-3 col-form-label"
-                  >Github Username
-                </label>
-                <div class="col-sm-7">
-                  <input
-                    name="username"
-                    v-model="githubUsername"
-                    :disabled="pullingData"
-                    class="form-control"
-                  />
+            <router-link to="accounts"
+              >Connect your Github account to get started..
+            </router-link>
+          </div>
+        </div>
+      </div>
+      <div v-else class="card">
+        <div class="card-body">
+          <form @submit.prevent="start">
+            <div class="row g-4">
+              <div class="col-12">
+                <div class="row mb-3">
+                  <label for="username" class="col-sm-5 col-form-label"
+                    >Github Username
+                  </label>
+                  <div class="col-sm-7">
+                    <input
+                      name="username"
+                      v-model="githubUsername"
+                      :disabled="pullingData"
+                      class="form-control"
+                    />
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <label for="from" class="col-sm-5 col-form-label">From</label>
+                  <div class="col-sm-7">
+                    <input
+                      name="from"
+                      type="date"
+                      class="form-control"
+                      v-model="from"
+                      :max="to"
+                    />
+                  </div>
+                </div>
+                <div class="row">
+                  <label for="to" class="col-sm-5 col-form-label">To</label>
+                  <div class="col-sm-7">
+                    <input
+                      name="to"
+                      type="date"
+                      class="form-control"
+                      v-model="to"
+                      :max="today"
+                      :min="from"
+                    />
+                  </div>
                 </div>
               </div>
-              <div class="d-grid">
-                <button
-                  type="submit"
-                  class="btn btn-lg btn-outline-secondary"
-                  :disabled="pullingData"
-                >
-                  Start
-                </button>
+              <div class="col-12 align-self-center">
+                <div class="d-grid">
+                  <button
+                    type="submit"
+                    class="btn btn-lg btn-outline-secondary"
+                    :disabled="pullingData"
+                  >
+                    <play-icon /> Start
+                  </button>
+                </div>
               </div>
-            </form>
-          </div>
+            </div>
+          </form>
         </div>
       </div>
     </div>
@@ -73,6 +106,7 @@ import EventsByDayLineChart from "../components/charts/EventsByDayLineChart.vue"
 import EventsPerWeekdayChart from "../components/charts/EventsPerWeekdayChart.vue";
 import EventsPerTimeWindowChart from "../components/charts/EventsPerTimeWindowChart.vue";
 import GithubCommitsPerRepo from "../components/charts/GithubCommitsPerRepo.vue";
+import PlayIcon from "../components/icons/PlayIcon";
 import { GithubAccount } from "../api/github-account";
 import { getAccounts } from "../api/accounts";
 
@@ -82,6 +116,7 @@ export default {
     GithubCommitsPerRepo,
     EventsPerWeekdayChart,
     EventsPerTimeWindowChart,
+    PlayIcon,
   },
   name: "Assessment",
   beforeRouteEnter(to, from, next) {
@@ -92,6 +127,9 @@ export default {
       .catch(() => window.location.replace("/auth/login/"));
   },
   setup() {
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+    const today = new Date().toISOString().slice(0, 10);
     const accounts = ref([]);
     const setAccounts = (val) => (accounts.value = val);
     const canStart = computed(() => {
@@ -102,6 +140,9 @@ export default {
       );
     });
     return {
+      from: ref(oneYearAgo.toISOString().slice(0, 10)),
+      today,
+      to: ref(today),
       accounts,
       setAccounts,
       canStart,
@@ -134,10 +175,13 @@ export default {
           this.githubUsername = account1.username;
         }
         const { userId, repos } = await this.pullRepos(account1);
-        const since = new Date(
-          new Date().setFullYear(new Date().getFullYear() - 1)
+        await this.pullCommits(
+          account1,
+          repos,
+          userId,
+          new Date(this.from),
+          new Date(this.to)
         );
-        await this.pullCommits(account1, repos, userId, since);
         this.statusMessage = "";
         this.pullingData = false;
       });
@@ -155,7 +199,7 @@ export default {
       }
       return { userId: userId, repos: repositoriesContributedTo };
     },
-    async pullCommits(account, repos, userId, since) {
+    async pullCommits(account, repos, userId, since, until) {
       let commits = [];
       for (let i = 0; i < repos.length; i++) {
         let repo = repos[i];
@@ -163,7 +207,8 @@ export default {
           repo.owner.login,
           repo.name,
           userId,
-          since
+          since,
+          until
         )) {
           commits = [...commits, ...repoCommitsPage];
           this.statusMessage = `Found ${commits.length} commits -- Scanning ${

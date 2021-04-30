@@ -1,6 +1,7 @@
 <template>
-  <div ref="div">
-    <card :title="title">
+  <div ref="div" class="card">
+    <div class="card-body">
+      <h6 class="card-title">{{ title }}</h6>
       <svg width="100%" :height="height" :viewbox="`0 0 ${width} ${height}`">
         <g
           id="events-per-weekday-chart"
@@ -15,16 +16,14 @@
           ></g>
         </g>
       </svg>
-    </card>
+    </div>
   </div>
 </template>
 
 <script>
 import * as d3 from "d3";
-import Card from "../Card.vue";
 
 export default {
-  components: { Card },
   props: ["events"],
   data() {
     return {

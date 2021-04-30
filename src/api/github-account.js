@@ -119,19 +119,19 @@ class GithubAccount {
      * @param {Date} since 
      * @returns 
      */
-    async *repoCommits(owner, name, userId, since) {
+    async *repoCommits(owner, name, userId, since, until) {
         let hasNextPage = true;
         let afterCursor = null;
         while (hasNextPage) {
             let response = await this.graphql(
                 `
-                query repoCommits($owner: String!, $name: String!, $userId: String!, $since: GitTimestamp!, $after: String) {
+                query repoCommits($owner: String!, $name: String!, $userId: String!, $since: GitTimestamp!, $until: GitTimestamp!, $after: String) {
                     repository(owner: $owner, name:$name) {
                         name
                         defaultBranchRef {
                             target {
                                 ... on Commit {
-                                    history (after: $after, first: 100, author: {id: $userId}, since: $since) {
+                                    history (after: $after, first: 100, author: {id: $userId}, since: $since, until: $until) {
                                         totalCount
                                         pageInfo {
                                             endCursor
@@ -147,6 +147,8 @@ class GithubAccount {
                                             }
                                             message
                                             committedDate
+                                            authoredDate
+                                            pushedDate
                                         }
                                     }
                                 }
@@ -159,6 +161,7 @@ class GithubAccount {
                     owner: owner,
                     userId: userId,
                     since: since.toISOString(),
+                    until: until.toISOString(),
                     after: afterCursor
                 }
             );

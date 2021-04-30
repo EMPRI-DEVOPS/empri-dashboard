@@ -154,26 +154,6 @@ export default {
         .transition()
         .duration(transitionDuration)
         .call(d3.axisBottom(this.xScale).ticks(this.boundedWidth / 80));
-      console.log(this.boundedWidth / 80);
-
-      /*
-      let rects = chart.selectAll("rect").data(this.preparedData);
-
-      // Bars
-      rects
-        .enter()
-        .append("rect")
-        .merge(rects)
-        .transition()
-        .duration(transitionDuration)
-        .attr("x", (e) => this.xBand(e.day))
-        .attr("y", (e) => this.yScale(e.events))
-        .attr("width", this.xBand.bandwidth())
-        .attr("height", (e) => this.boundedHeight - this.yScale(e.events))
-        .attr("fill", "#69b3a2");
-
-      rects.exit().remove();
-      */
 
       chart
         .select(".area")

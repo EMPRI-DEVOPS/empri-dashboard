@@ -2,9 +2,10 @@
 - - issue comments
 - events über graphql
 - gedanken machen über weitere visualisierungen
-- heatmap
-- Zeitbereich Eingabe (?)
-- github user Zeitzone inferieren
+- heatmap / punchcard
+- Bug: das "User interactions per day" muss alle untersuchten Tage anzeigen
+- Eingabe der Tageszeitfenster
+- Zeitzone Angabe
 - github commits per repo sollte lieber horizontal werden
 - horizontale charts könnten lieber lollipop charts werden
 - untersuchen wie man vermeiden könnte die selben commits mehrfach zu ziehen mittels hash-prüfung

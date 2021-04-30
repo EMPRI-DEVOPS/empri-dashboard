@@ -1,6 +1,7 @@
 <template>
-  <div ref="div" class="justify-contents-center">
-    <card :title="title">
+  <div ref="div" class="card">
+    <div class="card-body">
+      <h6 class="card-title">{{ title }}</h6>
       <svg width="100%" :height="height" :viewbox="`0 0 ${width} ${height}`">
         <g
           id="commits-per-repo-chart"
@@ -15,16 +16,14 @@
           ></g>
         </g>
       </svg>
-    </card>
+    </div>
   </div>
 </template>
 
 <script>
 import * as d3 from "d3";
-import Card from "../Card.vue";
 
 export default {
-  components: { Card },
   props: ["commits"],
   data() {
     return {
@@ -34,7 +33,7 @@ export default {
         top: 10,
         bottom: 120,
         left: 50,
-        right: 15
+        right: 15,
       },
       title: "Github commits per repo",
     };
