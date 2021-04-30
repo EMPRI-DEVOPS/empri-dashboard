@@ -4,14 +4,14 @@
 
 
 <div class="mx-auto flex-column card shadow-sm" style="width: 100%; max-width: 500px;">
-    <form method="post" action="{% url 'signup' %}" class="{% if form.errors%} was-validated {% endif %}">
-        <div class="card-header text-center">
-            <div class="btn-group">
-                <a class="btn btn-outline-secondary" href="{% url 'login'%}">Login</a>
-                <a class="btn btn-outline-secondary active" href="{% url 'signup'%}">Sign up</a>
-            </div>
+    <div class="card-header text-center">
+        <div class="btn-group">
+            <a class="btn btn-outline-secondary" href="{% url 'login'%}">Login</a>
+            <a class="btn btn-outline-secondary active" href="{% url 'signup'%}">Sign up</a>
         </div>
-        <div class="card-body">
+    </div>
+    <div class="card-body">
+        <form method="post" action="{% url 'signup' %}" class="{% if form.errors%} was-validated {% endif %}">
             {% if form.errors %}
             {{ form.non_field_errors }}
             {% endif %}
@@ -45,8 +45,8 @@
             <div class="d-grid">
                 <button class="btn btn-lg btn-outline-secondary" type="submit">Sign up</button>
             </div>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
 
 {% endblock %}

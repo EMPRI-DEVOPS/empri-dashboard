@@ -27,7 +27,7 @@
 
 <script>
 import * as d3 from "d3";
-import Card from "./Card.vue";
+import Card from "../Card.vue";
 import { computed, ref, onMounted } from "vue";
 
 export default {

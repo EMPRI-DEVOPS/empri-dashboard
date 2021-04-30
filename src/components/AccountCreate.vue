@@ -1,8 +1,6 @@
 <template>
-  <div class="row">
-    <div v-for="tool in tools" class="col-4 mb-5" :key="tool.id">
-      <add-account-button :tool="tool.name" @click="add(tool.name)" />
-    </div>
+  <div v-for="tool in tools" class="col-sm-4" :key="tool.id">
+    <add-account-button :tool="tool.name" @click="add(tool.name)" />
   </div>
 </template>
 
@@ -14,7 +12,7 @@ import AddAccountButton from "../components/AddAccountButton";
 export default {
   name: "AccountCreate",
   components: { AddAccountButton },
-
+  emits: ["account-added"],
   setup(props, { emit }) {
     const selectedTool = ref("");
     const error = ref("");
@@ -33,9 +31,11 @@ export default {
       },
     ];
     const add = (name) => {
-      createAccount(name).then(() => {
-        emit("created");
-      }).catch(() => error.value = "Error");
+      createAccount(name)
+        .then(() => {
+          emit("account-added");
+        })
+        .catch(() => (error.value = "Error"));
     };
     return { tools, selectedTool, error, add };
   },

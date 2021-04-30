@@ -3,16 +3,16 @@
 {% block content %}
 
 <div class="mx-auto flex-column card shadow-sm" style="width: 100%; max-width: 500px;">
-  <form method="post" action="{% url 'login' %}" class="{% if form.errors%} was-validated {% endif %}">
 
-    <div class="card-header text-center">
-      <div class="btn-group">
-        <a class="btn btn-outline-secondary active" href="{% url 'login'%}">Login</a>
-        <a class="btn btn-outline-secondary" href="{% url 'signup'%}">Sign up</a>
-      </div>
+  <div class="card-header text-center">
+    <div class="btn-group">
+      <a class="btn btn-outline-secondary active" href="{% url 'login'%}">Login</a>
+      <a class="btn btn-outline-secondary" href="{% url 'signup'%}">Sign up</a>
     </div>
-    <div class="card-body">
-      <p>Please sign in</p>
+  </div>
+  <div class="card-body">
+    <p>Please sign in</p>
+    <form method="post" action="{% url 'login' %}" class="{% if form.errors%} was-validated {% endif %}">
       {% csrf_token %}
       {% if form.errors %} <p>Your username and password didn't match. Please try again.</p>
       {% endif %}
@@ -34,7 +34,7 @@
       <div class="d-grid">
         <button class="btn btn-lg btn-outline-secondary" type="submit">Sign in</button>
       </div>
-    </div>
-  </form>
+    </form>
+  </div>
 
 </div> {% endblock %}

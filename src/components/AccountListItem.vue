@@ -28,26 +28,34 @@
       :id="id"
       @authenticated="$emit('authenticated')"
     />
+    <a
+      v-if="github_auth_link && !credentials"
+      class="btn btn-outline-primary"
+      :href="github_auth_link"
+      >Github Login
+    </a>
     <template v-slot:footer>
-      <div v-show="!confirmDelete" class="btn-group">
-        <button class="btn btn-outline-danger" @click="confirmDelete = true">
-          Delete
-        </button>
-      </div>
-      <div v-show="confirmDelete">
-        Are you sure?
-        <div class="btn-group">
-        <button class="btn btn-outline-danger" @click="deleteAccount">
-          Delete
-        </button>
-        <button
-          class="btn btn-outline-secondary"
-          @click="confirmDelete = false"
-        >
-          Cancel
-        </button>
+      <transition name="fade" mode="out-in">
+        <div v-if="!confirmDelete" class="btn-group">
+          <button class="btn btn-outline-danger" @click="confirmDelete = true">
+            Delete
+          </button>
         </div>
-      </div>
+        <div v-else>
+          Are you sure?
+          <div class="btn-group">
+            <button class="btn btn-outline-danger" @click="deleteAccount">
+              Delete
+            </button>
+            <button
+              class="btn btn-outline-secondary"
+              @click="confirmDelete = false"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </transition>
     </template>
   </card>
 </template>
@@ -63,7 +71,14 @@ import { deleteAccount } from "../api/accounts";
 export default {
   components: { Card, TaigaLogin, GithubIcon, TaigaLogo, MattermostLogo },
   name: "AccountListItem",
-  props: ["id", "tool", "credentials", "username", "instance_url"],
+  props: [
+    "id",
+    "tool",
+    "credentials",
+    "username",
+    "instance_url",
+    "github_auth_link",
+  ],
   data() {
     return {
       confirmDelete: false,
@@ -78,3 +93,15 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.1s;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>

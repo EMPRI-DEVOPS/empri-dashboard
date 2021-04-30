@@ -18,8 +18,7 @@ def github_auth(request):
         github_auth.get_access_token(code)
     except Exception:
         pass
-    account = github_auth.account
-    return redirect('/accounts/'+str(account.id))
+    return redirect('/accounts')
 
 
 class AccountViewSet(viewsets.ModelViewSet):

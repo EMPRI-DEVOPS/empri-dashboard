@@ -64,10 +64,10 @@
 
 <script>
 import { ref } from "vue";
-import EventsByDayLineChart from "../components/EventsByDayLineChart.vue";
-import EventsPerWeekdayChart from "../components/EventsPerWeekdayChart.vue";
-import EventsPerTimeWindowChart from "../components/EventsPerTimeWindowChart.vue";
-import GithubCommitsPerRepo from "../components/GithubCommitsPerRepo.vue";
+import EventsByDayLineChart from "../components/charts/EventsByDayLineChart.vue";
+import EventsPerWeekdayChart from "../components/charts/EventsPerWeekdayChart.vue";
+import EventsPerTimeWindowChart from "../components/charts/EventsPerTimeWindowChart.vue";
+import GithubCommitsPerRepo from "../components/charts/GithubCommitsPerRepo.vue";
 import { GithubAccount } from "../modules/github-account";
 import { getAccounts } from "../api/accounts";
 
