@@ -1,10 +1,11 @@
 <template>
-  <div ref="div">
-    <card :title="title">
+  <div ref="div" class="card shadow-sm">
+    <div class="card-body">
+      <h6 v-if="title" class="card-title"><activity-icon /> {{ title }}</h6>
       <svg width="100%" :height="height" :viewbox="`0 0 ${width} ${height}`">
         <g
           id="events-by-day-line-chart"
-          :transform="`translate(${margin}, ${margin})`"
+          :transform="`translate(${margin.left}, ${margin.top})`"
         >
           <g class="yAxis" fill="none" text-anchor="end"></g>
           <g
@@ -14,24 +15,24 @@
             text-anchor="middle"
           ></g>
           <path
-            class="line"
-            fill="none"
+            class="area"
+            fill="#69b3a2"
             stroke="steelblue"
-            stroke-width="2.5"
+            stroke-width="0"
           ></path>
         </g>
       </svg>
-    </card>
+    </div>
   </div>
 </template>
 
 <script>
 import * as d3 from "d3";
-import Card from "../Card.vue";
 import { computed, ref, onMounted } from "vue";
+import ActivityIcon from "../icons/ActivityIcon";
 
 export default {
-  components: { Card },
+  components: { ActivityIcon },
   props: ["events"],
   watch: {
     width() {
@@ -49,10 +50,18 @@ export default {
 
     let width = ref(700);
     const height = 400;
-    const margin = 32;
+    //const margin = 32;
+    const margin = {
+      top: 10,
+      right: 50,
+      left: 30,
+      bottom: 20,
+    };
 
-    const boundedWidth = computed(() => width.value - 2 * margin);
-    const boundedHeight = height - 2 * margin;
+    const boundedWidth = computed(
+      () => width.value - margin.left - margin.right
+    );
+    const boundedHeight = height - margin.top - margin.bottom;
 
     const div = ref(null);
 
@@ -144,8 +153,10 @@ export default {
         .select(".xAxis")
         .transition()
         .duration(transitionDuration)
-        .call(d3.axisBottom(this.xScale));
+        .call(d3.axisBottom(this.xScale).ticks(this.boundedWidth / 80));
+      console.log(this.boundedWidth / 80);
 
+      /*
       let rects = chart.selectAll("rect").data(this.preparedData);
 
       // Bars
@@ -162,9 +173,10 @@ export default {
         .attr("fill", "#69b3a2");
 
       rects.exit().remove();
+      */
 
       chart
-        .select(".line")
+        .select(".area")
         .raise() // nach vorne bringen
         .datum(this.preparedData)
         .transition()
@@ -172,9 +184,10 @@ export default {
         .attr(
           "d",
           d3
-            .line()
+            .area()
             .x((e) => this.xBand(e.day) + this.xBand.bandwidth() / 2)
-            .y((e) => this.yScale(e.events))
+            .y0(() => this.yScale(0))
+            .y1((e) => this.yScale(e.events))
             .curve(d3.curveMonotoneX)
         );
     },

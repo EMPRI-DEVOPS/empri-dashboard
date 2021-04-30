@@ -1,10 +1,13 @@
 <template>
   <div class="container">
     <h5>
-      <router-link to="/" class="btn btn-outline-secondary"><arrow-left /></router-link>
-      User Account Settings<span v-if="loading"> Loading..</span>
+      <router-link to="/" class="btn btn-outline-secondary m-1"
+        ><arrow-left
+      /></router-link>
+      <span class="m-1">User Account Settings</span
+      ><span class="m-1" v-if="loading"> Loading..</span>
     </h5>
-    <div class="row g-4 mb-5">
+    <div class="row mb-5">
       <div class="col-xl-7 row g-4">
         <transition-group name="list">
           <div v-for="account in accounts" :key="account.id">

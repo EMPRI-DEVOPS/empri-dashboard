@@ -1,34 +1,39 @@
 <template>
   <div>
-    <span v-if="loading">Loading..</span>
-    <span v-if="error">Error!</span>
-
-    <div class="row row-cols-1 g-3">
-      <div class="row py-4">
-        <div class="col-md-7">
-          <form @submit.prevent="start">
-            <div class="row mb-3">
-              <label for="username" class="col-sm-3 col-form-label"
-                >Github Username</label
+    <div class="container mb-3">
+      <div class="row justify-content-center">
+        <div class="card col-xl-5 col-lg-6 col-md-8 col-sm-10">
+          <div class="card-body">
+            <div v-if="!canStart">
+              <router-link to="accounts"
+                >Connect your Github account to get started..</router-link
               >
-
-              <div class="col-md-7">
-                <input
-                  name="username"
-                  v-model="githubUsername"
-                  :disabled="pullingData"
-                  class="col-md-7 form-control"
-                />
-              </div>
             </div>
-            <button
-              type="submit"
-              class="col-md-12 btn btn-lg btn-outline-secondary"
-              :disabled="pullingData"
-            >
-              Start
-            </button>
-          </form>
+            <form v-else @submit.prevent="start">
+              <div class="row mb-3">
+                <label for="username" class="col-sm-3 col-form-label"
+                  >Github Username
+                </label>
+                <div class="col-sm-7">
+                  <input
+                    name="username"
+                    v-model="githubUsername"
+                    :disabled="pullingData"
+                    class="form-control"
+                  />
+                </div>
+              </div>
+              <div class="d-grid">
+                <button
+                  type="submit"
+                  class="btn btn-lg btn-outline-secondary"
+                  :disabled="pullingData"
+                >
+                  Start
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>
@@ -63,12 +68,12 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import EventsByDayLineChart from "../components/charts/EventsByDayLineChart.vue";
 import EventsPerWeekdayChart from "../components/charts/EventsPerWeekdayChart.vue";
 import EventsPerTimeWindowChart from "../components/charts/EventsPerTimeWindowChart.vue";
 import GithubCommitsPerRepo from "../components/charts/GithubCommitsPerRepo.vue";
-import { GithubAccount } from "../modules/github-account";
+import { GithubAccount } from "../api/github-account";
 import { getAccounts } from "../api/accounts";
 
 export default {
@@ -79,16 +84,6 @@ export default {
     EventsPerTimeWindowChart,
   },
   name: "Assessment",
-  data() {
-    return {
-      data: [],
-      pullingData: false,
-      githubUsername: "",
-      statusMessage: "",
-      userInteractions: [],
-      githubCommits: [],
-    };
-  },
   beforeRouteEnter(to, from, next) {
     getAccounts(to.params.id)
       .then((accounts) => {
@@ -97,14 +92,25 @@ export default {
       .catch(() => window.location.replace("/auth/login/"));
   },
   setup() {
-    const accounts = ref();
+    const accounts = ref([]);
     const setAccounts = (val) => (accounts.value = val);
+    const canStart = computed(() => {
+      return (
+        accounts.value
+          .filter((account) => account.tool == "Github")
+          .filter((account) => account.credentials).length > 0
+      );
+    });
     return {
       accounts,
       setAccounts,
-      loading: ref(false),
-      error: ref(false),
+      canStart,
+      githubUsername: ref(""),
+      statusMessage: ref(""),
+      userInteractions: ref([]),
+      githubCommits: ref([]),
       accountCreate: ref(false),
+      pullingData: ref(false),
     };
   },
   computed: {
