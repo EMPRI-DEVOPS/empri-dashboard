@@ -7,6 +7,7 @@ module.exports = {
     runtimeCompiler: true,
     // von hier: https://github.com/EugeneDae/django-vue-cli-webpack-demo/blob/master/client/vue.config.js
     devServer: {
+        allowedHosts: ['127.0.0.1:8000'],
         writeToDisk: filePath => filePath.endsWith('index.html') || filePath.endsWith('.css'),
         headers: {
             "Access-Control-Allow-Origin": "*",

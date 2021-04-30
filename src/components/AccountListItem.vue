@@ -1,7 +1,12 @@
 <template>
   <card>
     <h5 class="card-title d-flex justify-content-between mb-3">
-      {{ `${tool} Account` }}
+      <span>
+        <github-icon v-if="tool == 'Github'" />
+        <taiga-logo v-if="tool == 'Taiga'" />
+        <mattermost-logo v-if="tool == 'Mattermost'" />
+        {{ `${tool} Account` }}
+      </span>
       <span v-if="credentials" class="badge rounded-pill bg-success">
         Activated
       </span>
@@ -24,15 +29,24 @@
       @authenticated="$emit('authenticated')"
     />
     <template v-slot:footer>
-      <div class="btn-group">
-        <router-link
-          class="btn btn-outline-secondary"
-          :to="{ name: 'Account', params: { id: id } }"
-          >Detail</router-link
-        >
+      <div v-show="!confirmDelete" class="btn-group">
+        <button class="btn btn-outline-danger" @click="confirmDelete = true">
+          Delete
+        </button>
+      </div>
+      <div v-show="confirmDelete">
+        Are you sure?
+        <div class="btn-group">
         <button class="btn btn-outline-danger" @click="deleteAccount">
           Delete
         </button>
+        <button
+          class="btn btn-outline-secondary"
+          @click="confirmDelete = false"
+        >
+          Cancel
+        </button>
+        </div>
       </div>
     </template>
   </card>
@@ -40,22 +54,26 @@
 
 <script>
 import Card from "./Card.vue";
-import TaigaLogin from "../components/TaigaLogin.vue";
+import TaigaLogin from "./TaigaLogin.vue";
+import TaigaLogo from "./icons/TaigaLogo";
+import GithubIcon from "./icons/GithubIcon";
+import MattermostLogo from "./icons/MattermostLogo";
 import { deleteAccount } from "../api/accounts";
 
 export default {
-  components: { Card, TaigaLogin },
+  components: { Card, TaigaLogin, GithubIcon, TaigaLogo, MattermostLogo },
   name: "AccountListItem",
   props: ["id", "tool", "credentials", "username", "instance_url"],
+  data() {
+    return {
+      confirmDelete: false,
+    };
+  },
   methods: {
     deleteAccount() {
-      deleteAccount(this.id)
-        .then(() => {
-          this.$emit("deleted");
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      deleteAccount(this.id).then(() => {
+        this.$emit("deleted");
+      });
     },
   },
 };

@@ -10,7 +10,6 @@
 - untersuchen wie man vermeiden könnte die selben commits mehrfach zu ziehen mittels hash-prüfung
 - bessere Fehlerbehandlung bei allen DRF aufrufen
 - Integrity Violation bei Account Create/Update auffangen
-- delete account confirmation
 - loading anzeige aufhübschen
 - PDF export des Assessments
 - schauen wie sich das bootstrap css kleiner kompilieren lässt

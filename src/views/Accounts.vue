@@ -1,7 +1,6 @@
 <template>
   <div class="container">
     <span v-if="loading">Loading..</span>
-    <span v-if="error">Error!</span>
     <div class="row row-cols-1 g-4">
       <h5>User Account Settings</h5>
       <div v-for="account in accounts" :key="account.id" class="col-lg-7">
@@ -11,22 +10,9 @@
           @authenticated="fetchAccounts"
         />
       </div>
-      <div class="col-lg-7" v-show="accountCreate">
-        <account-create
-          @closed="accountCreate = !accountCreate"
-          @created="
-            fetchAccounts();
-            accountCreate = false;
-          "
-        />
+      <div class="col-lg-7">
+        <account-create @created="fetchAccounts" />
       </div>
-      <button
-        v-show="!accountCreate"
-        class="col-lg-7 btn bg-white btn-outline-secondary mb-4"
-        @click="accountCreate = !accountCreate"
-      >
-        Add Account
-      </button>
     </div>
   </div>
 </template>
@@ -59,8 +45,6 @@ export default {
       accounts,
       setAccounts,
       loading,
-      error: ref(false),
-      accountCreate: ref(false),
       fetchAccounts,
     };
   },
