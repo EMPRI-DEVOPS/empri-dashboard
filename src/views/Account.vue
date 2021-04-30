@@ -33,35 +33,33 @@
 
           <template v-slot:footer>
             <div class="btn-group">
-              <div class="btn-group">
-                <router-link
-                  class="btn btn-outline-secondary"
-                  :to="{ name: 'Accounts' }"
-                  >Back to overview</router-link
-                >
-                <a
-                  v-if="account.github_auth_link && !credentials"
-                  class="btn btn-outline-primary"
-                  :href="account.github_auth_link"
-                  >Github Login</a
-                >
+              <router-link
+                class="btn btn-outline-secondary"
+                :to="{ name: 'Accounts' }"
+                >Back to overview</router-link
+              >
+              <a
+                v-if="account.github_auth_link && !credentials"
+                class="btn btn-outline-primary"
+                :href="account.github_auth_link"
+                >Github Login</a
+              >
 
-                <button
-                  v-if="credentials"
-                  class="btn btn-outline-warning"
-                  @click="deleteCredentials"
-                >
-                  Delete credentials
-                </button>
+              <button
+                v-if="credentials"
+                class="btn btn-outline-warning"
+                @click="deleteCredentials"
+              >
+                Delete credentials
+              </button>
 
-                <button
-                  class="btn btn-outline-danger"
-                  v-if="!error"
-                  @click.prevent="deleteAccount"
-                >
-                  Delete
-                </button>
-              </div>
+              <button
+                class="btn btn-outline-danger"
+                v-if="!error"
+                @click.prevent="deleteAccount"
+              >
+                Delete
+              </button>
             </div>
           </template>
         </card>

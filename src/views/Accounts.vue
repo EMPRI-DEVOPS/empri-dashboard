@@ -5,7 +5,11 @@
     <div class="row row-cols-1 g-4">
       <h5>User Account Settings</h5>
       <div v-for="account in accounts" :key="account.id" class="col-lg-7">
-        <account-list-item :account="account" @deleted="fetchAccounts" />
+        <account-list-item
+          v-bind="account"
+          @deleted="fetchAccounts"
+          @authenticated="fetchAccounts"
+        />
       </div>
       <div class="col-lg-7" v-show="accountCreate">
         <account-create
@@ -18,7 +22,7 @@
       </div>
       <button
         v-show="!accountCreate"
-        class="col-lg-7 btn bg-white btn-outline-secondary"
+        class="col-lg-7 btn bg-white btn-outline-secondary mb-4"
         @click="accountCreate = !accountCreate"
       >
         Add Account
@@ -38,13 +42,26 @@ export default {
 
   setup() {
     const accounts = ref();
+    const loading = ref(false);
     const setAccounts = (val) => (accounts.value = val);
+    const fetchAccounts = () => {
+      loading.value = true;
+      getAccounts()
+        .then((fetchedAccounts) => {
+          setAccounts(fetchedAccounts);
+        })
+        .catch(() => {
+          window.location.replace("/auth/login/");
+        })
+        .finally(() => (loading.value = false));
+    };
     return {
       accounts,
       setAccounts,
-      loading: ref(false),
+      loading,
       error: ref(false),
       accountCreate: ref(false),
+      fetchAccounts,
     };
   },
   beforeRouteEnter(to, from, next) {
@@ -53,21 +70,6 @@ export default {
         next((vm) => vm.setAccounts(accounts));
       })
       .catch(() => window.location.replace("/auth/login/"));
-  },
-  methods: {
-    fetchAccounts() {
-      this.loading = true;
-      getAccounts()
-        .then((accounts) => {
-          this.setAccounts(accounts);
-        })
-        .catch((error) => {
-          //falls ein auth error kommt den nutzer zur loginseite umleiten
-          this.error = true;
-          console.log(error);
-        })
-        .finally(() => (this.loading = false));
-    },
   },
 };
 </script>
