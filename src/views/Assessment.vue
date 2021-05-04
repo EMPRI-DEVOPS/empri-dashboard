@@ -1,8 +1,8 @@
 <template>
   <div>
     <div class="container mb-3">
-      <div v-if="!canStart" class="row justify-content-center">
-        <div v-if="!canStart" class="card col-lg-5">
+      <div v-if="!enabledGithubAccounts.length" class="row justify-content-center">
+        <div v-if="!enabledGithubAccounts.length" class="card col-lg-5">
           <div class="card-body">
             <router-link to="accounts"
               >Connect your Github account to get started..
@@ -10,7 +10,7 @@
           </div>
         </div>
       </div>
-      <div v-else class="card">
+      <div v-else class="card shadow-sm">
         <div class="card-body">
           <form @submit.prevent="start">
             <div class="row g-4">
@@ -101,7 +101,7 @@
 </template>
 
 <script>
-import { ref, computed } from "vue";
+import { ref } from "vue";
 import EventsByDayLineChart from "../components/charts/EventsByDayLineChart.vue";
 import EventsPerWeekdayChart from "../components/charts/EventsPerWeekdayChart.vue";
 import EventsPerTimeWindowChart from "../components/charts/EventsPerTimeWindowChart.vue";
@@ -109,6 +109,7 @@ import GithubCommitsPerRepo from "../components/charts/GithubCommitsPerRepo.vue"
 import PlayIcon from "../components/icons/PlayIcon";
 import { GithubAccount } from "../api/github-account";
 import { getAccounts } from "../api/accounts";
+import useAccounts from "../composables/useAccounts";
 
 export default {
   components: {
@@ -130,22 +131,11 @@ export default {
     const oneYearAgo = new Date();
     oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
     const today = new Date().toISOString().slice(0, 10);
-    const accounts = ref([]);
-    const setAccounts = (val) => (accounts.value = val);
-    const canStart = computed(() => {
-      return (
-        accounts.value
-          .filter((account) => account.tool == "Github")
-          .filter((account) => account.credentials).length > 0
-      );
-    });
     return {
+      ...useAccounts(),
       from: ref(oneYearAgo.toISOString().slice(0, 10)),
       today,
       to: ref(today),
-      accounts,
-      setAccounts,
-      canStart,
       githubUsername: ref(""),
       statusMessage: ref(""),
       userInteractions: ref([]),
@@ -154,19 +144,12 @@ export default {
       pullingData: ref(false),
     };
   },
-  computed: {
-    githubAccounts: function () {
-      return this.accounts.filter(
-        (account) => account.tool === "Github" && account.credentials
-      );
-    },
-  },
   methods: {
     async start() {
       this.userInteractions = [];
       this.pullingData = true;
 
-      this.githubAccounts.forEach(async (githubAccount) => {
+      this.enabledGithubAccounts.forEach(async (githubAccount) => {
         let account1 = new GithubAccount(githubAccount);
 
         if (this.githubUsername) {

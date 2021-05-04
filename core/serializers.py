@@ -1,6 +1,17 @@
 from django.contrib.auth import password_validation
 from rest_framework import serializers
 from django.core.exceptions import ValidationError
+from timezone_field.rest_framework import TimeZoneSerializerField
+
+from .models import User
+
+
+class UserSerializer(serializers.ModelSerializer):
+    time_zone = TimeZoneSerializerField()
+
+    class Meta:
+        model = User
+        fields = ['username', 'time_zone', 'date_joined']
 
 
 class ChangePasswordSerializer(serializers.Serializer):

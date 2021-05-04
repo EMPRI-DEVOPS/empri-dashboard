@@ -1,5 +1,5 @@
 <template>
-  <div class="card">
+  <div class="card shadow-sm">
     <div class="card-body">
       <h5 class="card-title mb-3">Update password</h5>
       <form

@@ -1,28 +1,39 @@
 <template>
   <div class="container">
-    <h5>
-      <router-link to="/" class="btn btn-outline-secondary m-1"
-        ><arrow-left
-      /></router-link>
-      <span class="m-1">User Account Settings</span
-      ><span class="m-1" v-if="loading"> Loading..</span>
-    </h5>
-    <div class="row mb-5">
-      <div class="col-xl-7 row g-4">
-        <transition-group name="list">
-          <div v-for="account in accounts" :key="account.id">
-            <account-list-item
-              v-bind="account"
-              @deleted="fetchAccounts"
-              @authenticated="fetchAccounts"
-            />
-          </div>
-        </transition-group>
-        <account-create @account-added="fetchAccounts" />
+    <div class="row">
+      <div class="col-12">
+        <h5>
+          <router-link to="/" class="btn btn-outline-secondary m-1"
+            ><arrow-left
+          /></router-link>
+          <span class="m-1">User Account Settings</span
+          ><span class="m-1" v-if="loading"> Loading..</span>
+        </h5>
       </div>
-      <div class="col-xl-5 row g-4">
-        <div class="col">
-          <update-password />
+    </div>
+    <div class="row mb-5 g-4 pt-0 mt-0">
+      <div class="col-xl-7">
+        <div class="row g-4">
+          <transition-group name="list">
+            <div v-for="account in accounts" :key="account.id">
+              <account-list-item
+                v-bind="account"
+                @deleted="fetchAccounts"
+                @authenticated="fetchAccounts"
+              />
+            </div>
+          </transition-group>
+          <account-create @account-added="fetchAccounts" />
+        </div>
+      </div>
+      <div class="col-xl-5">
+        <div class="row g-4">
+          <div>
+            <update-password />
+          </div>
+          <div>
+            <update-timezone v-bind="user" />
+          </div>
         </div>
       </div>
     </div>
@@ -30,37 +41,23 @@
 </template>
 
 <script>
-import { ref } from "vue";
 import AccountListItem from "../components/AccountListItem.vue";
 import AccountCreate from "../components/AccountCreate.vue";
 import UpdatePassword from "../components/UpdatePassword";
+import UpdateTimezone from "../components/UpdateTimezone";
 import { getAccounts } from "../api/accounts";
 import ArrowLeft from "../components/icons/ArrowLeft.vue";
+import useAccounts from "../composables/useAccounts";
 export default {
-  components: { AccountListItem, AccountCreate, UpdatePassword, ArrowLeft },
-  name: "Accounts",
-
+  components: {
+    AccountListItem,
+    AccountCreate,
+    UpdatePassword,
+    UpdateTimezone,
+    ArrowLeft,
+  },
   setup() {
-    const accounts = ref();
-    const loading = ref(false);
-    const setAccounts = (val) => (accounts.value = val);
-    const fetchAccounts = () => {
-      loading.value = true;
-      getAccounts()
-        .then((fetchedAccounts) => {
-          setAccounts(fetchedAccounts);
-        })
-        .catch(() => {
-          window.location.replace("/auth/login/");
-        })
-        .finally(() => (loading.value = false));
-    };
-    return {
-      accounts,
-      setAccounts,
-      loading,
-      fetchAccounts,
-    };
+    return useAccounts();
   },
   beforeRouteEnter(to, from, next) {
     getAccounts(to.params.id)

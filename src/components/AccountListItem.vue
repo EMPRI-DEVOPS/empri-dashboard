@@ -1,5 +1,5 @@
 <template>
-  <div class="card">
+  <div class="card shadow-sm">
     <div class="card-body">
       <h5 class="card-title d-flex justify-content-between mb-3">
         <span>

@@ -19,13 +19,14 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 from accounts.views import AccountViewSet, github_auth
-from core.views import IndexTemplateView, SignUpView, ChangePasswordView
+from core.views import IndexTemplateView, SignUpView, ChangePasswordView, UserDetails
 
 router = routers.DefaultRouter(trailing_slash=False)
 router.register(r'account', AccountViewSet, basename='account')
 
 urlpatterns = [
     path('api/', include(router.urls)),
+    path('api/user', UserDetails.as_view()),
     path('github-auth', github_auth),
     path('auth/', include('django.contrib.auth.urls')),
     path('auth/signup', SignUpView.as_view(), name='signup'),

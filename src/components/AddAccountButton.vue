@@ -1,6 +1,6 @@
 <template>
-  <div class="card">
-    <div class="card-body text-center shadow-sm">
+  <div class="card shadow-sm">
+    <div class="card-body text-center">
       <h6 class="card-title">
         <span class="icon p-1">
           <github-icon v-if="tool == 'Github'" />
