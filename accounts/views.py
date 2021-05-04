@@ -1,7 +1,8 @@
 """account views"""
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect
-from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -23,9 +24,10 @@ def github_auth(request):
 
 class AccountViewSet(viewsets.ModelViewSet):
     serializer_class = AccountSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return self.request.user.accounts.all()
+        return self.request.user.accounts.order_by('id').all()
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -40,4 +42,4 @@ class AccountViewSet(viewsets.ModelViewSet):
         account.username = serializer.response['username']
         account.instance_url = serializer.validated_data['url']
         account.save()
-        return Response({'success': True})
+        return Response(status=status.HTTP_204_NO_CONTENT)

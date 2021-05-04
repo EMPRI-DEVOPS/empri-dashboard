@@ -10,7 +10,6 @@ import { createAccount } from "../api/accounts";
 import AddAccountButton from "../components/AddAccountButton";
 
 export default {
-  name: "AccountCreate",
   components: { AddAccountButton },
   emits: ["account-added"],
   setup(props, { emit }) {

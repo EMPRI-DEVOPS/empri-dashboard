@@ -85,10 +85,7 @@ export default {
   ],
   setup(props) {
     const dateProp = toRef(props, "created_at");
-    console.log(dateProp.value);
     const dateObj = new Date(dateProp.value);
-    console.log(dateObj);
-    console.log(dateObj.toLocaleString());
     const createdAt = dateObj.toLocaleString("en-US");
 
     return {

@@ -16,7 +16,7 @@ module.exports = {
     },
     css: {
         extract: true,
-        sourceMap: true,
+        //sourceMap: true,
         loaderOptions: {
             css: {
                 // options here will be passed to css-loader
