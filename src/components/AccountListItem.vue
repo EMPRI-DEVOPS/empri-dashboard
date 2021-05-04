@@ -1,48 +1,51 @@
 <template>
-  <card>
-    <h5 class="card-title d-flex justify-content-between mb-3">
-      <span>
-        <github-icon v-if="tool == 'Github'" />
-        <taiga-logo v-if="tool == 'Taiga'" />
-        <mattermost-logo v-if="tool == 'Mattermost'" />
-        {{ `${tool} Account` }}
-      </span>
-      <span v-if="credentials" class="badge rounded-pill bg-success">
-        Activated
-      </span>
-    </h5>
-    <table class="table table-borderless table-hover">
-      <tbody>
-        <tr v-if="username">
-          <th style="width: 20%">Username</th>
-          <td>{{ username }}</td>
-        </tr>
-        <tr v-if="instance_url">
-          <th>URL</th>
-          <td>{{ instance_url }}</td>
-        </tr>
-      </tbody>
-    </table>
-    <taiga-login
-      v-if="tool === 'Taiga' && !credentials"
-      :id="id"
-      @authenticated="$emit('authenticated')"
-    />
-    <a
-      v-if="github_auth_link && !credentials"
-      class="btn btn-outline-primary"
-      :href="github_auth_link"
-      >Github Login
-    </a>
-    <template v-slot:footer>
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title d-flex justify-content-between mb-3">
+        <span>
+          <github-icon v-if="tool == 'Github'" />
+          <taiga-logo v-if="tool == 'Taiga'" />
+          <mattermost-logo v-if="tool == 'Mattermost'" />
+          {{ `${tool} Account` }}
+        </span>
+        <span v-if="credentials" class="badge rounded-pill bg-success">
+          Activated
+        </span>
+      </h5>
+      <table class="table table-borderless table-hover">
+        <tbody>
+          <tr v-if="username">
+            <th style="width: 20%">Username</th>
+            <td>{{ username }}</td>
+          </tr>
+          <tr v-if="instance_url">
+            <th>URL</th>
+            <td>{{ instance_url }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <taiga-login
+        v-if="tool === 'Taiga' && !credentials"
+        :id="id"
+        @authenticated="$emit('authenticated')"
+      />
+      <a
+        v-if="github_auth_link && !credentials"
+        class="btn btn-outline-primary"
+        :href="github_auth_link"
+        >Github Login
+      </a>
+    </div>
+    <div class="card-footer d-flex flex-row-reverse">
       <transition name="fade" mode="out-in">
-        <div v-if="!confirmDelete" class="btn-group">
+        <div v-if="!confirmDelete">
+          <span class="text-muted p-2">Created at: {{ createdAt }}</span>
           <button class="btn btn-outline-danger" @click="confirmDelete = true">
             Delete
           </button>
         </div>
         <div v-else>
-          Are you sure?
+          <span class="text-muted p-2">Are you sure?</span>
           <div class="btn-group">
             <button class="btn btn-outline-danger" @click="deleteAccount">
               Delete
@@ -56,12 +59,12 @@
           </div>
         </div>
       </transition>
-    </template>
-  </card>
+    </div>
+  </div>
 </template>
 
 <script>
-import Card from "./Card.vue";
+import { toRef } from "vue";
 import TaigaLogin from "./TaigaLogin.vue";
 import TaigaLogo from "./icons/TaigaLogo";
 import GithubIcon from "./icons/GithubIcon";
@@ -69,7 +72,7 @@ import MattermostLogo from "./icons/MattermostLogo";
 import { deleteAccount } from "../api/accounts";
 
 export default {
-  components: { Card, TaigaLogin, GithubIcon, TaigaLogo, MattermostLogo },
+  components: { TaigaLogin, GithubIcon, TaigaLogo, MattermostLogo },
   name: "AccountListItem",
   props: [
     "id",
@@ -78,7 +81,20 @@ export default {
     "username",
     "instance_url",
     "github_auth_link",
+    "created_at",
   ],
+  setup(props) {
+    const dateProp = toRef(props, "created_at");
+    console.log(dateProp.value);
+    const dateObj = new Date(dateProp.value);
+    console.log(dateObj);
+    console.log(dateObj.toLocaleString());
+    const createdAt = dateObj.toLocaleString("en-US");
+
+    return {
+      createdAt,
+    };
+  },
   data() {
     return {
       confirmDelete: false,
