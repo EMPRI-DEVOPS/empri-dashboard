@@ -1,8 +1,12 @@
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, update_session_auth_hash
 from django.urls import reverse_lazy
+from rest_framework.generics import UpdateAPIView
+from rest_framework.response import Response
+from rest_framework import status
+from .serializers import ChangePasswordSerializer
 
 
 class IndexTemplateView(TemplateView):
@@ -21,3 +25,14 @@ class SignUpView(CreateView):
         new_user = authenticate(username=username, password=password)
         login(self.request, new_user)
         return valid
+
+
+class ChangePasswordView(UpdateAPIView):
+    serializer_class = ChangePasswordSerializer
+
+    def update(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        update_session_auth_hash(request, request.user)
+        return Response(status=status.HTTP_204_NO_CONTENT)
