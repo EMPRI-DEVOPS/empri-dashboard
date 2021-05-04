@@ -4,6 +4,7 @@ from urllib.parse import urlencode, urlunsplit
 import requests
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 
 
 class Account(models.Model):
@@ -20,6 +21,7 @@ class Account(models.Model):
     credentials = models.JSONField(blank=True, null=True)
     username = models.CharField(max_length=100, blank=True, default='')
     instance_url = models.URLField(max_length=100, blank=True, default='')
+    created_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
         constraints = [

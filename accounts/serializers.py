@@ -9,7 +9,7 @@ class AccountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Account
-        fields = ['id', 'enabled', 'tool', 'credentials', 'username', 'instance_url', 'github_auth_link']
+        fields = ['id', 'enabled', 'tool', 'credentials', 'username', 'instance_url', 'github_auth_link', 'created_at']
         depth = 1
         read_only_fields = ['id', 'github_auth_link']
 
