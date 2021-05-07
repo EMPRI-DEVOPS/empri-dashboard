@@ -108,6 +108,7 @@ celerybeat-schedule.*
 .env.dev
 .env.prod
 .venv 
+psadvenv/
 env/ 
 venv/ 
 ENV/ 
@@ -119,13 +120,6 @@ venv.bak/
 
 # mypy 
 .mypy_cache/ 
-
-# Sublime Text # 
-*.tmlanguage.cache 
-*.tmPreferences.cache 
-*.stTheme.cache 
-*.sublime-workspace 
-*.sublime-project 
 
 # sftp configuration file 
 sftp-config.json 
