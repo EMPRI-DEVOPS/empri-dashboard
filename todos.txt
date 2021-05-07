@@ -5,7 +5,7 @@
 - heatmap / punchcard
 - Bug: das "User interactions per day" muss alle untersuchten Tage anzeigen
 - Eingabe der Tageszeitfenster
-- Zeitzone Angabe
+- Event timestamps in die richtige Zeitzone bringen
 - github commits per repo sollte lieber horizontal werden
 - horizontale charts könnten lieber lollipop charts werden
 - untersuchen wie man vermeiden könnte die selben commits mehrfach zu ziehen mittels hash-prüfung
@@ -14,5 +14,6 @@
 - loading anzeige aufhübschen
 - PDF export des Assessments
 - schauen wie sich das bootstrap css kleiner kompilieren lässt
+- google fonts vermeiden
 - https://github.com/jazzband/django-configurations einbauen
 - https://github.com/kimmobrunfeldt/git-hours/ angucken
