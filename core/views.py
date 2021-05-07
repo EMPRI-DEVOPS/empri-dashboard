@@ -2,7 +2,7 @@ from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView
 from django.contrib.auth import authenticate, login, update_session_auth_hash
 from django.urls import reverse_lazy
-from rest_framework.generics import UpdateAPIView, RetrieveAPIView
+from rest_framework.generics import RetrieveUpdateAPIView, UpdateAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
@@ -39,7 +39,7 @@ class ChangePasswordView(UpdateAPIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class UserDetails(RetrieveAPIView):
+class UserDetails(RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = UserSerializer
 

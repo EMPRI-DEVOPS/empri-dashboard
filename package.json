@@ -10,6 +10,7 @@
   "dependencies": {
     "@octokit/graphql": "^4.6.1",
     "@octokit/rest": "^18.5.2",
+    "@vvo/tzdb": "^6.7.0",
     "axios": "^0.21.1",
     "bootstrap": "^5.0.0-beta3",
     "core-js": "^3.9.0",

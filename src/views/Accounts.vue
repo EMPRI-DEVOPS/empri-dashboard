@@ -32,7 +32,7 @@
             <update-password />
           </div>
           <div>
-            <update-timezone v-bind="user" />
+            <update-timezone v-if="user.time_zone" v-model:time_zone="user.time_zone" />
           </div>
         </div>
       </div>

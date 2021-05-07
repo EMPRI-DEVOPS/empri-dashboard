@@ -6,6 +6,7 @@ from .models import Account
 
 class AccountSerializer(serializers.ModelSerializer):
     github_auth_link = serializers.ReadOnlyField()
+    created_at = serializers.ReadOnlyField()
 
     class Meta:
         model = Account

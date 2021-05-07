@@ -8,6 +8,7 @@ from .models import User
 
 class UserSerializer(serializers.ModelSerializer):
     time_zone = TimeZoneSerializerField()
+    date_joined = serializers.ReadOnlyField()
 
     class Meta:
         model = User

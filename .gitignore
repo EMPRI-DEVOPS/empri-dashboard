@@ -4,11 +4,6 @@ node_modules
 static/
 templates/base-vue.html
 
-
-# local env files
-.env.local
-.env.*.local
-
 # Log files
 npm-debug.log*
 yarn-debug.log*
@@ -91,24 +86,11 @@ coverage.xml
 *.cover 
 .hypothesis/ 
 
-# Jupyter Notebook 
-.ipynb_checkpoints 
-
-# pyenv 
-.python-version 
-
-# celery 
-celerybeat-schedule.* 
-
-# SageMath parsed files 
-*.sage.py 
-
 # Environments 
 .env 
 .env.dev
 .env.prod
 .venv 
-psadvenv/
 env/ 
 venv/ 
 ENV/ 
