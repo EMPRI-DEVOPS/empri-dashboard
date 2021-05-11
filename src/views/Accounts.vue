@@ -29,10 +29,19 @@
       <div class="col-xl-5">
         <div class="row g-4">
           <div>
+            <update-day-time-ranges
+              v-if="user.day_time_ranges"
+              v-model:user="user"
+            />
+          </div>
+          <div>
             <update-password />
           </div>
           <div>
-            <update-timezone v-if="user.time_zone" v-model:time_zone="user.time_zone" />
+            <update-timezone
+              v-if="user.time_zone"
+              v-model:time_zone="user.time_zone"
+            />
           </div>
         </div>
       </div>
@@ -45,16 +54,29 @@ import AccountListItem from "../components/AccountListItem.vue";
 import AccountCreate from "../components/AccountCreate.vue";
 import UpdatePassword from "../components/UpdatePassword";
 import UpdateTimezone from "../components/UpdateTimezone";
+import UpdateDayTimeRanges from "../components/UpdateDayTimeRanges";
 import { getAccounts } from "../api/accounts";
 import ArrowLeft from "../components/icons/ArrowLeft.vue";
 import useAccounts from "../composables/useAccounts";
+import { patchUser } from "../api/user";
+
 export default {
   components: {
     AccountListItem,
     AccountCreate,
     UpdatePassword,
     UpdateTimezone,
+    UpdateDayTimeRanges,
     ArrowLeft,
+  },
+  watch: {
+    "user.day_time_ranges": {
+      handler(val) {
+        patchUser({
+          day_time_ranges: val,
+        });
+      },
+    },
   },
   setup() {
     return useAccounts();

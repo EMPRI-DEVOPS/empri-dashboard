@@ -4,7 +4,7 @@
 - gedanken machen über weitere visualisierungen
 - heatmap / punchcard
 - Bug: das "User interactions per day" muss alle untersuchten Tage anzeigen
-- Eingabe der Tageszeitfenster
+- Tageszeitfenster-Einstellung berücksichtigen
 - Event timestamps in die richtige Zeitzone bringen
 - github commits per repo sollte lieber horizontal werden
 - horizontale charts könnten lieber lollipop charts werden

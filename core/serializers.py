@@ -12,7 +12,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username', 'time_zone', 'date_joined']
+        fields = ['username', 'time_zone', 'date_joined', 'day_time_ranges']
 
 
 class ChangePasswordSerializer(serializers.Serializer):
