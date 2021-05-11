@@ -24,7 +24,7 @@
 import * as d3 from "d3";
 
 export default {
-  props: ["events"],
+  props: ["events", "dayTimeRanges"],
   data() {
     return {
       width: 700,
@@ -32,11 +32,10 @@ export default {
       margin: {
         top: 10,
         bottom: 30,
-        left: 40,
-        right: 22,
+        left: 80,
+        right: 50,
       },
       title: "User interactions per time window",
-      timeWindows: ["0-6", "6-9", "9-12", "12-15", "15-18", "18-0"],
     };
   },
   watch: {
@@ -49,9 +48,21 @@ export default {
     this.updateChart();
   },
   computed: {
+    timeWindows() {
+      let result = [];
+      for (let i = 0; i < this.dayTimeRanges.length; i++) {
+        let to = i + 1 == this.dayTimeRanges.length ? 0 : i + 1;
+        result.push({
+          from: this.dayTimeRanges[i],
+          to: this.dayTimeRanges[to],
+          name: `${this.dayTimeRanges[i]}:00 - ${this.dayTimeRanges[to]}:00`,
+        });
+      }
+      return result;
+    },
     processedData() {
       let eventsPerTimeWindow = this.timeWindows.map((timeWindow) => ({
-        timeWindow: timeWindow,
+        timeWindow: timeWindow.name,
         events: 0,
       }));
       for (let i = 0; i < this.events.length; i++) {
@@ -59,7 +70,7 @@ export default {
         const date = new Date(event.timestamp);
         const timeWindow = this.getTimeWindowOfDate(date);
         const timeWindowObj = eventsPerTimeWindow.filter(
-          (e) => e.timeWindow === timeWindow
+          (e) => e.timeWindow === timeWindow.name
         )[0];
         if (timeWindowObj) {
           timeWindowObj.events++;
@@ -88,7 +99,7 @@ export default {
       return d3
         .scaleBand()
         .range([0, this.boundedHeight])
-        .domain(this.processedData.map((w) => w.timeWindow))
+        .domain(this.timeWindows.map((timeWidnow) => timeWidnow.name))
         .padding(0.3);
     },
   },
@@ -98,22 +109,13 @@ export default {
      */
     getTimeWindowOfDate(date) {
       const hours = date.getHours();
-      if (hours < 6) {
-        return "0-6";
+      for (let i = 0; i < this.timeWindows.length; i++) {
+        let timeWindow = this.timeWindows[i];
+        if (hours >= timeWindow.from && hours < timeWindow.to) {
+          return timeWindow
+        }
       }
-      if (hours < 9) {
-        return "6-9";
-      }
-      if (hours < 12) {
-        return "9-12";
-      }
-      if (hours < 15) {
-        return "12-15";
-      }
-      if (hours < 18) {
-        return "15-18";
-      }
-      return "18-0";
+      return this.timeWindows[this.timeWindows.length -1];
     },
     updateChart() {
       const chart = d3.select("#events-per-time-window-chart");

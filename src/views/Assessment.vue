@@ -93,7 +93,7 @@
           <events-per-weekday-chart :events="userInteractions" />
         </div>
         <div class="col-xl-6">
-          <events-per-time-window-chart :events="userInteractions" />
+          <events-per-time-window-chart :events="userInteractions" :day-time-ranges="user.day_time_ranges" />
         </div>
       </div>
     </div>
