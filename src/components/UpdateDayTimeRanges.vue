@@ -65,7 +65,6 @@
 <script>
 import { create } from "nouislider";
 import { ref, toRefs, defineComponent, onMounted, computed } from "vue";
-import "nouislider/dist/nouislider.css";
 
 export default defineComponent({
   props: ["user"],
@@ -145,6 +144,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style scoped>
-</style>

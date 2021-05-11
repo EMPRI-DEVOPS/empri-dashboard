@@ -7,6 +7,7 @@ import router from './router'
 import "bootstrap/dist/css/bootstrap.min.css";
 import Collapse from "bootstrap/js/dist/collapse"
 import "./assets/app.css";
+import "nouislider/dist/nouislider.css";
 
 createApp({})
     .use(router)
