@@ -4,6 +4,7 @@ import {
 import {
     graphql
 } from "@octokit/graphql";
+import { DateTime } from "luxon";
 
 class GithubAccount {
     constructor(account) {
@@ -35,8 +36,8 @@ class GithubAccount {
     async pullRepos() {
         const repoNames = await this.rest.paginate(
             "GET /users/{username}/repos", {
-                username: this.username
-            },
+            username: this.username
+        },
             (response) => response.data.map((repo) => repo.name)
         );
 
@@ -45,15 +46,15 @@ class GithubAccount {
             this.repos[repoName] = {
                 commits: await this.rest.paginate(
                     "GET /repos/{owner}/{repo}/commits", {
-                        owner: this.username,
-                        repo: repoName
-                    }
+                    owner: this.username,
+                    repo: repoName
+                }
                 ),
                 issues: await this.rest.paginate(
                     "GET /repos/{owner}/{repo}/issues", {
-                        owner: this.username,
-                        repo: repoName
-                    }
+                    owner: this.username,
+                    repo: repoName
+                }
                 ),
             }
         });
@@ -95,9 +96,9 @@ class GithubAccount {
                     }
                 }
                 `, {
-                    username: this.username,
-                    afterCursor: endCursor ? endCursor : null
-                }
+                username: this.username,
+                afterCursor: endCursor ? endCursor : null
+            }
             );
             totalCount = response.user.repositoriesContributedTo.totalCount;
             endCursor = response.user.repositoriesContributedTo.pageInfo.endCursor;
@@ -119,7 +120,7 @@ class GithubAccount {
      * @param {Date} since 
      * @returns 
      */
-    async *repoCommits(owner, name, userId, since, until) {
+    async *repoCommits(owner, name, userId, since, until, timeZone) {
         let hasNextPage = true;
         let afterCursor = null;
         while (hasNextPage) {
@@ -157,13 +158,13 @@ class GithubAccount {
                     }
                 }
                 `, {
-                    name: name,
-                    owner: owner,
-                    userId: userId,
-                    since: since.toISOString(),
-                    until: until.toISOString(),
-                    after: afterCursor
-                }
+                name: name,
+                owner: owner,
+                userId: userId,
+                since: since.toISOString(),
+                until: until.toISOString(),
+                after: afterCursor
+            }
             );
             if (!response.repository.defaultBranchRef) {
                 hasNextPage = false;
@@ -173,7 +174,7 @@ class GithubAccount {
             hasNextPage = response.repository.defaultBranchRef.target.history.pageInfo.hasNextPage;
             afterCursor = response.repository.defaultBranchRef.target.history.pageInfo.endCursor;
             yield response.repository.defaultBranchRef.target.history.nodes.map((commit) => ({
-                timestamp: commit.committedDate,
+                timestamp: DateTime.fromISO(commit.committedDate, { zone: timeZone }),
                 message: commit.message,
                 repo: `${owner}/${name}`
             }));
@@ -191,9 +192,9 @@ class GithubAccount {
 
         for await (const response of this.rest.paginate.iterator(
             "GET /users/{username}/events", {
-                username: this.username,
-                per_page: 50
-            })) {
+            username: this.username,
+            per_page: 50
+        })) {
             yield response.data.map((event) => {
                 return {
                     id: event.id,
@@ -222,9 +223,9 @@ class GithubAccount {
 
         const events = await this.rest
             .paginate("GET /users/{username}/events", {
-                    username: this.username,
-                    per_page: 50
-                },
+                username: this.username,
+                per_page: 50
+            },
                 (response) => response.data.map((event) => {
                     return {
                         id: event.id,

@@ -67,8 +67,7 @@ export default {
       }));
       for (let i = 0; i < this.events.length; i++) {
         const event = this.events[i];
-        const date = new Date(event.timestamp);
-        const timeWindow = this.getTimeWindowOfDate(date);
+        const timeWindow = this.getTimeWindowOfDate(event.timestamp);
         const timeWindowObj = eventsPerTimeWindow.filter(
           (e) => e.timeWindow === timeWindow.name
         )[0];
@@ -105,13 +104,12 @@ export default {
   },
   methods: {
     /**
-     * @param {Date} date
+     * @param {DateTime} date
      */
     getTimeWindowOfDate(date) {
-      const hours = date.getHours();
-      for (let i = 0; i < this.timeWindows.length; i++) {
+      for (let i = 0; i < this.timeWindows.length - 1; i++) {
         let timeWindow = this.timeWindows[i];
-        if (hours >= timeWindow.from && hours < timeWindow.to) {
+        if (date.hour >= timeWindow.from && date.hour < timeWindow.to) {
           return timeWindow
         }
       }

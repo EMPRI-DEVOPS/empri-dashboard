@@ -81,7 +81,7 @@ export default {
 
       for (let i = 0; i < props.events.length; i++) {
         const event = props.events[i];
-        const date = new Date(event.timestamp);
+        const date = event.timestamp.toJSDate();
         const day = d3.timeFormat("%d.%m.%Y")(date);
         const obj = eventsByDay.filter((o) => o.day === day)[0];
         if (obj) {
@@ -157,7 +157,6 @@ export default {
 
       chart
         .select(".area")
-        .raise() // nach vorne bringen
         .datum(this.preparedData)
         .transition()
         .duration(transitionDuration)

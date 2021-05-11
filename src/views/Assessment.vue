@@ -81,7 +81,7 @@
       </div>
     </div>
 
-    <div v-if="!pullingData && userInteractions.length">
+    <div class="m-2" v-if="!pullingData && userInteractions.length">
       <div class="row g-2">
         <div class="col-xl-8" v-if="userInteractions.length">
           <events-by-day-line-chart :events="userInteractions" />
@@ -150,6 +150,7 @@ export default {
       this.pullingData = true;
 
       this.enabledGithubAccounts.forEach(async (githubAccount) => {
+        const timeZone = this.user.time_zone;
         let account1 = new GithubAccount(githubAccount);
 
         if (this.githubUsername) {
@@ -163,7 +164,8 @@ export default {
           repos,
           userId,
           new Date(this.from),
-          new Date(this.to)
+          new Date(this.to),
+          timeZone
         );
         this.statusMessage = "";
         this.pullingData = false;
@@ -182,7 +184,7 @@ export default {
       }
       return { userId: userId, repos: repositoriesContributedTo };
     },
-    async pullCommits(account, repos, userId, since, until) {
+    async pullCommits(account, repos, userId, since, until, timeZone) {
       let commits = [];
       for (let i = 0; i < repos.length; i++) {
         let repo = repos[i];
@@ -191,7 +193,8 @@ export default {
           repo.name,
           userId,
           since,
-          until
+          until,
+          timeZone
         )) {
           commits = [...commits, ...repoCommitsPage];
           this.statusMessage = `Found ${commits.length} commits -- Scanning ${
