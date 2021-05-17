@@ -93,10 +93,8 @@ export default defineComponent({
   components: { GlobeIcon, CollapseButton },
   setup() {
     const store = useStore();
-    const userSettings = computed(() => store.state.user.settings);
-    const time_zone = computed(() => userSettings.value.time_zone);
-    const timeZone = computed(
-      () => rawTimeZones.filter((tz) => tz.name === time_zone.value)[0]
+    const timeZone = computed(() =>
+      rawTimeZones.find((tz) => tz.name === store.getters.timeZone)
     );
 
     const selectedContinent = ref(null);

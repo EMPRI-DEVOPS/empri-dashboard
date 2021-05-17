@@ -96,10 +96,7 @@
           <events-per-weekday-chart :events="userInteractions" />
         </div>
         <div class="col-xl-6">
-          <events-per-time-window-chart
-            :events="userInteractions"
-            :day-time-ranges="user.day_time_ranges"
-          />
+          <events-per-time-window-chart :events="userInteractions" />
         </div>
       </div>
     </div>
@@ -151,7 +148,7 @@ export default {
       githubCommits: ref([]),
       accountCreate: ref(false),
       pullingData: ref(false),
-      user: computed(() => store.state.user),
+      userSettings: computed(() => store.state.user.settings),
     };
   },
   methods: {
@@ -160,7 +157,7 @@ export default {
       this.pullingData = true;
 
       this.enabledGithubAccounts.forEach(async (githubAccount) => {
-        const timeZone = this.user.time_zone;
+        const timeZone = this.$store.getters.timeZone;
         let account1 = new GithubAccount(githubAccount);
 
         if (this.githubUsername) {

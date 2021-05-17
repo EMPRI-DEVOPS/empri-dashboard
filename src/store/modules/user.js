@@ -4,6 +4,10 @@ const state = {
     settings: {}
 }
 
+const getters = {
+    timeZone(state) { return state.settings.time_zone }
+}
+
 const mutations = {
     setUser(state, settings) {
         state.settings = settings
@@ -24,5 +28,5 @@ const actions = {
 }
 
 export default {
-    state, mutations, actions
+    state, mutations, actions, getters
 }

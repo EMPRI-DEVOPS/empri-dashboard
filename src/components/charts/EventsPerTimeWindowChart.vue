@@ -21,25 +21,38 @@
 </template>
 
 <script>
+import { useStore } from "vuex";
 import * as d3 from "d3";
+import { computed, ref } from "vue";
 
 export default {
-  props: ["events", "dayTimeRanges"],
-  data() {
+  props: ["events"],
+  setup() {
+    const width = ref(700);
+    const height = 400;
+    const margin = {
+      top: 10,
+      bottom: 30,
+      left: 80,
+      right: 50,
+    };
+
+    const store = useStore();
+    const userSettings = computed(() => store.state.user.settings);
+    const dayTimeRanges = computed(() => userSettings.value.day_time_ranges);
     return {
-      width: 700,
-      height: 400,
-      margin: {
-        top: 10,
-        bottom: 30,
-        left: 80,
-        right: 50,
-      },
       title: "User interactions per time window",
+      width,
+      height,
+      margin,
+      dayTimeRanges,
     };
   },
   watch: {
     commits() {
+      this.updateChart();
+    },
+    dayTimeRanges() {
       this.updateChart();
     },
   },
@@ -110,10 +123,10 @@ export default {
       for (let i = 0; i < this.timeWindows.length - 1; i++) {
         let timeWindow = this.timeWindows[i];
         if (date.hour >= timeWindow.from && date.hour < timeWindow.to) {
-          return timeWindow
+          return timeWindow;
         }
       }
-      return this.timeWindows[this.timeWindows.length -1];
+      return this.timeWindows[this.timeWindows.length - 1];
     },
     updateChart() {
       const chart = d3.select("#events-per-time-window-chart");

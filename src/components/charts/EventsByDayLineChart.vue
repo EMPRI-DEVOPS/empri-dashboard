@@ -28,10 +28,10 @@
 
 <script>
 import * as d3 from "d3";
-import { computed, ref, onMounted } from "vue";
+import { computed, ref, onMounted, defineComponent } from "vue";
 import ActivityIcon from "../icons/ActivityIcon";
 
-export default {
+export default defineComponent({
   components: { ActivityIcon },
   props: ["events"],
   watch: {
@@ -48,9 +48,8 @@ export default {
   setup(props) {
     const title = "User interactions per day";
 
-    let width = ref(700);
+    const width = ref(700);
     const height = 400;
-    //const margin = 32;
     const margin = {
       top: 10,
       right: 50,
@@ -171,5 +170,5 @@ export default {
         );
     },
   },
-};
+});
 </script>
