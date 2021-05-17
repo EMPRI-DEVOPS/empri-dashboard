@@ -112,8 +112,6 @@ import EventsPerTimeWindowChart from "../components/charts/EventsPerTimeWindowCh
 import GithubCommitsPerRepo from "../components/charts/GithubCommitsPerRepo.vue";
 import PlayIcon from "../components/icons/PlayIcon";
 import { GithubAccount } from "../api/github-account";
-import { getAccounts } from "../api/accounts";
-import useAccounts from "../composables/useAccounts";
 
 export default {
   components: {
@@ -124,6 +122,7 @@ export default {
     PlayIcon,
   },
   name: "Assessment",
+  /*
   beforeRouteEnter(to, from, next) {
     getAccounts(to.params.id)
       .then((accounts) => {
@@ -131,14 +130,16 @@ export default {
       })
       .catch(() => window.location.replace("/auth/login/"));
   },
+  */
   setup() {
     const store = useStore();
     store.dispatch("loadUser");
+    store.dispatch("loadAccounts");
     const oneYearAgo = new Date();
     oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
     const today = new Date().toISOString().slice(0, 10);
     return {
-      ...useAccounts(),
+      enabledGithubAccounts: computed(() => store.getters.enabledGithubAccounts),
       from: ref(oneYearAgo.toISOString().slice(0, 10)),
       today,
       to: ref(today),
@@ -146,7 +147,6 @@ export default {
       statusMessage: ref(""),
       userInteractions: ref([]),
       githubCommits: ref([]),
-      accountCreate: ref(false),
       pullingData: ref(false),
       userSettings: computed(() => store.state.user.settings),
     };

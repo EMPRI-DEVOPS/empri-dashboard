@@ -64,12 +64,12 @@
 </template>
 
 <script>
-import { toRef } from "vue";
+import { toRef, ref } from "vue";
+import { useStore } from "vuex";
 import TaigaLogin from "./TaigaLogin.vue";
 import TaigaLogo from "./icons/TaigaLogo";
 import GithubIcon from "./icons/GithubIcon";
 import MattermostLogo from "./icons/MattermostLogo";
-import { deleteAccount } from "../api/accounts";
 
 export default {
   components: { TaigaLogin, GithubIcon, TaigaLogo, MattermostLogo },
@@ -84,25 +84,21 @@ export default {
     "created_at",
   ],
   setup(props) {
+    const store = useStore();
     const dateProp = toRef(props, "created_at");
+    const id = toRef(props, "id").value;
     const dateObj = new Date(dateProp.value);
     const createdAt = dateObj.toLocaleString("en-US");
 
+    const deleteAccount = () => {
+      store.dispatch("deleteAccount", id);
+    };
+
     return {
       createdAt,
+      deleteAccount,
+      confirmDelete: ref(false),
     };
-  },
-  data() {
-    return {
-      confirmDelete: false,
-    };
-  },
-  methods: {
-    deleteAccount() {
-      deleteAccount(this.id).then(() => {
-        this.$emit("deleted");
-      });
-    },
   },
 };
 </script>

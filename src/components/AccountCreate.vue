@@ -6,13 +6,14 @@
 
 <script>
 import { ref } from "vue";
-import { createAccount } from "../api/accounts";
+import { useStore} from "vuex";
 import AddAccountButton from "../components/AddAccountButton";
 
 export default {
   components: { AddAccountButton },
-  emits: ["account-added"],
-  setup(props, { emit }) {
+  //emits: ["account-added"],
+  setup() {
+    const store = useStore();
     const selectedTool = ref("");
     const error = ref("");
     const tools = [
@@ -30,11 +31,14 @@ export default {
       },
     ];
     const add = (name) => {
+      store.dispatch('createAccount', name);
+      /*
       createAccount(name)
         .then(() => {
           emit("account-added");
         })
         .catch(() => (error.value = "Error"));
+        */
     };
     return { tools, selectedTool, error, add };
   },

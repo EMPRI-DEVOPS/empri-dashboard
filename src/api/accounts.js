@@ -3,36 +3,35 @@ function getCsrfToken() {
     return cookies.get("csrftoken");
 }
 
-export async function getAccounts() {
-    const axios = require('axios');
-    const response = await axios.get('/api/account');
-    return response.data.results;
-}
+export default {
+    async getAccounts() {
+        const axios = require('axios');
+        const response = await axios.get('/api/account');
+        return response.data.results;
+    },
+    async getAccount(id) {
+        const axios = require('axios');
+        const response = await axios.get('/api/account/' + id);
+        return response.data;
+    },
+    async deleteAccount(id) {
+        const axios = require('axios');
 
-export async function getAccount(id) {
-    const axios = require('axios');
-    const response = await axios.get('/api/account/' + id);
-    return response.data;
-}
-
-export async function deleteAccount(id) {
-    const axios = require('axios');
-
-    return axios.delete('/api/account/' + id, {
-        headers: {
-            "X-CSRFToken": getCsrfToken()
-        }
-    })
-}
-
-export async function createAccount(tool) {
-    const axios = require('axios');
-
-    return axios.post('/api/account', {
-        tool: tool
-    }, {
-        headers: {
-            "X-CSRFToken": getCsrfToken()
-        }
-    })
+        return axios.delete('/api/account/' + id, {
+            headers: {
+                "X-CSRFToken": getCsrfToken()
+            }
+        })
+    },
+    async createAccount(tool) {
+        const axios = require('axios');
+        const response = await axios.post('/api/account', {
+            tool: tool
+        }, {
+            headers: {
+                "X-CSRFToken": getCsrfToken()
+            }
+        })
+        return response.data
+    }
 }

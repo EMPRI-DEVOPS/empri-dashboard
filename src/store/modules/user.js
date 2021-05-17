@@ -17,14 +17,13 @@ const mutations = {
 
 const actions = {
     async loadUser({ commit }) {
-        return api.getUser().then((user) => {
-            commit('setUser', user)
-        })
+        return api.getUser()
+            .then((user) => commit('setUser', user))
+            .catch(() => window.location.replace("/auth/login/"))
     },
     async updateUser({ commit }, payload) {
-        return api.patchUser(payload).then((user) => {
-            commit('setUser', user)
-        })
+        return api.patchUser(payload)
+            .then((user) => commit('setUser', user))
     }
 }
 

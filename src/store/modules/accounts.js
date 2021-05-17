@@ -1,0 +1,44 @@
+import api from '../../api/accounts';
+
+const state = {
+    all: []
+}
+
+const getters = {
+    enabledGithubAccounts(state) {
+        return state.all
+            .filter((account) => account.tool == "Github")
+            .filter((account) => account.credentials)
+    },
+}
+
+const mutations = {
+    setAccounts(state, accounts) {
+        state.all = accounts
+    },
+    addAccount(state, account) {
+        state.all.push(account)
+    },
+    removeAccount(state, id) {
+        const idx = state.all.findIndex((acc) => acc.id == id);
+        state.all.splice(idx, 1);
+    }
+}
+
+const actions = {
+    async loadAccounts({ commit }) {
+        return api.getAccounts().then((accounts) => {
+            commit('setAccounts', accounts)
+        })
+    },
+    async createAccount({ commit }, tool) {
+        return api.createAccount(tool).then((account) => commit('addAccount', account))
+    },
+    async deleteAccount({ commit }, id) {
+        return api.deleteAccount(id).then(() => commit('removeAccount', id))
+    }
+}
+
+export default {
+    state, mutations, actions, getters
+}

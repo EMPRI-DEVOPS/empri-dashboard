@@ -7,7 +7,7 @@
             ><arrow-left
           /></router-link>
           <span class="m-1">User Account Settings</span
-          ><span class="m-1" v-if="loading"> Loading..</span>
+          ><span class="m-1" v-if="loadingAccounts"> Loading..</span>
         </h5>
       </div>
     </div>
@@ -18,12 +18,11 @@
             <div v-for="account in accounts" :key="account.id">
               <account-list-item
                 v-bind="account"
-                @deleted="fetchAccounts"
                 @authenticated="fetchAccounts"
               />
             </div>
           </transition-group>
-          <account-create @account-added="fetchAccounts" />
+          <account-create />
         </div>
       </div>
       <div class="col-xl-5">
@@ -45,15 +44,13 @@
 
 <script>
 import { useStore } from "vuex";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import AccountListItem from "../components/AccountListItem.vue";
 import AccountCreate from "../components/AccountCreate.vue";
 import UpdatePassword from "../components/UpdatePassword";
 import UpdateTimezone from "../components/UpdateTimezone";
 import UpdateDayTimeRanges from "../components/UpdateDayTimeRanges";
-import { getAccounts } from "../api/accounts";
 import ArrowLeft from "../components/icons/ArrowLeft.vue";
-import useAccounts from "../composables/useAccounts";
 
 export default {
   components: {
@@ -67,9 +64,13 @@ export default {
   setup() {
     const store = useStore();
     const settingsLoaded = ref(false);
-    store.dispatch("loadUser").then(() => settingsLoaded.value = true);
-    return { ...useAccounts(), settingsLoaded };
+    const loadingAccounts = ref(true);
+    const accounts = computed(() => store.state.accounts.all);
+    store.dispatch("loadUser").then(() => (settingsLoaded.value = true));
+    store.dispatch("loadAccounts").then(() => (loadingAccounts.value = false));
+    return { accounts, loadingAccounts, settingsLoaded };
   },
+  /*
   beforeRouteEnter(to, from, next) {
     getAccounts(to.params.id)
       .then((accounts) => {
@@ -77,6 +78,7 @@ export default {
       })
       .catch(() => window.location.replace("/auth/login/"));
   },
+  */
 };
 </script>
 
