@@ -39,13 +39,13 @@
             <th>To</th>
           </tr>
         </thead>
-        <tbody>
+        <transition-group name="list" tag="tbody">
           <tr v-for="(pair, index) in pairs" :key="index">
             <td>{{ index + 1 }}</td>
             <td>{{ pair[0] }}:00</td>
             <td>{{ pair[1] }}:00</td>
           </tr>
-        </tbody>
+        </transition-group>
       </table>
       <div class="row mb-3">
         <div class="col-12">
@@ -146,3 +146,16 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped>
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.2s ease;
+}
+
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(200px);
+}
+</style>
