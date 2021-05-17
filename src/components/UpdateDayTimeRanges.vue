@@ -70,11 +70,11 @@ import { defineComponent, onMounted, computed, ref } from "vue";
 export default defineComponent({
   setup() {
     const store = useStore();
-    const user = computed(() => store.state.user);
-    const handles = ref(user.value.day_time_ranges);
+    const userSettings = computed(() => store.state.user.settings);
+    const handles = ref(userSettings.value.day_time_ranges);
     const saved = computed(
       () =>
-        JSON.stringify(user.value.day_time_ranges) ==
+        JSON.stringify(userSettings.value.day_time_ranges) ==
         JSON.stringify(handles.value)
     );
 
@@ -142,7 +142,7 @@ export default defineComponent({
       store.dispatch("updateUser", { day_time_ranges: handles.value });
     };
 
-    return { handles, pairs, removeHandle, addHandle, save, user, saved };
+    return { handles, pairs, removeHandle, addHandle, save, saved };
   },
 });
 </script>

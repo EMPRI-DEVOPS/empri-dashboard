@@ -67,7 +67,7 @@ export default {
   setup() {
     const store = useStore();
     store.dispatch("loadUser");
-    return { ...useAccounts(), user: computed(() => store.state.user) };
+    return { ...useAccounts(), user: computed(() => store.state.user.settings) };
   },
   beforeRouteEnter(to, from, next) {
     getAccounts(to.params.id)

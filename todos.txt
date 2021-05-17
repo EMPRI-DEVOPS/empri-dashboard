@@ -6,8 +6,6 @@
 
 
 - Bug: das "User interactions per day" muss alle untersuchten Tage anzeigen
-- Tageszeitfenster-Einstellung berücksichtigen
-- Event timestamps in die richtige Zeitzone bringen
 - github commits per repo sollte lieber horizontal werden
 - horizontale charts könnten lieber lollipop charts werden
 - untersuchen wie man vermeiden könnte die selben commits mehrfach zu ziehen mittels hash-prüfung
