@@ -49,13 +49,22 @@
       </table>
       <div class="row mb-3">
         <div class="col-12">
-          <button
-            :disabled="saved"
-            class="btn btn-outline-secondary"
-            @click="save"
-          >
-            Save
-          </button>
+          <div class="btn-group">
+            <button
+              :disabled="saved"
+              class="btn btn-outline-secondary"
+              @click="save"
+            >
+              Save
+            </button>
+            <button
+              v-if="!saved"
+              class="btn btn-outline-secondary"
+              @click="reset"
+            >
+              Reset
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -142,7 +151,13 @@ export default defineComponent({
       store.dispatch("updateUser", { day_time_ranges: handles.value });
     };
 
-    return { handles, pairs, removeHandle, addHandle, save, saved };
+    const reset = () => {
+      handles.value = userSettings.value.day_time_ranges;
+      destroySlider();
+      createSlider();
+    };
+
+    return { handles, pairs, removeHandle, addHandle, save, saved, reset };
   },
 });
 </script>
