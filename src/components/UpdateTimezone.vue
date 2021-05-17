@@ -11,7 +11,7 @@
     <div class="collapse show" id="collapseTimezone">
       <ul class="list-group list-group-flush">
         <li class="list-group-item">
-          <table class="table table-borderless table-hover mb-0">
+          <table v-if="timeZone" class="table table-borderless table-hover mb-0">
             <tbody>
               <tr>
                 <th style="width: 40%">Current time zone</th>

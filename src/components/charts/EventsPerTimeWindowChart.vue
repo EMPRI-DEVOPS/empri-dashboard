@@ -38,8 +38,7 @@ export default {
     };
 
     const store = useStore();
-    const userSettings = computed(() => store.state.user.settings);
-    const dayTimeRanges = computed(() => userSettings.value.day_time_ranges);
+    const dayTimeRanges = computed(() => store.getters.dayTimeRanges);
     return {
       title: "User interactions per time window",
       width,

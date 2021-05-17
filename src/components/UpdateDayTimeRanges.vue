@@ -8,7 +8,7 @@
 
       <div class="row mb-2" style="height: 80px">
         <div class="col-12">
-          <div id="time-window-handles"></div>
+          <div ref="slider" id="time-window-handles"></div>
         </div>
       </div>
       <div class="row mb-3">
@@ -74,27 +74,21 @@
 <script>
 import { create } from "nouislider";
 import { useStore } from "vuex";
-import { defineComponent, onMounted, computed, ref } from "vue";
+import { defineComponent, computed, ref, watch, onMounted } from "vue";
 
 export default defineComponent({
   setup() {
     const store = useStore();
-    const userSettings = computed(() => store.state.user.settings);
-    const handles = ref(userSettings.value.day_time_ranges);
+    const dayTimeRanges = computed(() => store.getters.dayTimeRanges);
+    const handles = ref(dayTimeRanges.value);
     const saved = computed(
-      () =>
-        JSON.stringify(userSettings.value.day_time_ranges) ==
-        JSON.stringify(handles.value)
+      () => JSON.stringify(dayTimeRanges.value) == JSON.stringify(handles.value)
     );
+    const slider = ref(null);
 
-    const destroySlider = () => {
-      const slider = document.getElementById("time-window-handles");
-      slider.noUiSlider.destroy();
-    };
     const createSlider = () => {
-      const slider = document.getElementById("time-window-handles");
-      create(slider, getSliderConf(handles.value));
-      slider.noUiSlider.on("change", (vals) => (handles.value = vals));
+      create(slider.value, getSliderConf(handles.value));
+      slider.value.noUiSlider.on("change", (vals) => (handles.value = vals));
     };
 
     const getSliderConf = (values) => ({
@@ -134,8 +128,6 @@ export default defineComponent({
 
     const removeHandle = () => {
       handles.value = handles.value.slice(0, handles.value.length - 1);
-      destroySlider();
-      createSlider();
     };
 
     const addHandle = () => {
@@ -143,21 +135,35 @@ export default defineComponent({
         ...handles.value,
         handles.value[handles.value.length - 1] + 1,
       ];
-      destroySlider();
-      createSlider();
     };
+
+    watch(handles, (currentHandles, prevHandles) => {
+      if (currentHandles.length != prevHandles.length) {
+        slider.value.noUiSlider.destroy();
+        createSlider();
+      } else {
+        slider.value.noUiSlider.set(currentHandles);
+      }
+    });
 
     const save = () => {
       store.dispatch("updateUser", { day_time_ranges: handles.value });
     };
 
     const reset = () => {
-      handles.value = userSettings.value.day_time_ranges;
-      destroySlider();
-      createSlider();
+      handles.value = dayTimeRanges.value;
     };
 
-    return { handles, pairs, removeHandle, addHandle, save, saved, reset };
+    return {
+      slider,
+      handles,
+      pairs,
+      removeHandle,
+      addHandle,
+      save,
+      saved,
+      reset,
+    };
   },
 });
 </script>

@@ -29,13 +29,13 @@
       <div class="col-xl-5">
         <div class="row g-4">
           <div>
-            <update-day-time-ranges v-if="user.day_time_ranges" />
+            <update-day-time-ranges v-if="settingsLoaded" />
           </div>
           <div>
             <update-password />
           </div>
           <div>
-            <update-timezone v-if="user.time_zone" />
+            <update-timezone />
           </div>
         </div>
       </div>
@@ -45,7 +45,7 @@
 
 <script>
 import { useStore } from "vuex";
-import { computed } from "vue";
+import { ref } from "vue";
 import AccountListItem from "../components/AccountListItem.vue";
 import AccountCreate from "../components/AccountCreate.vue";
 import UpdatePassword from "../components/UpdatePassword";
@@ -66,8 +66,9 @@ export default {
   },
   setup() {
     const store = useStore();
-    store.dispatch("loadUser");
-    return { ...useAccounts(), user: computed(() => store.state.user.settings) };
+    const settingsLoaded = ref(false);
+    store.dispatch("loadUser").then(() => settingsLoaded.value = true);
+    return { ...useAccounts(), settingsLoaded };
   },
   beforeRouteEnter(to, from, next) {
     getAccounts(to.params.id)
