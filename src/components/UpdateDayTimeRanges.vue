@@ -50,7 +50,7 @@
       <div class="row mb-3">
         <div class="col-12">
           <button
-            :disabled="user.day_time_ranges == handles"
+            :disabled="saved"
             class="btn btn-outline-secondary"
             @click="save"
           >
@@ -64,14 +64,19 @@
 
 <script>
 import { create } from "nouislider";
-import { ref, toRefs, defineComponent, onMounted, computed } from "vue";
+import { useStore } from "vuex";
+import { defineComponent, onMounted, computed, ref } from "vue";
 
 export default defineComponent({
-  props: ["user"],
-  emits: ["update:user"],
-  setup(props) {
-    const { user } = toRefs(props);
+  setup() {
+    const store = useStore();
+    const user = computed(() => store.state.user);
     const handles = ref(user.value.day_time_ranges);
+    const saved = computed(
+      () =>
+        JSON.stringify(user.value.day_time_ranges) ==
+        JSON.stringify(handles.value)
+    );
 
     const destroySlider = () => {
       const slider = document.getElementById("time-window-handles");
@@ -133,14 +138,11 @@ export default defineComponent({
       createSlider();
     };
 
-    return { handles, pairs, removeHandle, addHandle };
-  },
-  methods: {
-    save() {
-      const user = this.user;
-      user.day_time_ranges = this.handles;
-      this.$emit("update:user", user);
-    },
+    const save = () => {
+      store.dispatch("updateUser", { day_time_ranges: handles.value });
+    };
+
+    return { handles, pairs, removeHandle, addHandle, save, user, saved };
   },
 });
 </script>

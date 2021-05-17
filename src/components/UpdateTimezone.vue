@@ -83,23 +83,18 @@
 </template>
 
 <script>
-import { computed, defineComponent, ref, toRefs } from "vue";
+import { computed, defineComponent, ref } from "vue";
+import { useStore } from "vuex";
 import { rawTimeZones } from "@vvo/tzdb";
-import { patchUser } from "../api/user";
 import GlobeIcon from "./icons/GlobeIcon";
 import CollapseButton from "./CollapseButton.vue";
 
 export default defineComponent({
   components: { GlobeIcon, CollapseButton },
-  props: {
-    time_zone: {
-      type: String,
-      required: true,
-    },
-  },
-  emits: ["update:time_zone"],
-  setup(props, { emit }) {
-    const { time_zone } = toRefs(props);
+  setup() {
+    const store = useStore();
+    const user = computed(() => store.state.user);
+    const time_zone = computed(() => user.value.time_zone);
     const timeZone = computed(
       () => rawTimeZones.filter((tz) => tz.name === time_zone.value)[0]
     );
@@ -121,11 +116,13 @@ export default defineComponent({
     });
     const newTimeZone = ref("");
     const updateTimeZone = () => {
-      patchUser({ time_zone: newTimeZone.value }).then(() => {
-        emit("update:time_zone", newTimeZone.value);
-        selectedContinent.value = null;
-        newTimeZone.value = null;
-      });
+      store
+        .dispatch("updateUser", { time_zone: newTimeZone.value })
+        .then((res) => {
+          console.log(res);
+          selectedContinent.value = null;
+          newTimeZone.value = null;
+        });
     };
     return {
       continents,

@@ -1,8 +1,10 @@
+- heatmap / punchcard
 - schauen was sonst noch alles für datensätze gezogen werden können
 - - issue comments
 - events über graphql
-- gedanken machen über weitere visualisierungen
-- heatmap / punchcard
+- gedanken machen über weitere visualisierungen (github insights angucken)
+
+
 - Bug: das "User interactions per day" muss alle untersuchten Tage anzeigen
 - Tageszeitfenster-Einstellung berücksichtigen
 - Event timestamps in die richtige Zeitzone bringen

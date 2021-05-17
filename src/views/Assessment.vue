@@ -1,7 +1,10 @@
 <template>
   <div>
     <div class="container mb-3">
-      <div v-if="!enabledGithubAccounts.length" class="row justify-content-center">
+      <div
+        v-if="!enabledGithubAccounts.length"
+        class="row justify-content-center"
+      >
         <div v-if="!enabledGithubAccounts.length" class="card col-lg-5">
           <div class="card-body">
             <router-link to="accounts"
@@ -93,7 +96,10 @@
           <events-per-weekday-chart :events="userInteractions" />
         </div>
         <div class="col-xl-6">
-          <events-per-time-window-chart :events="userInteractions" :day-time-ranges="user.day_time_ranges" />
+          <events-per-time-window-chart
+            :events="userInteractions"
+            :day-time-ranges="user.day_time_ranges"
+          />
         </div>
       </div>
     </div>
@@ -101,7 +107,8 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref, computed } from "vue";
+import { useStore } from "vuex";
 import EventsByDayLineChart from "../components/charts/EventsByDayLineChart.vue";
 import EventsPerWeekdayChart from "../components/charts/EventsPerWeekdayChart.vue";
 import EventsPerTimeWindowChart from "../components/charts/EventsPerTimeWindowChart.vue";
@@ -128,6 +135,8 @@ export default {
       .catch(() => window.location.replace("/auth/login/"));
   },
   setup() {
+    const store = useStore();
+    store.dispatch("loadUser");
     const oneYearAgo = new Date();
     oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
     const today = new Date().toISOString().slice(0, 10);
@@ -142,6 +151,7 @@ export default {
       githubCommits: ref([]),
       accountCreate: ref(false),
       pullingData: ref(false),
+      user: computed(() => store.state.user),
     };
   },
   methods: {
