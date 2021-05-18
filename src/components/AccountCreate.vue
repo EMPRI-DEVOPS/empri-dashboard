@@ -1,12 +1,16 @@
 <template>
   <div v-for="tool in tools" class="col-sm-4" :key="tool.id">
-    <add-account-button :tool="tool.name" @click="add(tool.name)" />
+    <add-account-button
+      :tool="tool.name"
+      @click="add(tool.name)"
+      :unavailable="toolIsPending(tool.name)"
+    />
   </div>
 </template>
 
 <script>
-import { ref } from "vue";
-import { useStore} from "vuex";
+import { computed, ref } from "vue";
+import { useStore } from "vuex";
 import AddAccountButton from "../components/AddAccountButton";
 
 export default {
@@ -14,33 +18,19 @@ export default {
   //emits: ["account-added"],
   setup() {
     const store = useStore();
-    const selectedTool = ref("");
     const error = ref("");
-    const tools = [
-      {
-        id: 1,
-        name: "Taiga",
+    const tools = computed(() => store.state.accounts.accountTypes);
+    const pendingAccountTypes = computed(
+      () => store.getters.pendingAccountTypes
+    );
+    return {
+      tools,
+      error,
+      add: (name) => {
+        store.dispatch("createAccount", name);
       },
-      {
-        id: 2,
-        name: "Github",
-      },
-      {
-        id: 3,
-        name: "Mattermost",
-      },
-    ];
-    const add = (name) => {
-      store.dispatch('createAccount', name);
-      /*
-      createAccount(name)
-        .then(() => {
-          emit("account-added");
-        })
-        .catch(() => (error.value = "Error"));
-        */
+      toolIsPending: (toolName) => pendingAccountTypes.value.includes(toolName),
     };
-    return { tools, selectedTool, error, add };
   },
 };
 </script>

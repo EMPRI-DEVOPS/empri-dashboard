@@ -1,7 +1,22 @@
 import api from '../../api/accounts';
 
 const state = {
-    all: []
+    all: [],
+    /** accountTypes should be a constant and not reactive */
+    accountTypes: [
+        {
+            id: 1,
+            name: "Taiga",
+        },
+        {
+            id: 2,
+            name: "Github",
+        },
+        {
+            id: 3,
+            name: "Mattermost",
+        },
+    ]
 }
 
 const getters = {
@@ -9,6 +24,11 @@ const getters = {
         return state.all
             .filter((account) => account.tool == "Github")
             .filter((account) => account.credentials)
+    },
+    pendingAccountTypes(state) {
+        return state.all
+            .filter((account) => !account.credentials)
+            .map((account) => account.tool);
     },
 }
 

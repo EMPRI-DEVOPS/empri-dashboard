@@ -18,7 +18,6 @@
             <div v-for="account in accounts" :key="account.id">
               <account-list-item
                 v-bind="account"
-                @authenticated="fetchAccounts"
               />
             </div>
           </transition-group>
@@ -70,15 +69,6 @@ export default {
     store.dispatch("loadAccounts").then(() => (loadingAccounts.value = false));
     return { accounts, loadingAccounts, settingsLoaded };
   },
-  /*
-  beforeRouteEnter(to, from, next) {
-    getAccounts(to.params.id)
-      .then((accounts) => {
-        next((vm) => vm.setAccounts(accounts));
-      })
-      .catch(() => window.location.replace("/auth/login/"));
-  },
-  */
 };
 </script>
 

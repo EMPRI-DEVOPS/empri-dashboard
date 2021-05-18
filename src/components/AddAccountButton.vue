@@ -14,6 +14,7 @@
       <button
         class="btn btn-outline-secondary stretched-link"
         @click="$emit('added')"
+        :disabled="unavailable"
       >
         Add Account
       </button>
@@ -32,6 +33,10 @@ export default {
     tool: {
       type: String,
       default: "",
+      required: true,
+    },
+    unavailable: {
+      type: Boolean,
       required: true,
     },
   },
