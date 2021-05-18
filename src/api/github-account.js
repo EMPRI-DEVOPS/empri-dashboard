@@ -96,7 +96,7 @@ export default class GithubAccount {
                 yield {
                     foundCount, repo: repo.nameWithOwner
                 }
-
+                
             }
         }
     }
@@ -162,13 +162,13 @@ export default class GithubAccount {
             }
             hasNextPage = response.repository.defaultBranchRef.target.history.pageInfo.hasNextPage;
             afterCursor = response.repository.defaultBranchRef.target.history.pageInfo.endCursor;
-            yield response.repository.defaultBranchRef.target.history.nodes.map((commit) => ({
+            yield response.repository.defaultBranchRef.target.history.nodes.map((commit) => (Object.freeze({
                 tool: 'Github',
                 type: 'commit',
-                timestamp: DateTime.fromISO(commit.committedDate, { zone: this.timeZone }),
+                timestamp: DateTime.fromISO(commit.committedDate).setZone(this.timeZone).toISO(),
                 message: commit.message,
                 repo: `${owner}/${name}`
-            }));
+            })));
         }
     }
 

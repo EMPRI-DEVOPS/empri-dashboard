@@ -28,12 +28,14 @@
 
 <script>
 import * as d3 from "d3";
+import { useStore } from "vuex";
+import { Interval, DateTime } from "luxon";
 import { computed, ref, onMounted, defineComponent } from "vue";
 import ActivityIcon from "../icons/ActivityIcon";
 
 export default defineComponent({
   components: { ActivityIcon },
-  props: ["events"],
+  props: ["from", "to"],
   watch: {
     width() {
       this.updateChart();
@@ -57,6 +59,9 @@ export default defineComponent({
       bottom: 20,
     };
 
+    const store = useStore();
+    const events = computed(() => store.state.userInteractions.all);
+
     const boundedWidth = computed(
       () => width.value - margin.left - margin.right
     );
@@ -73,40 +78,39 @@ export default defineComponent({
       });
     });
 
-    const dateParser = d3.timeParse("%d.%m.%Y");
-
     const preparedData = computed(() => {
-      let eventsByDay = [];
-
-      for (let i = 0; i < props.events.length; i++) {
-        const event = props.events[i];
-        const date = event.timestamp.toJSDate();
-        const day = d3.timeFormat("%d.%m.%Y")(date);
-        const obj = eventsByDay.filter((o) => o.day === day)[0];
-        if (obj) {
-          obj.events += 1;
-        } else {
-          eventsByDay.unshift({
-            day: day,
-            events: 1,
-          });
+      function* days(interval) {
+        let cursor = interval.start.startOf("day");
+        while (cursor < interval.end) {
+          yield cursor;
+          cursor = cursor.plus({ days: 1 });
         }
       }
 
-      const timeExtent = d3.extent(eventsByDay, (d) => dateParser(d.day));
-      const allDays = d3.timeDay.range(timeExtent[0], timeExtent[1]);
-      return allDays.map((day) => {
-        const dayData = eventsByDay.find((ed) => {
-          return dateParser(ed.day).toString() === day.toString();
-        });
-        return { events: dayData ? dayData.events : 0, day: day };
+      let interval = Interval.fromDateTimes(
+        DateTime.fromISO(props.from).setZone(store.getters.timeZone),
+        DateTime.fromISO(props.to).setZone(store.getters.timeZone)
+      );
+      const allDays = Array.from(days(interval));
+
+      const eventsByDay = allDays.map((day) => {
+        return { events: 0, day: day };
       });
+      for (let i = 0; i < events.value.length; i++) {
+        const event = events.value[i];
+        const timestamp = DateTime.fromISO(event.timestamp).setZone(store.getters.timeZone);
+        const dayObj = eventsByDay.find((o) => {
+          return o.day.hasSame(timestamp, 'day');
+        });
+        dayObj.events++;
+      }
+      return eventsByDay;
     });
 
     const xBand = computed(() =>
       d3
         .scaleBand()
-        .domain(preparedData.value.map((d) => d.day))
+        .domain(preparedData.value.map((d) => d.day.toJSDate()))
         .range([0, boundedWidth.value])
         .padding(0.1)
     );
@@ -114,7 +118,7 @@ export default defineComponent({
     const xScale = computed(() =>
       d3
         .scaleTime()
-        .domain(d3.extent(preparedData.value, (d) => d.day))
+        .domain(d3.extent(preparedData.value, (d) => d.day.toJSDate()))
         .range([0, boundedWidth.value])
     );
 
@@ -135,7 +139,7 @@ export default defineComponent({
       xScale,
       xBand,
       preparedData,
-      dateParser,
+      events: computed(() => store.state.userInteractions.all),
     };
   },
   methods: {
@@ -163,7 +167,7 @@ export default defineComponent({
           "d",
           d3
             .area()
-            .x((e) => this.xBand(e.day) + this.xBand.bandwidth() / 2)
+            .x((e) => this.xBand(e.day.toJSDate()) + this.xBand.bandwidth() / 2)
             .y0(() => this.yScale(0))
             .y1((e) => this.yScale(e.events))
             .curve(d3.curveMonotoneX)

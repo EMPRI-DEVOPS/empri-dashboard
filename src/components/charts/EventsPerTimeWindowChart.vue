@@ -23,10 +23,10 @@
 <script>
 import { useStore } from "vuex";
 import * as d3 from "d3";
+import { DateTime } from "luxon";
 import { computed, ref } from "vue";
 
 export default {
-  props: ["events"],
   setup() {
     const width = ref(700);
     const height = 400;
@@ -45,6 +45,7 @@ export default {
       height,
       margin,
       dayTimeRanges,
+      events: computed(() => store.state.userInteractions.all),
     };
   },
   watch: {
@@ -115,13 +116,11 @@ export default {
     },
   },
   methods: {
-    /**
-     * @param {DateTime} date
-     */
     getTimeWindowOfDate(date) {
+      const dt = DateTime.fromISO(date).setZone(this.$store.getters.timeZone);
       for (let i = 0; i < this.timeWindows.length - 1; i++) {
         let timeWindow = this.timeWindows[i];
-        if (date.hour >= timeWindow.from && date.hour < timeWindow.to) {
+        if (dt.hour >= timeWindow.from && dt.hour < timeWindow.to) {
           return timeWindow;
         }
       }

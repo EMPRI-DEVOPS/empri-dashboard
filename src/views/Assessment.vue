@@ -87,7 +87,7 @@
     <div class="m-2" v-if="!pullingData && userInteractions.length">
       <div class="row g-2">
         <div class="col-xl-8">
-          <events-by-day-line-chart :events="userInteractions" />
+          <events-by-day-line-chart :from="from" :to="to" />
         </div>
         <div class="col-xl-4">
           <github-commits-per-repo />
@@ -151,7 +151,7 @@ export default {
         account.username = this.githubUsername =
           this.githubUsername || account.username;
         for await (const loaded of account.loadRepositoriesContributedTo()) {
-          this.statusMessage = `Pulled ${loaded.loadedCount}/${loaded.totalCount} repos where ${this.githubUsername} has contributed to..`;
+          this.statusMessage = `Found ${loaded.loadedCount}/${loaded.totalCount} repos where ${this.githubUsername} has contributed to..`;
         }
         for await (const found of account.loadCommits(this.from, this.to)) {
           this.statusMessage = `Found ${found.foundCount} commits in ${found.repo}`;
