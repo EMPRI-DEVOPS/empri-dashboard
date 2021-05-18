@@ -1,0 +1,195 @@
+<template>
+  <div ref="div" class="card shadow-sm">
+    <div class="card-body">
+      <h6 v-if="title" class="card-title"><activity-icon /> {{ title }}</h6>
+      <svg width="100%" :height="height" :viewbox="`0 0 ${width} ${height}`">
+        <g
+          id="weekday-heatmap"
+          :transform="`translate(${margin.left}, ${margin.top})`"
+        >
+          <g class="yAxis" fill="none" text-anchor="end"></g>
+          <g
+            class="xAxis"
+            :transform="`translate(0, ${boundedHeight})`"
+            fill="none"
+            text-anchor="middle"
+          ></g>
+        </g>
+      </svg>
+      <div class="tooltip"></div>
+    </div>
+  </div>
+</template>
+
+<script>
+import ActivityIcon from "../icons/ActivityIcon";
+import * as d3 from "d3";
+import { computed, ref } from "vue";
+import { useStore } from "vuex";
+import { Interval, DateTime } from "luxon";
+
+export default {
+  components: { ActivityIcon },
+  props: ["from", "to"],
+  setup(props) {
+    const store = useStore();
+    const interval = Interval.fromDateTimes(
+      DateTime.fromISO(props.from).setZone(store.getters.timeZone),
+      DateTime.fromISO(props.to).setZone(store.getters.timeZone)
+    );
+    const events = computed(() => store.state.userInteractions.all);
+    const width = ref(700);
+    const margin = {
+      top: 10,
+      right: 70,
+      left: 80,
+      bottom: 40,
+    };
+    const boundedWidth = computed(
+      () => width.value - margin.left - margin.right
+    );
+    const height = 400;
+    const boundedHeight = height - margin.top - margin.bottom;
+    const weekdays = [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday",
+    ];
+    const heatmapData = computed(() => {
+      function* days(interval) {
+        let cursor = interval.start.startOf("day").setLocale("en-US");
+        while (cursor < interval.end) {
+          yield cursor;
+          cursor = cursor.plus({ days: 1 });
+        }
+      }
+
+      const weekmap = Array.from(days(interval)).map((day) => ({
+        weekYear: day.weekYear,
+        weekNumber: day.weekNumber,
+        week: `${day.weekYear} ${day.weekNumber}`,
+        weekday: day.weekday,
+        isoDate: day.toISODate(),
+        events: 0,
+      }));
+
+      for (let i = 0; i < events.value.length; i++) {
+        const event = events.value[i];
+        const timestamp = DateTime.fromISO(event.timestamp).setZone(
+          store.getters.timeZone
+        );
+        const dayObj = weekmap.find((day) => {
+          return day.isoDate === timestamp.toISODate();
+        });
+        dayObj.events++;
+      }
+
+      return weekmap;
+    });
+
+    const xBand = computed(() =>
+      d3
+        .scaleBand()
+        .domain(heatmapData.value.map((d) => `${d.weekYear} ${d.weekNumber}`))
+        .range([0, boundedWidth.value])
+        .padding(0.2)
+    );
+
+    const xTimeScale = computed(() =>
+      d3
+        .scaleTime()
+        .domain([new Date(props.from), new Date(props.to)])
+        .range([0, boundedWidth.value])
+    );
+
+    const yBand = computed(() =>
+      d3.scaleBand().domain(weekdays).range([0, boundedHeight]).padding(0.2)
+    );
+
+    const colorScale = computed(() =>
+      d3
+        .scaleLinear()
+        .range(["#f8f8f8", "#69b3a2"])
+        .domain(d3.extent(heatmapData.value, (e) => e.events))
+    );
+
+    return {
+      title: "Weekday heatmap",
+      width,
+      height,
+      margin,
+      boundedHeight,
+      boundedWidth,
+      xBand,
+      xTimeScale,
+      yBand,
+      colorScale,
+      heatmapData,
+      weekdays,
+    };
+  },
+  mounted() {
+    this.width = this.$refs.div.offsetWidth;
+
+    this.updateChart();
+  },
+  methods: {
+    updateChart() {
+      const chart = d3.select("#weekday-heatmap");
+      chart.select(".yAxis").call(d3.axisLeft(this.yBand));
+
+      chart
+        .select(".xAxis")
+        .call(d3.axisBottom(this.xTimeScale).ticks(this.boundedWidth / 80));
+
+      const tooltip = d3.select(".tooltip");
+
+      // Three function that change the tooltip when user hover / move / leave a cell
+      const mouseover = () => tooltip.style("opacity", 0.7);
+      const mousemove = (event, d) => {
+        tooltip
+          .html(`${d.events} commits on ${d.isoDate}`)
+          .style("left", d3.pointer(event)[0] + 20 + "px")
+          .style("top", d3.pointer(event)[1] + "px");
+      };
+      const mouseleave = () => tooltip.style("opacity", 0);
+
+      let rects = chart.selectAll("rect").data(this.heatmapData);
+
+      // Bars
+      rects
+        .enter()
+        .append("rect")
+        .merge(rects)
+        .attr("x", (d) => this.xBand(`${d.weekYear} ${d.weekNumber}`))
+        .attr("y", (d) => this.yBand(this.weekdays[d.weekday - 1]))
+        .attr("rx", 4)
+        .attr("ry", 4)
+        .attr("width", d3.min([this.xBand.bandwidth(), this.yBand.bandwidth()]))
+        .attr("height", this.yBand.bandwidth())
+        .attr("fill", (d) => this.colorScale(d.events))
+        .attr("stroke", "#c8c8c8")
+        .attr("stroke-width", 2)
+        .on("mouseover", mouseover)
+        .on("mousemove", mousemove)
+        .on("mouseleave", mouseleave);
+    },
+  },
+};
+</script>
+
+<style scoped>
+.tooltip {
+  opacity: 0;
+  background-color: white;
+  border: 2px solid #c8c8c8;
+  border-radius: 5px;
+  padding: 5px;
+  left: 452px;
+  top: 264.017px;
+}
+</style>

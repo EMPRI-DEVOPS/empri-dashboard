@@ -21,21 +21,27 @@
 </template>
 
 <script>
+import { ref, computed } from "vue";
 import * as d3 from "d3";
 
 export default {
   props: ["events"],
-  data() {
+  setup() {
+    const width = ref(700);
+    const height = 400;
+    const margin = {
+      top: 10,
+      right: 50,
+      left: 70,
+      bottom: 20,
+    };
     return {
-      width: 700,
-      height: 400,
-      margin: {
-        top: 10,
-        bottom: 30,
-        left: 70,
-        right: 15,
-      },
       title: "User interactions per weekday",
+      width,
+      height,
+      margin,
+      boundedHeight: height - margin.top - margin.bottom,
+      boundedWidth: computed(() => width.value - margin.left - margin.right),
       weekdays: [
         "Sunday",
         "Monday",
@@ -46,11 +52,6 @@ export default {
         "Saturday",
       ],
     };
-  },
-  watch: {
-    commits() {
-      this.updateChart();
-    },
   },
   mounted() {
     this.width = this.$refs.div.offsetWidth;
@@ -66,25 +67,12 @@ export default {
         const event = this.events[i];
         const date = new Date(event.timestamp);
         const weekday = this.weekdays[date.getDay()];
-        const weekdayObj = eventsPerWeekday.filter(
+        const weekdayObj = eventsPerWeekday.find(
           (e) => e.weekday === weekday
-        )[0];
-        if (weekdayObj) {
-          weekdayObj.events++;
-          continue;
-        }
-        eventsPerWeekday.unshift({
-          weekday: weekday,
-          events: 1,
-        });
+        );
+        weekdayObj.events++;
       }
       return eventsPerWeekday;
-    },
-    boundedWidth() {
-      return this.width - this.margin.left - this.margin.right;
-    },
-    boundedHeight() {
-      return this.height - this.margin.top - this.margin.bottom;
     },
     xScale() {
       return d3

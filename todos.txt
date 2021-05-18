@@ -1,4 +1,3 @@
-- heatmap / punchcard
 - schauen was sonst noch alles für datensätze gezogen werden können
 - - issue comments
 - events über graphql

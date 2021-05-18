@@ -98,6 +98,9 @@
         <div class="col-xl-6">
           <events-per-time-window-chart :events="userInteractions" />
         </div>
+        <div class="col-xl-6">
+          <weekday-heatmap :from="from" :to="to" />
+        </div>
       </div>
     </div>
   </div>
@@ -113,6 +116,7 @@ import EventsPerTimeWindowChart from "../components/charts/EventsPerTimeWindowCh
 import GithubCommitsPerRepo from "../components/charts/GithubCommitsPerRepo.vue";
 import PlayIcon from "../components/icons/PlayIcon";
 import GithubAccount from "../api/github-account";
+import WeekdayHeatmap from '../components/charts/WeekdayHeatmap.vue';
 
 export default {
   components: {
@@ -121,6 +125,7 @@ export default {
     EventsPerWeekdayChart,
     EventsPerTimeWindowChart,
     PlayIcon,
+    WeekdayHeatmap,
   },
   name: "Assessment",
   setup() {

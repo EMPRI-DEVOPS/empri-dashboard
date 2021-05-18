@@ -87,7 +87,7 @@ export default defineComponent({
         }
       }
 
-      let interval = Interval.fromDateTimes(
+      const interval = Interval.fromDateTimes(
         DateTime.fromISO(props.from).setZone(store.getters.timeZone),
         DateTime.fromISO(props.to).setZone(store.getters.timeZone)
       );
@@ -98,9 +98,11 @@ export default defineComponent({
       });
       for (let i = 0; i < events.value.length; i++) {
         const event = events.value[i];
-        const timestamp = DateTime.fromISO(event.timestamp).setZone(store.getters.timeZone);
+        const timestamp = DateTime.fromISO(event.timestamp).setZone(
+          store.getters.timeZone
+        );
         const dayObj = eventsByDay.find((o) => {
-          return o.day.hasSame(timestamp, 'day');
+          return o.day.hasSame(timestamp, "day");
         });
         dayObj.events++;
       }
@@ -118,7 +120,7 @@ export default defineComponent({
     const xScale = computed(() =>
       d3
         .scaleTime()
-        .domain(d3.extent(preparedData.value, (d) => d.day.toJSDate()))
+        .domain([new Date(props.from), new Date(props.to)])
         .range([0, boundedWidth.value])
     );
 
