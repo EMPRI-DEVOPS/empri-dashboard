@@ -5,10 +5,17 @@ import {
     graphql
 } from "@octokit/graphql";
 import { DateTime } from "luxon";
+import store from '../store/index';
 
-class GithubAccount {
+export default class GithubAccount {
+    username;
+    timeZone;
+    #userId;
+    #repositoriesContributedTo = [];
+
     constructor(account) {
         this.username = account.username;
+        this.timeZone = store.getters.timeZone;
 
         const accessToken = account.credentials.access_token;
 
@@ -25,50 +32,7 @@ class GithubAccount {
 
     }
 
-    async commits(repo) {
-        let response = await this.restClient(`repos/${this.username}/${repo}/commits`);
-        console.log(response.headers);
-
-        console.log(response.data);
-        return response.data;
-    }
-
-    async pullRepos() {
-        const repoNames = await this.rest.paginate(
-            "GET /users/{username}/repos", {
-            username: this.username
-        },
-            (response) => response.data.map((repo) => repo.name)
-        );
-
-        this.repos = {};
-        repoNames.forEach(async (repoName) => {
-            this.repos[repoName] = {
-                commits: await this.rest.paginate(
-                    "GET /repos/{owner}/{repo}/commits", {
-                    owner: this.username,
-                    repo: repoName
-                }
-                ),
-                issues: await this.rest.paginate(
-                    "GET /repos/{owner}/{repo}/issues", {
-                    owner: this.username,
-                    repo: repoName
-                }
-                ),
-            }
-        });
-    }
-
-    getRepos() {
-        return this.repos
-    }
-
-    async getUserId() {
-
-    }
-
-    async *repositoriesContributedTo() {
+    async *loadRepositoriesContributedTo() {
         let totalCount = 1;
 
         let loadedCount = 0;
@@ -104,11 +68,36 @@ class GithubAccount {
             endCursor = response.user.repositoriesContributedTo.pageInfo.endCursor;
             let repos = response.user.repositoriesContributedTo.nodes;
             loadedCount += repos.length;
+            if (!this.#userId) {
+                this.#userId = response.user.id;
+            }
+            this.#repositoriesContributedTo.push(...repos);
             yield {
-                userId: response.user.id,
-                totalCount: totalCount,
-                repos: repos
+                totalCount,
+                loadedCount
             };
+        }
+    }
+
+    async *loadCommits(since, until) {
+        const sinceDate = DateTime.fromISO(since).setZone(this.timeZone);
+        const untilDate = DateTime.fromISO(until).setZone(this.timeZone);
+        for (let i = 0; i < this.#repositoriesContributedTo.length; i++) {
+            let repo = this.#repositoriesContributedTo[i];
+            let foundCount = 0;
+            for await (const repoCommitsPage of this.repoCommits(
+                repo.owner.login,
+                repo.name,
+                sinceDate.toISO(),
+                untilDate.toISO(),
+            )) {
+                store.commit('addUserInteractions', repoCommitsPage);
+                foundCount += repoCommitsPage.length;
+                yield {
+                    foundCount, repo: repo.nameWithOwner
+                }
+
+            }
         }
     }
 
@@ -116,11 +105,11 @@ class GithubAccount {
      * 
      * @param {*} owner 
      * @param {*} name 
-     * @param {*} userId 
-     * @param {Date} since 
+     * @param {string} since 
+     * @param {string} until
      * @returns 
      */
-    async *repoCommits(owner, name, userId, since, until, timeZone) {
+    async *repoCommits(owner, name, since, until) {
         let hasNextPage = true;
         let afterCursor = null;
         while (hasNextPage) {
@@ -158,11 +147,11 @@ class GithubAccount {
                     }
                 }
                 `, {
-                name: name,
-                owner: owner,
-                userId: userId,
-                since: since.toISOString(),
-                until: until.toISOString(),
+                name,
+                owner,
+                userId: this.#userId,
+                since,
+                until,
                 after: afterCursor
             }
             );
@@ -174,7 +163,9 @@ class GithubAccount {
             hasNextPage = response.repository.defaultBranchRef.target.history.pageInfo.hasNextPage;
             afterCursor = response.repository.defaultBranchRef.target.history.pageInfo.endCursor;
             yield response.repository.defaultBranchRef.target.history.nodes.map((commit) => ({
-                timestamp: DateTime.fromISO(commit.committedDate, { zone: timeZone }),
+                tool: 'Github',
+                type: 'commit',
+                timestamp: DateTime.fromISO(commit.committedDate, { zone: this.timeZone }),
                 message: commit.message,
                 repo: `${owner}/${name}`
             }));
@@ -204,40 +195,4 @@ class GithubAccount {
             })
         }
     }
-
-    async pullData() {
-
-
-
-        //"Search text is required when searching commits. Searches that use qualifiers only are not allowed. Were you searching for something else?
-        /*
-        const searchCommits = await this.octokit.paginate(
-            "GET /search/commits", {
-                q: `user:${this.username}`,
-                mediaType: {
-                    previews: ['cloak']
-                }
-            }
-        );
-        */
-
-        const events = await this.rest
-            .paginate("GET /users/{username}/events", {
-                username: this.username,
-                per_page: 50
-            },
-                (response) => response.data.map((event) => {
-                    return {
-                        id: event.id,
-                        type: event.type,
-                        timestamp: event.created_at
-                    }
-                }));
-
-        return events;
-    }
-}
-
-export {
-    GithubAccount
 }

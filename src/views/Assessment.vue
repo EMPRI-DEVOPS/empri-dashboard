@@ -86,11 +86,11 @@
 
     <div class="m-2" v-if="!pullingData && userInteractions.length">
       <div class="row g-2">
-        <div class="col-xl-8" v-if="userInteractions.length">
+        <div class="col-xl-8">
           <events-by-day-line-chart :events="userInteractions" />
         </div>
-        <div class="col-xl-4" v-if="githubCommits.length">
-          <github-commits-per-repo :commits="githubCommits" />
+        <div class="col-xl-4">
+          <github-commits-per-repo />
         </div>
         <div class="col-xl-6">
           <events-per-weekday-chart :events="userInteractions" />
@@ -106,12 +106,13 @@
 <script>
 import { ref, computed } from "vue";
 import { useStore } from "vuex";
+import { DateTime } from "luxon";
 import EventsByDayLineChart from "../components/charts/EventsByDayLineChart.vue";
 import EventsPerWeekdayChart from "../components/charts/EventsPerWeekdayChart.vue";
 import EventsPerTimeWindowChart from "../components/charts/EventsPerTimeWindowChart.vue";
 import GithubCommitsPerRepo from "../components/charts/GithubCommitsPerRepo.vue";
 import PlayIcon from "../components/icons/PlayIcon";
-import { GithubAccount } from "../api/github-account";
+import GithubAccount from "../api/github-account";
 
 export default {
   components: {
@@ -122,95 +123,42 @@ export default {
     PlayIcon,
   },
   name: "Assessment",
-  /*
-  beforeRouteEnter(to, from, next) {
-    getAccounts(to.params.id)
-      .then((accounts) => {
-        next((vm) => vm.setAccounts(accounts));
-      })
-      .catch(() => window.location.replace("/auth/login/"));
-  },
-  */
   setup() {
     const store = useStore();
     store.dispatch("loadUser");
     store.dispatch("loadAccounts");
-    const oneYearAgo = new Date();
-    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-    const today = new Date().toISOString().slice(0, 10);
+    const now = DateTime.fromObject({ zone: store.getters.timeZone });
     return {
-      enabledGithubAccounts: computed(() => store.getters.enabledGithubAccounts),
-      from: ref(oneYearAgo.toISOString().slice(0, 10)),
-      today,
-      to: ref(today),
+      enabledGithubAccounts: computed(
+        () => store.getters.enabledGithubAccounts
+      ),
+      from: ref(now.minus({ year: 1 }).toISODate()),
+      today: now.toISODate(),
+      to: ref(now.toISODate()),
       githubUsername: ref(""),
       statusMessage: ref(""),
-      userInteractions: ref([]),
-      githubCommits: ref([]),
       pullingData: ref(false),
-      userSettings: computed(() => store.state.user.settings),
+      userInteractions: computed(() => store.state.userInteractions.all),
     };
   },
   methods: {
     async start() {
-      this.userInteractions = [];
+      this.$store.commit("resetUserInteractions");
       this.pullingData = true;
 
       this.enabledGithubAccounts.forEach(async (githubAccount) => {
-        const timeZone = this.$store.getters.timeZone;
-        let account1 = new GithubAccount(githubAccount);
-
-        if (this.githubUsername) {
-          account1.username = this.githubUsername;
-        } else {
-          this.githubUsername = account1.username;
+        let account = new GithubAccount(githubAccount);
+        account.username = this.githubUsername =
+          this.githubUsername || account.username;
+        for await (const loaded of account.loadRepositoriesContributedTo()) {
+          this.statusMessage = `Pulled ${loaded.loadedCount}/${loaded.totalCount} repos where ${this.githubUsername} has contributed to..`;
         }
-        const { userId, repos } = await this.pullRepos(account1);
-        await this.pullCommits(
-          account1,
-          repos,
-          userId,
-          new Date(this.from),
-          new Date(this.to),
-          timeZone
-        );
+        for await (const found of account.loadCommits(this.from, this.to)) {
+          this.statusMessage = `Found ${found.foundCount} commits in ${found.repo}`;
+        }
         this.statusMessage = "";
         this.pullingData = false;
       });
-    },
-    async pullRepos(account) {
-      let repositoriesContributedTo = [];
-      let userId;
-      for await (const repoPage of account.repositoriesContributedTo()) {
-        userId = repoPage.userId;
-        repositoriesContributedTo = [
-          ...repositoriesContributedTo,
-          ...repoPage.repos,
-        ];
-        this.statusMessage = `Pulled ${repositoriesContributedTo.length}/${repoPage.totalCount} repos where ${this.githubUsername} has contributed to..`;
-      }
-      return { userId: userId, repos: repositoriesContributedTo };
-    },
-    async pullCommits(account, repos, userId, since, until, timeZone) {
-      let commits = [];
-      for (let i = 0; i < repos.length; i++) {
-        let repo = repos[i];
-        for await (const repoCommitsPage of account.repoCommits(
-          repo.owner.login,
-          repo.name,
-          userId,
-          since,
-          until,
-          timeZone
-        )) {
-          commits = [...commits, ...repoCommitsPage];
-          this.statusMessage = `Found ${commits.length} commits -- Scanning ${
-            repo.nameWithOwner
-          } ${i + 1}/${repos.length}`;
-        }
-      }
-      this.githubCommits = commits;
-      this.userInteractions = [...this.userInteractions, ...commits];
     },
   },
 };

@@ -24,7 +24,6 @@
 import * as d3 from "d3";
 
 export default {
-  props: ["commits"],
   data() {
     return {
       width: 700,
@@ -48,6 +47,9 @@ export default {
     this.updateChart();
   },
   computed: {
+    commits() {
+      return this.$store.getters.githubCommits;
+    },
     processedData() {
       let repos = [];
       for (let i = 0; i < this.commits.length; i++) {
