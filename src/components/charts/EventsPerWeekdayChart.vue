@@ -62,9 +62,6 @@ export default {
     width() {
       this.updateChart();
     },
-    eventsPerWeekday() {
-      this.updateChart();
-    },
   },
   computed: {
     eventsPerWeekday() {

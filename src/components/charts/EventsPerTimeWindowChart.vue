@@ -51,12 +51,6 @@ export default {
     width() {
       this.updateChart();
     },
-    dayTimeRanges() {
-      this.updateChart();
-    },
-    processedData() {
-      this.updateChart();
-    },
   },
   mounted() {
     this.updateChart();

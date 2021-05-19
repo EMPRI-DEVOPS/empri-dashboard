@@ -41,12 +41,6 @@ export default defineComponent({
     width() {
       this.updateChart();
     },
-    events() {
-      this.updateChart();
-    },
-    preparedData() {
-      this.updateChart();
-    },
   },
   mounted() {
     this.updateChart();

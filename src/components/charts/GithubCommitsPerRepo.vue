@@ -41,9 +41,6 @@ export default {
     };
   },
   watch: {
-    commits() {
-      this.updateChart();
-    },
     width() {
       this.updateChart();
     },
