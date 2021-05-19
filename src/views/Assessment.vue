@@ -74,17 +74,18 @@
       </div>
     </div>
 
-    <div v-if="statusMessage" class="row py-4 justify-content-center">
-      <div class="col-md-7">
-        <div class="card shadow-sm account-list-item">
-          <div class="card-header text-center">
-            <h5 class="card-title">{{ statusMessage }}</h5>
+    <div class="container-fluid" v-if="statusMessage">
+      <div class="row justify-content-center">
+        <div class="col-md-7">
+          <div class="card shadow-sm account-list-item">
+            <div class="card-header text-center">
+              <h5 class="card-title">{{ statusMessage }}</h5>
+            </div>
           </div>
         </div>
       </div>
     </div>
-
-    <div class="p-2" v-if="createdAssessment">
+    <div class="container-fluid" v-if="createdAssessment">
       <div id="assessment" class="row g-2 justify-content-xl-center">
         <div :ref="setChartRef" class="col-xl-8">
           <events-by-day-line-chart :from="from" :to="to" />
@@ -106,7 +107,7 @@
         </div>
       </div>
       <div class="row">
-        <div class="col justify-content-center">
+        <div class="col">
           <button class="btn btn-outline-secondary" @click="pdf">
             Export to PDF
           </button>

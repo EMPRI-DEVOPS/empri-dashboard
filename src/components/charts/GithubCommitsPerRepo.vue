@@ -29,7 +29,7 @@ export default {
     const height = 200;
     const margin = {
       top: 10,
-      right: 50,
+      right: 10,
       left: 250,
       bottom: 30,
     };

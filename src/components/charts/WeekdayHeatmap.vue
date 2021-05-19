@@ -41,7 +41,7 @@ export default {
     const events = computed(() => store.state.userInteractions.all);
     const margin = {
       top: 10,
-      right: 70,
+      right: 10,
       left: 80,
       bottom: 40,
     };

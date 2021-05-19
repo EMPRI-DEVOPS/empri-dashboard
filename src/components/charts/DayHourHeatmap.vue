@@ -37,7 +37,7 @@ export default {
     const { width, div } = useResponsiveWidth();
     const margin = {
       top: 10,
-      right: 70,
+      right: 10,
       left: 80,
       bottom: 40,
     };

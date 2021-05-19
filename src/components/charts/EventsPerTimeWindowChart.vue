@@ -34,7 +34,7 @@ export default {
       top: 10,
       bottom: 30,
       left: 80,
-      right: 50,
+      right: 10,
     };
     const store = useStore();
     const dayTimeRanges = computed(() => store.getters.dayTimeRanges);

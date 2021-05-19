@@ -52,7 +52,7 @@ export default defineComponent({
     const height = 400;
     const margin = {
       top: 10,
-      right: 50,
+      right: 10,
       left: 30,
       bottom: 20,
     };
