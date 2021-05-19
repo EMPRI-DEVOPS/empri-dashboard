@@ -2,7 +2,7 @@
   <div ref="div" class="card">
     <div class="card-body">
       <h6 class="card-title">{{ title }}</h6>
-      <svg width="100%" :height="height" :viewbox="`0 0 ${width} ${height}`">
+      <svg :width="width" :height="height" :viewbox="`0 0 ${width} ${height}`">
         <g
           id="events-per-time-window-chart"
           :transform="`translate(${margin.left}, ${margin.top})`"

@@ -84,26 +84,32 @@
       </div>
     </div>
 
-    <div class="m-2" v-if="createdAssessment">
-      <div class="row g-2">
-        <div class="col-xl-8">
+    <div class="p-2" v-if="createdAssessment">
+      <div id="assessment" class="row g-2 justify-content-xl-center">
+        <div :ref="setChartRef" class="col-xl-8">
           <events-by-day-line-chart :from="from" :to="to" />
         </div>
-        <div class="col-xl-4"></div>
-        <div class="col-xl-6">
+        <div :ref="setChartRef" class="col-xl-6">
           <events-per-weekday-chart />
         </div>
-        <div class="col-xl-6">
+        <div :ref="setChartRef" class="col-xl-6">
           <github-commits-per-repo />
         </div>
-        <div class="col-xl-6">
+        <div :ref="setChartRef" class="col-xl-6">
           <weekday-heatmap :from="from" :to="to" />
         </div>
-        <div class="col-xl-6">
+        <div :ref="setChartRef" class="col-xl-6">
           <day-hour-heatmap />
         </div>
-        <div class="col-xl-6">
+        <div :ref="setChartRef" class="col-xl-6">
           <events-per-time-window-chart />
+        </div>
+      </div>
+      <div class="row">
+        <div class="col justify-content-center">
+          <button class="btn btn-outline-secondary" @click="pdf">
+            Export to PDF
+          </button>
         </div>
       </div>
     </div>
@@ -114,6 +120,8 @@
 import { ref, computed } from "vue";
 import { useStore } from "vuex";
 import { DateTime } from "luxon";
+import { jsPDF } from "jspdf";
+import * as html2canvas from "html2canvas";
 import EventsByDayLineChart from "../components/charts/EventsByDayLineChart.vue";
 import EventsPerWeekdayChart from "../components/charts/EventsPerWeekdayChart.vue";
 import EventsPerTimeWindowChart from "../components/charts/EventsPerTimeWindowChart.vue";
@@ -121,7 +129,7 @@ import GithubCommitsPerRepo from "../components/charts/GithubCommitsPerRepo.vue"
 import PlayIcon from "../components/icons/PlayIcon";
 import GithubAccount from "../api/github-account";
 import WeekdayHeatmap from "../components/charts/WeekdayHeatmap.vue";
-import DayHourHeatmap from '../components/charts/DayHourHeatmap.vue';
+import DayHourHeatmap from "../components/charts/DayHourHeatmap.vue";
 
 export default {
   components: {
@@ -139,6 +147,12 @@ export default {
     store.dispatch("loadUser");
     store.dispatch("loadAccounts");
     const now = DateTime.fromObject({ zone: store.getters.timeZone });
+    let chartRefs = [];
+    const setChartRef = (el) => {
+      if (el) {
+        chartRefs.push(el);
+      }
+    };
     return {
       enabledGithubAccounts: computed(
         () => store.getters.enabledGithubAccounts
@@ -150,6 +164,8 @@ export default {
       statusMessage: ref(""),
       pullingData: ref(false),
       createdAssessment: ref(false),
+      chartRefs,
+      setChartRef,
     };
   },
   methods: {
@@ -171,6 +187,50 @@ export default {
         this.statusMessage = "";
         this.createdAssessment = true;
         this.pullingData = false;
+      });
+    },
+    pdf() {
+      let promises = [];
+      for (const chart of this.chartRefs) {
+        promises.push(
+          html2canvas(chart, {
+            scrollX: 0,
+            scrollY: -window.scrollY,
+            allowTaint: true,
+            backgroundColor: "#ffffff",
+            logging: false,
+          })
+        );
+      }
+      Promise.all(promises).then((data) => {
+        let pdf = new jsPDF();
+        let y = 20;
+        const margin = 40;
+        for (const canvas of data) {
+          let pdfImage = canvas.toDataURL("image/jpeg", 1);
+
+          const pdfWidth = pdf.internal.pageSize.getWidth();
+          const pdfHeight = pdf.internal.pageSize.getHeight();
+
+          const imgProps = pdf.getImageProperties(pdfImage);
+          const ratio = imgProps.height / imgProps.width;
+          const targetImgWidth = pdfWidth - margin;
+          const targetImgHeight = ratio * pdfWidth - margin * ratio;
+          if (y + targetImgHeight + 5 > pdfHeight) {
+            pdf.addPage();
+            y = 20;
+          }
+          pdf.addImage(
+            pdfImage,
+            "JPEG",
+            20,
+            y,
+            targetImgWidth,
+            targetImgHeight
+          );
+          y += targetImgHeight + 5;
+        }
+        pdf.save();
       });
     },
   },

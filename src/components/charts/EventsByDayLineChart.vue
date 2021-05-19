@@ -1,8 +1,8 @@
 <template>
-  <div ref="div" class="card shadow-sm">
+  <div ref="div" class="card">
     <div class="card-body">
       <h6 v-if="title" class="card-title"><activity-icon /> {{ title }}</h6>
-      <svg width="100%" :height="height" :viewbox="`0 0 ${width} ${height}`">
+      <svg :width="width" :height="height" :viewbox="`0 0 ${width} ${height}`">
         <g
           id="events-by-day-line-chart"
           :transform="`translate(${margin.left}, ${margin.top})`"
@@ -74,7 +74,7 @@ export default defineComponent({
     const preparedData = computed(() => {
       function* days(interval) {
         let cursor = interval.start.startOf("day");
-        while (cursor < interval.end) {
+        while (cursor <= interval.end) {
           yield cursor;
           cursor = cursor.plus({ days: 1 });
         }
@@ -89,8 +89,7 @@ export default defineComponent({
       const eventsByDay = allDays.map((day) => {
         return { events: 0, day: day };
       });
-      for (let i = 0; i < events.value.length; i++) {
-        const event = events.value[i];
+      for (const event of events.value) {
         const timestamp = DateTime.fromISO(event.timestamp).setZone(
           store.getters.timeZone
         );

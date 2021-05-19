@@ -1,8 +1,8 @@
 <template>
-  <div ref="div" class="card shadow-sm">
+  <div ref="div" class="card">
     <div class="card-body">
       <h6 v-if="title" class="card-title"><activity-icon /> {{ title }}</h6>
-      <svg width="100%" :height="height" :viewbox="`0 0 ${width} ${height}`">
+      <svg :width="width" :height="height" :viewbox="`0 0 ${width} ${height}`">
         <g
           id="weekday-heatmap"
           :transform="`translate(${margin.left}, ${margin.top})`"
@@ -63,7 +63,7 @@ export default {
     const heatmapData = computed(() => {
       function* days(interval) {
         let cursor = interval.start.startOf("day").setLocale("en-US");
-        while (cursor < interval.end) {
+        while (cursor <= interval.end) {
           yield cursor;
           cursor = cursor.plus({ days: 1 });
         }
