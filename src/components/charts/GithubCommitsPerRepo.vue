@@ -22,18 +22,22 @@
 
 <script>
 import * as d3 from "d3";
+import { ref } from "vue";
 
 export default {
-  data() {
+  setup() {
+    const width = ref(700);
+    const height = 200;
+    const margin = {
+      top: 10,
+      right: 50,
+      left: 250,
+      bottom: 30,
+    };
     return {
-      width: 700,
-      height: 400,
-      margin: {
-        top: 10,
-        bottom: 120,
-        left: 50,
-        right: 15,
-      },
+      width,
+      height,
+      margin,
       title: "Github commits per repo",
     };
   },
@@ -74,31 +78,37 @@ export default {
     boundedHeight() {
       return this.height - this.margin.top - this.margin.bottom;
     },
-    xBand() {
+    xScale() {
       return d3
-        .scaleBand()
-        .domain(this.processedData.map((d) => d.repo))
+        .scaleLinear()
         .range([0, this.boundedWidth])
-        .padding(0.1);
+        .domain([0, d3.max(this.processedData, (d) => d.commits)]);
     },
     yScale() {
       return d3
-        .scaleLinear()
-        .range([this.boundedHeight, 0])
-        .domain([0, d3.max(this.processedData, (d) => d.commits)]);
+        .scaleBand()
+        .domain(this.processedData.map((d) => d.repo))
+        .range([0, this.boundedHeight])
+        .padding(0.1);
     },
   },
   methods: {
     updateChart() {
       const chart = d3.select("#commits-per-repo-chart");
-      chart.select(".yAxis").call(d3.axisLeft(this.yScale).ticks(10));
+      chart
+        .select(".yAxis")
+        .call(d3.axisLeft(this.yScale))
+        .call((g) => g.select(".domain").remove())
+        .call((g) => g.selectAll(".tick line").remove());
 
       chart
         .select(".xAxis")
-        .call(d3.axisBottom(this.xBand))
-        .selectAll("text")
-        .attr("transform", "translate(-10,0)rotate(-45)")
-        .style("text-anchor", "end");
+        .call(d3.axisBottom(this.xScale))
+        .call((g) => g.select(".domain").remove())
+        .call((g) => g.selectAll(".tick line").remove());
+      //.selectAll("text")
+      //.attr("transform", "translate(-10,0)rotate(-45)")
+      //.style("text-anchor", "end");
 
       let rects = chart.selectAll("rect").data(this.processedData);
 
@@ -107,10 +117,12 @@ export default {
         .enter()
         .append("rect")
         .merge(rects)
-        .attr("x", (e) => this.xBand(e.repo))
-        .attr("y", (e) => this.yScale(e.commits))
-        .attr("width", this.xBand.bandwidth())
-        .attr("height", (e) => this.boundedHeight - this.yScale(e.commits))
+        .attr("x", this.xScale(0))
+        .attr("y", (e) => this.yScale(e.repo))
+        .attr("rx", 2)
+        .attr("ry", 2)
+        .attr("width", (e) => this.xScale(e.commits))
+        .attr("height", this.yScale.bandwidth())
         .attr("fill", "#69b3a2");
 
       rects.exit().remove();

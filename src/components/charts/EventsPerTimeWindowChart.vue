@@ -49,12 +49,12 @@ export default {
     };
   },
   watch: {
-    commits() {
-      this.updateChart();
-    },
     dayTimeRanges() {
       this.updateChart();
     },
+    processedData() {
+      this.updateChart();
+    }
   },
   mounted() {
     this.width = this.$refs.div.offsetWidth;

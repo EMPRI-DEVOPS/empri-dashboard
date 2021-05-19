@@ -6,7 +6,7 @@ const state = {
 
 const getters = {
     timeZone(state) { return state.settings.time_zone },
-    dayTimeRanges(state) { return state.settings.day_time_ranges }
+    dayTimeRanges(state) { return state.settings.day_time_ranges ?? [] }
 }
 
 const mutations = {

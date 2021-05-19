@@ -43,6 +43,9 @@ export default defineComponent({
     events() {
       this.updateChart();
     },
+    preparedData() {
+      this.updateChart();
+    },
   },
   mounted() {
     this.updateChart();
@@ -147,24 +150,25 @@ export default defineComponent({
   methods: {
     updateChart() {
       const chart = d3.select("#events-by-day-line-chart");
-      const transitionDuration = 2000;
+      //const transitionDuration = 2000;
       chart
         .select(".yAxis")
-        .transition()
-        .duration(3000)
+        //.transition()
+        //.duration(3000)
         .call(d3.axisLeft(this.yScale).ticks(10));
 
       chart
         .select(".xAxis")
-        .transition()
-        .duration(transitionDuration)
-        .call(d3.axisBottom(this.xScale).ticks(this.boundedWidth / 80));
+        //.transition()
+        //.duration(transitionDuration)
+        .call(d3.axisBottom(this.xScale).ticks(this.boundedWidth / 80))
+        .call((g) => g.selectAll(".tick line").remove());
 
       chart
         .select(".area")
         .datum(this.preparedData)
-        .transition()
-        .duration(transitionDuration)
+        //.transition()
+        //.duration(transitionDuration)
         .attr(
           "d",
           d3

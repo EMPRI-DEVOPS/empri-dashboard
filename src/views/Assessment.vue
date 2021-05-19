@@ -84,22 +84,26 @@
       </div>
     </div>
 
-    <div class="m-2" v-if="!pullingData && userInteractions.length">
+    <div class="m-2" v-if="createdAssessment">
       <div class="row g-2">
         <div class="col-xl-8">
           <events-by-day-line-chart :from="from" :to="to" />
         </div>
-        <div class="col-xl-4">
+        <div class="col-xl-4"></div>
+        <div class="col-xl-6">
+          <events-per-weekday-chart />
+        </div>
+        <div class="col-xl-6">
           <github-commits-per-repo />
         </div>
         <div class="col-xl-6">
-          <events-per-weekday-chart :events="userInteractions" />
-        </div>
-        <div class="col-xl-6">
-          <events-per-time-window-chart :events="userInteractions" />
-        </div>
-        <div class="col-xl-6">
           <weekday-heatmap :from="from" :to="to" />
+        </div>
+        <div class="col-xl-6">
+          <day-hour-heatmap />
+        </div>
+        <div class="col-xl-6">
+          <events-per-time-window-chart />
         </div>
       </div>
     </div>
@@ -116,7 +120,8 @@ import EventsPerTimeWindowChart from "../components/charts/EventsPerTimeWindowCh
 import GithubCommitsPerRepo from "../components/charts/GithubCommitsPerRepo.vue";
 import PlayIcon from "../components/icons/PlayIcon";
 import GithubAccount from "../api/github-account";
-import WeekdayHeatmap from '../components/charts/WeekdayHeatmap.vue';
+import WeekdayHeatmap from "../components/charts/WeekdayHeatmap.vue";
+import DayHourHeatmap from '../components/charts/DayHourHeatmap.vue';
 
 export default {
   components: {
@@ -126,6 +131,7 @@ export default {
     EventsPerTimeWindowChart,
     PlayIcon,
     WeekdayHeatmap,
+    DayHourHeatmap,
   },
   name: "Assessment",
   setup() {
@@ -143,12 +149,13 @@ export default {
       githubUsername: ref(""),
       statusMessage: ref(""),
       pullingData: ref(false),
-      userInteractions: computed(() => store.state.userInteractions.all),
+      createdAssessment: ref(false),
     };
   },
   methods: {
     async start() {
       this.$store.commit("resetUserInteractions");
+      this.createdAssessment = false;
       this.pullingData = true;
 
       this.enabledGithubAccounts.forEach(async (githubAccount) => {
@@ -162,6 +169,7 @@ export default {
           this.statusMessage = `Found ${found.foundCount} commits in ${found.repo}`;
         }
         this.statusMessage = "";
+        this.createdAssessment = true;
         this.pullingData = false;
       });
     },
