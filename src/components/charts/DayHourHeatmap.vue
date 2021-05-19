@@ -24,16 +24,17 @@
 <script>
 import ActivityIcon from "../icons/ActivityIcon";
 import * as d3 from "d3";
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import { useStore } from "vuex";
 import { DateTime } from "luxon";
+import useResponsiveWidth from "../../composables/useResponsiveWidth";
 
 export default {
   components: { ActivityIcon },
   setup() {
     const store = useStore();
     const events = computed(() => store.state.userInteractions.all);
-    const width = ref(700);
+    const { width, div } = useResponsiveWidth();
     const margin = {
       top: 10,
       right: 70,
@@ -73,16 +74,15 @@ export default {
       return dayHourMap;
     });
 
-    const xBand = computed(
-      () =>
-        d3
-          .scaleBand()
-          .domain([...Array(24).keys()])
-          .range([0, boundedWidth.value])
+    const xBand = computed(() =>
+      d3
+        .scaleBand()
+        .domain([...Array(24).keys()])
+        .range([0, boundedWidth.value])
     );
 
-    const yBand = computed(
-      () => d3.scaleBand().domain(weekdays).range([0, boundedHeight])
+    const yBand = computed(() =>
+      d3.scaleBand().domain(weekdays).range([0, boundedHeight])
     );
 
     const colorScale = computed(() =>
@@ -95,6 +95,7 @@ export default {
     return {
       title: "Day/hour heatmap",
       width,
+      div,
       height,
       margin,
       boundedHeight,
@@ -107,11 +108,12 @@ export default {
     };
   },
   mounted() {
-    this.width = this.$refs.div.offsetWidth;
-
     this.updateChart();
   },
   watch: {
+    width() {
+      this.updateChart();
+    },
     heatmapData() {
       this.updateChart();
     },
@@ -156,9 +158,7 @@ export default {
         //.attr("ry", 2)
         .attr("width", this.xBand.bandwidth())
         .attr("height", this.yBand.bandwidth())
-        .attr("fill", (d) =>
-          d.e > 0 ? this.colorScale(d.e) : "#f8f8f8"
-        )
+        .attr("fill", (d) => (d.e > 0 ? this.colorScale(d.e) : "#f8f8f8"))
         .attr("stroke", "#c8c8c8")
         .attr("stroke-width", 0.5)
         .on("mouseover", mouseover)

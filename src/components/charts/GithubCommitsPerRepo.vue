@@ -22,11 +22,10 @@
 
 <script>
 import * as d3 from "d3";
-import { ref } from "vue";
+import useResponsiveWidth from "../../composables/useResponsiveWidth";
 
 export default {
   setup() {
-    const width = ref(700);
     const height = 200;
     const margin = {
       top: 10,
@@ -35,7 +34,7 @@ export default {
       bottom: 30,
     };
     return {
-      width,
+      ...useResponsiveWidth(),
       height,
       margin,
       title: "Github commits per repo",
@@ -45,9 +44,11 @@ export default {
     commits() {
       this.updateChart();
     },
+    width() {
+      this.updateChart();
+    },
   },
   mounted() {
-    this.width = this.$refs.div.offsetWidth;
     this.updateChart();
   },
   computed: {

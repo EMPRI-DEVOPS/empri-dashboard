@@ -24,11 +24,11 @@
 import { useStore } from "vuex";
 import * as d3 from "d3";
 import { DateTime } from "luxon";
-import { computed, ref } from "vue";
+import { computed } from "vue";
+import useResponsiveWidth from "../../composables/useResponsiveWidth";
 
 export default {
   setup() {
-    const width = ref(700);
     const height = 400;
     const margin = {
       top: 10,
@@ -36,12 +36,11 @@ export default {
       left: 80,
       right: 50,
     };
-
     const store = useStore();
     const dayTimeRanges = computed(() => store.getters.dayTimeRanges);
     return {
+      ...useResponsiveWidth(),
       title: "User interactions per time window",
-      width,
       height,
       margin,
       dayTimeRanges,
@@ -49,15 +48,17 @@ export default {
     };
   },
   watch: {
+    width() {
+      this.updateChart();
+    },
     dayTimeRanges() {
       this.updateChart();
     },
     processedData() {
       this.updateChart();
-    }
+    },
   },
   mounted() {
-    this.width = this.$refs.div.offsetWidth;
     this.updateChart();
   },
   computed: {

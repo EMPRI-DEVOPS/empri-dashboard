@@ -24,9 +24,10 @@
 <script>
 import ActivityIcon from "../icons/ActivityIcon";
 import * as d3 from "d3";
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import { useStore } from "vuex";
 import { Interval, DateTime } from "luxon";
+import useResponsiveWidth from "../../composables/useResponsiveWidth";
 
 export default {
   components: { ActivityIcon },
@@ -38,13 +39,13 @@ export default {
       DateTime.fromISO(props.to).setZone(store.getters.timeZone)
     );
     const events = computed(() => store.state.userInteractions.all);
-    const width = ref(700);
     const margin = {
       top: 10,
       right: 70,
       left: 80,
       bottom: 40,
     };
+    const { width, div } = useResponsiveWidth();
     const boundedWidth = computed(
       () => width.value - margin.left - margin.right
     );
@@ -119,8 +120,9 @@ export default {
     );
 
     return {
-      title: "Weekday heatmap",
       width,
+      div,
+      title: "Weekday heatmap",
       height,
       margin,
       boundedHeight,
@@ -134,11 +136,12 @@ export default {
     };
   },
   mounted() {
-    this.width = this.$refs.div.offsetWidth;
-
     this.updateChart();
   },
   watch: {
+    width() {
+      this.updateChart();
+    },
     heatmapData() {
       this.updateChart();
     },

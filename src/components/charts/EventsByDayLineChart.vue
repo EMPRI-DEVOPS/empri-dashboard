@@ -30,8 +30,9 @@
 import * as d3 from "d3";
 import { useStore } from "vuex";
 import { Interval, DateTime } from "luxon";
-import { computed, ref, onMounted, defineComponent } from "vue";
+import { computed, defineComponent } from "vue";
 import ActivityIcon from "../icons/ActivityIcon";
+import useResponsiveWidth from "../../composables/useResponsiveWidth";
 
 export default defineComponent({
   components: { ActivityIcon },
@@ -52,8 +53,8 @@ export default defineComponent({
   },
   setup(props) {
     const title = "User interactions per day";
+    const { div, width } = useResponsiveWidth();
 
-    const width = ref(700);
     const height = 400;
     const margin = {
       top: 10,
@@ -69,17 +70,6 @@ export default defineComponent({
       () => width.value - margin.left - margin.right
     );
     const boundedHeight = height - margin.top - margin.bottom;
-
-    const div = ref(null);
-
-    onMounted(() => {
-      width.value = div.value.offsetWidth;
-      window.addEventListener("resize", () => {
-        if (div.value !== null) {
-          width.value = div.value.offsetWidth;
-        }
-      });
-    });
 
     const preparedData = computed(() => {
       function* days(interval) {

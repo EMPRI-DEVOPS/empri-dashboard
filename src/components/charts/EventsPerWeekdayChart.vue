@@ -21,13 +21,13 @@
 </template>
 
 <script>
-import { ref, computed } from "vue";
+import { computed } from "vue";
 import * as d3 from "d3";
 import { DateTime } from "luxon";
+import useResponsiveWidth from "../../composables/useResponsiveWidth";
 
 export default {
   setup() {
-    const width = ref(700);
     const height = 200;
     const margin = {
       top: 10,
@@ -35,9 +35,11 @@ export default {
       left: 70,
       bottom: 30,
     };
+    const { div, width } = useResponsiveWidth();
     return {
-      title: "User interactions per weekday",
+      div,
       width,
+      title: "User interactions per weekday",
       height,
       margin,
       boundedHeight: height - margin.top - margin.bottom,
@@ -54,10 +56,12 @@ export default {
     };
   },
   mounted() {
-    this.width = this.$refs.div.offsetWidth;
     this.updateChart();
   },
   watch: {
+    width() {
+      this.updateChart();
+    },
     eventsPerWeekday() {
       this.updateChart();
     },
