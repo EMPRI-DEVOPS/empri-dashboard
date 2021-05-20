@@ -39,6 +39,7 @@
                       type="date"
                       class="form-control"
                       v-model="from"
+                      :disabled="pullingData"
                       :max="to"
                     />
                   </div>
@@ -51,6 +52,7 @@
                       type="date"
                       class="form-control"
                       v-model="to"
+                      :disabled="pullingData"
                       :max="today"
                       :min="from"
                     />
@@ -64,7 +66,15 @@
                     class="btn btn-lg btn-outline-secondary"
                     :disabled="pullingData"
                   >
-                    <play-icon /> Start
+                    <span v-if="pullingData">
+                      <span
+                        class="spinner-border spinner-border-sm"
+                        role="status"
+                        aria-hidden="true"
+                      >
+                      </span>
+                      Pulling data..</span
+                    ><span v-else><play-icon /> Start</span>
                   </button>
                 </div>
               </div>
@@ -74,42 +84,52 @@
       </div>
     </div>
 
-    <div class="container-fluid" v-if="statusMessage">
+    <div class="container-fluid" v-if="pullingData">
       <div class="row justify-content-center">
-        <div class="col-md-7">
-          <div class="card shadow-sm account-list-item">
-            <div class="card-header text-center">
-              <h5 class="card-title">{{ statusMessage }}</h5>
+        <div class="col-md-7 col-xl-5">
+          <div class="card">
+            <div class="card-body m-2 p-4">
+              <div class="d-flex align-items-center">
+                <samp>{{ statusMessage }}</samp>
+                <div
+                  class="spinner-border ms-auto"
+                  role="status"
+                  aria-hidden="true"
+                ></div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
     <div class="container-fluid" v-if="createdAssessment">
-      <div id="assessment" class="row g-2 justify-content-xl-center">
-        <div :ref="setChartRef" class="col-xl-8">
-          <events-by-day-line-chart :from="from" :to="to" />
-        </div>
-        <div :ref="setChartRef" class="col-xl-6">
-          <events-per-weekday-chart />
-        </div>
-        <div :ref="setChartRef" class="col-xl-6">
-          <github-commits-per-repo />
-        </div>
-        <div :ref="setChartRef" class="col-xl-6">
-          <weekday-heatmap :from="from" :to="to" />
-        </div>
-        <div :ref="setChartRef" class="col-xl-6">
-          <day-hour-heatmap />
-        </div>
-        <div :ref="setChartRef" class="col-xl-6">
-          <events-per-time-window-chart />
+      <div id="assessment" class="row g-2">
+        <div
+          v-for="chart in charts"
+          :key="chart + assessmentKey"
+          :ref="setChartRef"
+          class="col-xl-6"
+        >
+          <component :is="chart" :from="from" :to="to"></component>
         </div>
       </div>
-      <div class="row">
+      <div class="row my-2">
         <div class="col">
-          <button class="btn btn-outline-secondary" @click="pdf">
-            Export to PDF
+          <button
+            @click="pdf"
+            type="submit"
+            class="btn btn-lg btn-outline-secondary"
+            :disabled="creatingPdf"
+          >
+            <span v-if="creatingPdf">
+              <span
+                class="spinner-border spinner-border-sm"
+                role="status"
+                aria-hidden="true"
+              >
+              </span>
+              Rendering PDF..</span
+            ><span v-else> Export to PDF</span>
           </button>
         </div>
       </div>
@@ -118,29 +138,49 @@
 </template>
 
 <script>
-import { ref, computed } from "vue";
+import { ref, computed, defineAsyncComponent } from "vue";
 import { useStore } from "vuex";
 import { DateTime } from "luxon";
 import { jsPDF } from "jspdf";
 import * as html2canvas from "html2canvas";
-import EventsByDayLineChart from "../components/charts/EventsByDayLineChart.vue";
-import EventsPerWeekdayChart from "../components/charts/EventsPerWeekdayChart.vue";
-import EventsPerTimeWindowChart from "../components/charts/EventsPerTimeWindowChart.vue";
-import GithubCommitsPerRepo from "../components/charts/GithubCommitsPerRepo.vue";
 import PlayIcon from "../components/icons/PlayIcon";
 import GithubAccount from "../api/github-account";
-import WeekdayHeatmap from "../components/charts/WeekdayHeatmap.vue";
-import DayHourHeatmap from "../components/charts/DayHourHeatmap.vue";
+import ChartLoader from "../components/charts/ChartLoader";
 
 export default {
   components: {
-    EventsByDayLineChart,
-    GithubCommitsPerRepo,
-    EventsPerWeekdayChart,
-    EventsPerTimeWindowChart,
+    EventsByDay: defineAsyncComponent({
+      loadingComponent: ChartLoader,
+      loader: () => import("../components/charts/ChartEventsByDayLine.vue"),
+      delay: 0,
+    }),
+    GithubRepos: defineAsyncComponent({
+      loader: () =>
+        import("../components/charts/ChartGithubCommitsPerRepo.vue"),
+      loadingComponent: ChartLoader,
+      delay: 0,
+    }),
+    WeekdayChart: defineAsyncComponent({
+      loader: () => import("../components/charts/ChartEventsPerWeekday.vue"),
+      loadingComponent: ChartLoader,
+      delay: 0,
+    }),
+    TimeWindow: defineAsyncComponent({
+      loader: () => import("../components/charts/ChartEventsPerTimeWindow.vue"),
+      loadingComponent: ChartLoader,
+      delay: 0,
+    }),
+    WeekdayHeatmap: defineAsyncComponent({
+      loader: () => import("../components/charts/ChartWeekdayHeatmap.vue"),
+      loadingComponent: ChartLoader,
+      delay: 0,
+    }),
+    DayHourHeatmap: defineAsyncComponent({
+      loader: () => import("../components/charts/ChartDayHourHeatmap.vue"),
+      loadingComponent: ChartLoader,
+      delay: 0,
+    }),
     PlayIcon,
-    WeekdayHeatmap,
-    DayHourHeatmap,
   },
   name: "Assessment",
   setup() {
@@ -149,11 +189,15 @@ export default {
     store.dispatch("loadAccounts");
     const now = DateTime.fromObject({ zone: store.getters.timeZone });
     let chartRefs = [];
+    const charts = ref([]);
     const setChartRef = (el) => {
+      console.log(el);
       if (el) {
         chartRefs.push(el);
       }
     };
+    const assessmentKey = ref(0);
+    const creatingPdf = ref(false);
     return {
       enabledGithubAccounts: computed(
         () => store.getters.enabledGithubAccounts
@@ -167,10 +211,15 @@ export default {
       createdAssessment: ref(false),
       chartRefs,
       setChartRef,
+      charts,
+      assessmentKey,
+      creatingPdf,
     };
   },
   methods: {
     async start() {
+      this.charts = [];
+      this.assessmentKey++;
       this.$store.commit("resetUserInteractions");
       this.createdAssessment = false;
       this.pullingData = true;
@@ -188,11 +237,24 @@ export default {
         this.statusMessage = "";
         this.createdAssessment = true;
         this.pullingData = false;
+        this.charts.push("DayHourHeatmap");
+        await new Promise((res) => setTimeout(res, 500));
+        this.charts.push("WeekdayHeatmap");
+        await new Promise((res) => setTimeout(res, 500));
+        this.charts.push("TimeWindow");
+        await new Promise((res) => setTimeout(res, 500));
+        this.charts.push("EventsByDay");
+        await new Promise((res) => setTimeout(res, 500));
+        this.charts.push("GithubRepos");
+        await new Promise((res) => setTimeout(res, 500));
+        this.charts.push("WeekdayChart");
       });
     },
-    pdf() {
+    async pdf() {
+      this.creatingPdf = true;
+      await new Promise((res) => setTimeout(res, 50));
       let promises = [];
-      for (const chart of this.chartRefs) {
+      for (const chart of [...new Set(this.chartRefs)]) {
         promises.push(
           html2canvas(chart, {
             scrollX: 0,
@@ -232,6 +294,7 @@ export default {
           y += targetImgHeight + 5;
         }
         pdf.save();
+        this.creatingPdf = false;
       });
     },
   },

@@ -141,6 +141,8 @@ export default {
         .merge(rects)
         .attr("x", this.xScale(0))
         .attr("y", (e) => this.yScale(e.timeWindow))
+        .attr("rx", 2)
+        .attr("ry", 2)
         .attr("width", (e) => this.xScale(e.events))
         .attr("height", this.yScale.bandwidth())
         .attr("fill", "#69b3a2");

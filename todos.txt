@@ -7,7 +7,6 @@
 - horizontale charts könnten lieber lollipop charts werden
 - untersuchen wie man vermeiden könnte die selben commits mehrfach zu ziehen mittels hash-prüfung
 - bessere Fehlerbehandlung bei allen DRF aufrufen
-- loading anzeige aufhübschen
 - schauen wie sich das bootstrap css kleiner kompilieren lässt
 - google fonts vermeiden
 - https://github.com/jazzband/django-configurations einbauen

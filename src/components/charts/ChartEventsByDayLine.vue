@@ -43,7 +43,7 @@ export default defineComponent({
     },
   },
   mounted() {
-    this.updateChart();
+    //this.updateChart();
   },
   setup(props) {
     const title = "User interactions per day";
@@ -65,30 +65,30 @@ export default defineComponent({
     );
     const boundedHeight = height - margin.top - margin.bottom;
 
-    const preparedData = computed(() => {
-      function* days(interval) {
-        let cursor = interval.start.startOf("day");
-        while (cursor <= interval.end) {
-          yield cursor;
-          cursor = cursor.plus({ days: 1 });
-        }
+    function* days(interval) {
+      let cursor = interval.start.startOf("day");
+      while (cursor <= interval.end) {
+        yield cursor.toISODate();
+        cursor = cursor.plus({ days: 1 });
       }
+    }
 
-      const interval = Interval.fromDateTimes(
-        DateTime.fromISO(props.from).setZone(store.getters.timeZone),
-        DateTime.fromISO(props.to).setZone(store.getters.timeZone)
-      );
+    const interval = Interval.fromDateTimes(
+      DateTime.fromISO(props.from).setZone(store.getters.timeZone),
+      DateTime.fromISO(props.to).setZone(store.getters.timeZone)
+    );
+    const preparedData = computed(() => {
       const allDays = Array.from(days(interval));
 
       const eventsByDay = allDays.map((day) => {
         return { events: 0, day: day };
       });
       for (const event of events.value) {
-        const timestamp = DateTime.fromISO(event.timestamp).setZone(
-          store.getters.timeZone
-        );
+        const timestamp = DateTime.fromISO(event.timestamp)
+          .setZone(store.getters.timeZone)
+          .toISODate();
         const dayObj = eventsByDay.find((o) => {
-          return o.day.hasSame(timestamp, "day");
+          return o.day === timestamp;
         });
         dayObj.events++;
       }
@@ -98,7 +98,7 @@ export default defineComponent({
     const xBand = computed(() =>
       d3
         .scaleBand()
-        .domain(preparedData.value.map((d) => d.day.toJSDate()))
+        .domain(preparedData.value.map((d) => new Date(d.day)))
         .range([0, boundedWidth.value])
         .padding(0.1)
     );
@@ -127,7 +127,6 @@ export default defineComponent({
       xScale,
       xBand,
       preparedData,
-      events: computed(() => store.state.userInteractions.all),
     };
   },
   methods: {
@@ -156,7 +155,7 @@ export default defineComponent({
           "d",
           d3
             .area()
-            .x((e) => this.xBand(e.day.toJSDate()) + this.xBand.bandwidth() / 2)
+            .x((e) => this.xBand(new Date(e.day)) + this.xBand.bandwidth() / 2)
             .y0(() => this.yScale(0))
             .y1((e) => this.yScale(e.events))
             .curve(d3.curveMonotoneX)

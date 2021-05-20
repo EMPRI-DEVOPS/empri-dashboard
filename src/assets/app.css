@@ -25,3 +25,15 @@ body {
     transform: translateX(20px);
     opacity: 0;
 }
+
+.chart-tooltip {
+    opacity: 0;
+    position: absolute;
+    background-color: white;
+    border: 2px solid #c8c8c8;
+    border-radius: 5px;
+    padding: 5px;
+    left: 452px;
+    top: 264.017px;
+    z-index: 1000;
+  }
