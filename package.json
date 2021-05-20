@@ -14,13 +14,11 @@
     "axios": "^0.21.1",
     "bootstrap": "^5.0.1",
     "core-js": "^3.9.0",
-    "cssnano": "^5.0.2",
     "d3": "^6.5.0",
     "d3-time": "^2.1.1",
     "js-cookie": "^2.2.1",
     "jspdf": "^2.3.1",
     "nouislider": "^15.0.0",
-    "postcss": "^8.2.15",
     "vue": "^3.0.11",
     "vue-loader": "^15.9.7",
     "vue-router": "^4.0.0-0",
@@ -36,11 +34,8 @@
     "@vue/cli-service": "^4.5.13",
     "@vue/compiler-sfc": "^3.0.11",
     "babel-eslint": "^10.1.0",
-    "eslint": "^6.7.2",
     "eslint-plugin-vue": "^7.6.0",
-    "mutationobserver-shim": "^0.3.7",
-    "sass": "^1.32.11",
-    "sass-loader": "^10.1.1"
+    "mutationobserver-shim": "^0.3.7"
   },
   "eslintConfig": {
     "root": true,
