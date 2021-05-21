@@ -22,6 +22,14 @@
             <td>{{ username }}</td>
           </tr>
           <tr>
+            <th>Commits</th>
+            <td>{{ commitCount }}</td>
+          </tr>
+          <tr>
+            <th>Published issues</th>
+            <td>{{ issueCount }}</td>
+          </tr>
+          <tr>
             <th>Total user interactions found</th>
             <td>{{ totalEventCount }}</td>
           </tr>
@@ -63,7 +71,9 @@ export default defineComponent({
       toDate,
       timeZone,
       totalEventCount,
-      username
+      username,
+      commitCount: store.getters.byType("commit").length,
+      issueCount: store.getters.byType("issue").length,
     };
   },
 });

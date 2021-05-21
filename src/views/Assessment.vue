@@ -110,7 +110,12 @@
             :key="chart + assessmentKey"
             class="col-xl-6"
           >
-            <component :is="chart" :from="from" :to="to" :githubUsername="githubUsername"></component>
+            <component
+              :is="chart"
+              :from="from"
+              :to="to"
+              :githubUsername="githubUsername"
+            ></component>
           </div>
         </transition-group>
       </div>
@@ -233,6 +238,9 @@ export default {
         for await (const loaded of account.loadRepositoriesContributedTo()) {
           this.statusMessage = `Found ${loaded.loadedCount}/${loaded.totalCount} repos where ${this.githubUsername} has contributed to..`;
         }
+        for await (const found of account.userIssues(this.from, this.to)) {
+          this.statusMessage = `Loaded ${found.loadedCount}/${found.totalCount} published issues`;
+        }
         for await (const found of account.loadCommits(this.from, this.to)) {
           this.statusMessage = `Found ${found.foundCount} commits in ${found.repo}`;
         }
@@ -277,7 +285,7 @@ export default {
         const margin = 40;
         for (const canvas of data) {
           //let pdfImage = canvas.toDataURL("image/jpeg", 1);
-          let pdfImage = canvas.toDataURL('image/jpeg', 1);
+          let pdfImage = canvas.toDataURL("image/jpeg", 1);
 
           const pdfWidth = pdf.internal.pageSize.getWidth();
           const pdfHeight = pdf.internal.pageSize.getHeight();
@@ -290,10 +298,17 @@ export default {
             pdf.addPage();
             y = 20;
           }
-          pdf.addImage(pdfImage, "JPEG", 20, y, targetImgWidth, targetImgHeight);
+          pdf.addImage(
+            pdfImage,
+            "JPEG",
+            20,
+            y,
+            targetImgWidth,
+            targetImgHeight
+          );
           y += targetImgHeight + 5;
         }
-        pdf.save(this.githubUsername+DateTime.now().toISO());
+        pdf.save(this.githubUsername + DateTime.now().toISO());
         this.creatingPdf = false;
       });
     },

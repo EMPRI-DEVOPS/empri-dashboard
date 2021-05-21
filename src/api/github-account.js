@@ -4,7 +4,7 @@ import {
 import {
     graphql
 } from "@octokit/graphql";
-import { DateTime } from "luxon";
+import { DateTime, Interval } from "luxon";
 import store from '../store/index';
 
 export default class GithubAccount {
@@ -30,6 +30,135 @@ export default class GithubAccount {
             }
         });
 
+    }
+
+
+    async *userIssues(from, to) {
+        let totalCount = 1;
+
+        let loadedCount = 0;
+        let endCursor = "";
+
+        const since = DateTime.fromISO(from).toISO();
+        const interval = Interval.fromDateTimes(
+            DateTime.fromISO(from, { zone: this.timeZone }),
+            DateTime.fromISO(to, { zone: this.timeZone })
+        );
+        while (loadedCount < totalCount) {
+            let response = await this.graphql(
+                `
+                query userIssues($username: String!, $afterCursor: String="", $since: GitTimestamp!) {
+                    user(login: $username) {
+                        issues(first:100, after: $afterCursor, filterBy: {since: $since, createdBy: $username}) {
+                            totalCount
+                            pageInfo {
+                                endCursor
+                            }
+                            nodes {
+                                author {
+                                    login
+                                }
+                                title
+                                createdAt
+                                lastEditedAt
+                                publishedAt
+                                repository {
+                                    nameWithOwner
+                                }
+                            }
+                        }
+                    }
+                }
+                `, {
+                username: this.username,
+                afterCursor: endCursor ? endCursor : null,
+                since
+            }
+            );
+            totalCount = response.user.issues.totalCount;
+            endCursor = response.user.issues.pageInfo.endCursor;
+            let issues = response.user.issues.nodes;
+            let issueObjects = issues
+                .filter((issue) =>
+                    interval.contains(DateTime.fromISO(issue.publishedAt, { zone: this.timeZone }))
+                )
+                .map((issue) => (Object.freeze({
+                    tool: 'Github',
+                    type: 'issue',
+                    timestamp: DateTime.fromISO(issue.publishedAt, { zone: this.timeZone }).toISO(),
+                    title: issue.title,
+                    repo: issue.repository.nameWithOwner
+                })));
+            store.commit('addUserInteractions', issueObjects);
+            loadedCount += issues.length;
+            yield {
+                totalCount,
+                loadedCount
+            };
+        }
+    }
+
+    async *issueComments(from, to) {
+        let totalCount = 1;
+
+        let loadedCount = 0;
+        let endCursor = "";
+
+        const since = DateTime.fromISO(from).toISO();
+        const interval = Interval.fromDateTimes(
+            DateTime.fromISO(from, { zone: this.timeZone }),
+            DateTime.fromISO(to, { zone: this.timeZone })
+        );
+        while (loadedCount < totalCount) {
+            let response = await this.graphql(
+                `
+                query userIssues($username: String!, $afterCursor: String="") {
+                    user(login: $username) {
+                        issueComments(first:100, after: $afterCursor) {
+                            totalCount
+                            pageInfo {
+                                endCursor
+                            }
+                            nodes {
+                                author {
+                                    login
+                                }
+                                publishedAt
+                                repository {
+                                    nameWithOwner
+                                }
+                            }
+                        }
+                    }
+                }
+                `, {
+                username: this.username,
+                afterCursor: endCursor ? endCursor : null,
+                since
+            }
+            );
+            totalCount = response.user.issueComments.totalCount;
+            endCursor = response.user.issueComments.pageInfo.endCursor;
+            let issueComments = response.user.issueComments.nodes;
+            let issueCommentObjects = issueComments
+                .filter((issue) =>
+                    interval.contains(DateTime.fromISO(issue.publishedAt, { zone: this.timeZone }))
+                )
+                .map((issue) => (Object.freeze({
+                    tool: 'Github',
+                    type: 'issueComment',
+                    timestamp: DateTime.fromISO(issue.publishedAt, { zone: this.timeZone }).toISO(),
+                    title: issue.title,
+                    repo: issue.repository.nameWithOwner
+                })));
+            console.log(issueCommentObjects);
+            store.commit('addUserInteractions', issueCommentObjects);
+            loadedCount += issueComments.length;
+            yield {
+                totalCount,
+                loadedCount
+            };
+        }
     }
 
     async *loadRepositoriesContributedTo() {
@@ -96,7 +225,7 @@ export default class GithubAccount {
                 yield {
                     foundCount, repo: repo.nameWithOwner
                 }
-                
+
             }
         }
     }
@@ -165,7 +294,7 @@ export default class GithubAccount {
             yield response.repository.defaultBranchRef.target.history.nodes.map((commit) => (Object.freeze({
                 tool: 'Github',
                 type: 'commit',
-                timestamp: DateTime.fromISO(commit.committedDate).setZone(this.timeZone).toISO(),
+                timestamp: DateTime.fromISO(commit.committedDate, { zone: this.timeZone }).toISO(),
                 message: commit.message,
                 repo: `${owner}/${name}`
             })));
