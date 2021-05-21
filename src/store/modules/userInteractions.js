@@ -18,6 +18,9 @@ const getters = {
                 (userInteraction) =>
                     userInteraction.tool == 'Github' && userInteraction.type == 'commit'
             );
+    },
+    totalEventCount(state) {
+        return state.all.length;
     }
 }
 

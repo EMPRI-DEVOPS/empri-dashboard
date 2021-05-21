@@ -110,7 +110,7 @@
             :key="chart + assessmentKey"
             class="col-xl-6"
           >
-            <component :is="chart" :from="from" :to="to"></component>
+            <component :is="chart" :from="from" :to="to" :githubUsername="githubUsername"></component>
           </div>
         </transition-group>
       </div>
@@ -150,6 +150,11 @@ import ChartLoader from "../components/charts/ChartLoader";
 
 export default {
   components: {
+    Metrics: defineAsyncComponent({
+      loadingComponent: ChartLoader,
+      loader: () => import("../components/charts/ChartMetrics"),
+      delay: 0,
+    }),
     EventsByDay: defineAsyncComponent({
       loadingComponent: ChartLoader,
       loader: () => import("../components/charts/ChartEventsByDayLine.vue"),
@@ -234,6 +239,9 @@ export default {
         this.statusMessage = "";
         this.createdAssessment = true;
         this.pullingData = false;
+        this.charts.push("Metrics");
+        await new Promise((res) => setTimeout(res, 500));
+        this.charts.push("GithubRepos");
         await new Promise((res) => setTimeout(res, 500));
         this.charts.push("EventsByDay");
         await new Promise((res) => setTimeout(res, 500));
@@ -242,8 +250,6 @@ export default {
         this.charts.push("DayHourHeatmap");
         await new Promise((res) => setTimeout(res, 500));
         this.charts.push("WeekdayHeatmap");
-        await new Promise((res) => setTimeout(res, 500));
-        this.charts.push("GithubRepos");
         await new Promise((res) => setTimeout(res, 500));
         this.charts.push("WeekdayChart");
         await new Promise((res) => setTimeout(res, 500));
@@ -271,7 +277,7 @@ export default {
         const margin = 40;
         for (const canvas of data) {
           //let pdfImage = canvas.toDataURL("image/jpeg", 1);
-          let pdfImage = canvas.toDataURL();
+          let pdfImage = canvas.toDataURL('image/jpeg', 1);
 
           const pdfWidth = pdf.internal.pageSize.getWidth();
           const pdfHeight = pdf.internal.pageSize.getHeight();
@@ -284,10 +290,10 @@ export default {
             pdf.addPage();
             y = 20;
           }
-          pdf.addImage(pdfImage, "PNG", 20, y, targetImgWidth, targetImgHeight);
+          pdf.addImage(pdfImage, "JPEG", 20, y, targetImgWidth, targetImgHeight);
           y += targetImgHeight + 5;
         }
-        pdf.save();
+        pdf.save(this.githubUsername+DateTime.now().toISO());
         this.creatingPdf = false;
       });
     },
