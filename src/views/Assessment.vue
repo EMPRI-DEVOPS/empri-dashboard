@@ -107,7 +107,6 @@
         <div
           v-for="chart in charts"
           :key="chart + assessmentKey"
-          :ref="setChartRef"
           class="col-xl-6"
         >
           <component :is="chart" :from="from" :to="to"></component>
@@ -154,6 +153,11 @@ export default {
       loader: () => import("../components/charts/ChartEventsByDayLine.vue"),
       delay: 0,
     }),
+    EventsByWeek: defineAsyncComponent({
+      loadingComponent: ChartLoader,
+      loader: () => import("../components/charts/ChartEventsByWeek"),
+      delay: 0,
+    }),
     GithubRepos: defineAsyncComponent({
       loader: () =>
         import("../components/charts/ChartGithubCommitsPerRepo.vue"),
@@ -188,14 +192,7 @@ export default {
     store.dispatch("loadUser");
     store.dispatch("loadAccounts");
     const now = DateTime.fromObject({ zone: store.getters.timeZone });
-    let chartRefs = [];
     const charts = ref([]);
-    const setChartRef = (el) => {
-      console.log(el);
-      if (el) {
-        chartRefs.push(el);
-      }
-    };
     const assessmentKey = ref(0);
     const creatingPdf = ref(false);
     return {
@@ -209,8 +206,6 @@ export default {
       statusMessage: ref(""),
       pullingData: ref(false),
       createdAssessment: ref(false),
-      chartRefs,
-      setChartRef,
       charts,
       assessmentKey,
       creatingPdf,
@@ -237,17 +232,18 @@ export default {
         this.statusMessage = "";
         this.createdAssessment = true;
         this.pullingData = false;
+        this.charts.push("EventsByDay");
+        this.charts.push("EventsByWeek");
+        await new Promise((res) => setTimeout(res, 500));
         this.charts.push("DayHourHeatmap");
         await new Promise((res) => setTimeout(res, 500));
         this.charts.push("WeekdayHeatmap");
         await new Promise((res) => setTimeout(res, 500));
-        this.charts.push("TimeWindow");
-        await new Promise((res) => setTimeout(res, 500));
-        this.charts.push("EventsByDay");
-        await new Promise((res) => setTimeout(res, 500));
         this.charts.push("GithubRepos");
         await new Promise((res) => setTimeout(res, 500));
         this.charts.push("WeekdayChart");
+        await new Promise((res) => setTimeout(res, 500));
+        this.charts.push("TimeWindow");
       });
     },
     async pdf() {

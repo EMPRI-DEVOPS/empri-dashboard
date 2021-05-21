@@ -78,8 +78,7 @@ export default {
         events: 0,
       }));
 
-      for (let i = 0; i < events.value.length; i++) {
-        const event = events.value[i];
+      for (const event of events.value) {
         const timestamp = DateTime.fromISO(event.timestamp).setZone(
           store.getters.timeZone
         );
