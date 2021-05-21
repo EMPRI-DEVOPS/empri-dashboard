@@ -104,13 +104,15 @@
     </div>
     <div class="container-fluid" v-if="createdAssessment">
       <div id="assessment" class="row g-2">
-        <div
-          v-for="chart in charts"
-          :key="chart + assessmentKey"
-          class="col-xl-6"
-        >
-          <component :is="chart" :from="from" :to="to"></component>
-        </div>
+        <transition-group name="chart-list">
+          <div
+            v-for="chart in charts"
+            :key="chart + assessmentKey"
+            class="col-xl-6"
+          >
+            <component :is="chart" :from="from" :to="to"></component>
+          </div>
+        </transition-group>
       </div>
       <div class="row my-2">
         <div class="col">
@@ -232,7 +234,9 @@ export default {
         this.statusMessage = "";
         this.createdAssessment = true;
         this.pullingData = false;
+        await new Promise((res) => setTimeout(res, 500));
         this.charts.push("EventsByDay");
+        await new Promise((res) => setTimeout(res, 500));
         this.charts.push("EventsByWeek");
         await new Promise((res) => setTimeout(res, 500));
         this.charts.push("DayHourHeatmap");
@@ -250,7 +254,7 @@ export default {
       this.creatingPdf = true;
       await new Promise((res) => setTimeout(res, 50));
       let promises = [];
-      for (const chart of [...new Set(this.chartRefs)]) {
+      for (const chart of document.getElementsByClassName("chart-card")) {
         promises.push(
           html2canvas(chart, {
             scrollX: 0,
@@ -266,7 +270,8 @@ export default {
         let y = 20;
         const margin = 40;
         for (const canvas of data) {
-          let pdfImage = canvas.toDataURL("image/jpeg", 1);
+          //let pdfImage = canvas.toDataURL("image/jpeg", 1);
+          let pdfImage = canvas.toDataURL();
 
           const pdfWidth = pdf.internal.pageSize.getWidth();
           const pdfHeight = pdf.internal.pageSize.getHeight();
@@ -279,14 +284,7 @@ export default {
             pdf.addPage();
             y = 20;
           }
-          pdf.addImage(
-            pdfImage,
-            "JPEG",
-            20,
-            y,
-            targetImgWidth,
-            targetImgHeight
-          );
+          pdf.addImage(pdfImage, "PNG", 20, y, targetImgWidth, targetImgHeight);
           y += targetImgHeight + 5;
         }
         pdf.save();

@@ -1,6 +1,6 @@
 <template>
   <div ref="div" class="card">
-    <div class="card-body">
+    <div class="card-body chart-card">
       <h6 v-if="title" class="card-title"><activity-icon /> {{ title }}</h6>
       <svg :width="width" :height="height" :viewbox="`0 0 ${width} ${height}`">
         <g
