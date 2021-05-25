@@ -12,11 +12,11 @@ const mutations = {
 }
 
 const getters = {
-    githubCommits(state) {
+    githubEvents(state) {
         return state.all
             .filter(
                 (userInteraction) =>
-                    userInteraction.tool == 'Github' && userInteraction.type == 'commit'
+                    userInteraction.tool == 'Github'
             );
     },
     types: (state) => {

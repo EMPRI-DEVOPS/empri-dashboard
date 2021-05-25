@@ -1,20 +1,12 @@
 <template>
   <div ref="div" class="card">
     <div class="card-body chart-card">
-      <h6 class="card-title">{{ title }}</h6>
+      <h6 class="card-title"><github-icon /> {{ title }}</h6>
       <svg :width="width" :height="height" :viewbox="`0 0 ${width} ${height}`">
         <g
           id="commits-per-repo-chart"
           :transform="`translate(${margin.left}, ${margin.top})`"
-        >
-          <g class="yAxis" fill="none" text-anchor="end"></g>
-          <g
-            class="xAxis"
-            :transform="`translate(0, ${boundedHeight})`"
-            fill="none"
-            text-anchor="middle"
-          ></g>
-        </g>
+        ></g>
       </svg>
     </div>
   </div>
@@ -23,21 +15,78 @@
 <script>
 import * as d3 from "d3";
 import useResponsiveWidth from "../../composables/useResponsiveWidth";
+import { computed } from "vue";
+import { useStore } from "vuex";
+import GithubIcon from "../icons/GithubIcon.vue";
 
 export default {
+  components: { GithubIcon },
   setup() {
-    const height = 200;
+    const store = useStore();
+    const { div, width } = useResponsiveWidth();
+    const boundedWidth = computed(
+      () => width.value - margin.left - margin.right
+    );
+    const barHeight = 25;
+    const labelHeight = 15;
+    const height = computed(
+      () =>
+        (barHeight + labelHeight + 12) * eventsPerRepo.value.length + margin.top
+    );
     const margin = {
       top: 10,
       right: 10,
-      left: 250,
-      bottom: 30,
+      left: 0,
+      bottom: 10,
     };
+
+    const eventsPerRepo = computed(() => {
+      let repos = [];
+      for (const event of store.getters.githubEvents) {
+        const repo = repos.filter((r) => r.repo === event.repo)[0];
+        if (repo) {
+          repo.commits++;
+          continue;
+        }
+        repos.unshift({
+          repo: event.repo,
+          commits: 1,
+        });
+      }
+      repos.sort((a, b) => b.commits - a.commits);
+      if (repos.length > 7) {
+        repos = [
+          ...repos.slice(0, 7),
+          {
+            repo: "other",
+            commits: repos
+              .slice(7)
+              .reduce((acc, curr) => (acc += curr.commits), 0),
+          },
+        ];
+        repos.push();
+      }
+      return repos;
+    });
+
+    const xScale = computed(() =>
+      d3
+        .scaleLinear()
+        .range([0, boundedWidth.value - 40])
+        .domain([0, d3.max(eventsPerRepo.value, (d) => d.commits)])
+    );
+
     return {
-      ...useResponsiveWidth(),
+      div,
+      width,
+      boundedWidth,
+      barHeight,
+      labelHeight,
       height,
       margin,
-      title: "Github commits per repo",
+      title: "Github interactions per repo",
+      eventsPerRepo,
+      xScale,
     };
   },
   watch: {
@@ -48,82 +97,60 @@ export default {
   mounted() {
     this.updateChart();
   },
-  computed: {
-    commits() {
-      return this.$store.getters.githubCommits;
-    },
-    processedData() {
-      let repos = [];
-      for (let i = 0; i < this.commits.length; i++) {
-        const commit = this.commits[i];
-        const repo = repos.filter((r) => r.repo === commit.repo)[0];
-        if (repo) {
-          repo.commits++;
-          continue;
-        }
-        repos.unshift({
-          repo: commit.repo,
-          commits: 1,
-        });
-      }
-      repos.sort((a, b) => b.commits - a.commits);
-      repos = repos.slice(0, 5);
-      return repos;
-    },
-    boundedWidth() {
-      return this.width - this.margin.left - this.margin.right;
-    },
-    boundedHeight() {
-      return this.height - this.margin.top - this.margin.bottom;
-    },
-    xScale() {
-      return d3
-        .scaleLinear()
-        .range([0, this.boundedWidth])
-        .domain([0, d3.max(this.processedData, (d) => d.commits)]);
-    },
-    yScale() {
-      return d3
-        .scaleBand()
-        .domain(this.processedData.map((d) => d.repo))
-        .range([0, this.boundedHeight])
-        .padding(0.1);
-    },
-  },
   methods: {
     updateChart() {
       const chart = d3.select("#commits-per-repo-chart");
-      chart
-        .select(".yAxis")
-        .call(d3.axisLeft(this.yScale))
-        .call((g) => g.select(".domain").remove())
-        .call((g) => g.selectAll(".tick line").remove());
 
-      chart
-        .select(".xAxis")
-        .call(d3.axisBottom(this.xScale))
-        .call((g) => g.select(".domain").remove())
-        .call((g) => g.selectAll(".tick line").remove());
-      //.selectAll("text")
-      //.attr("transform", "translate(-10,0)rotate(-45)")
-      //.style("text-anchor", "end");
+      chart.selectAll(".bar").remove();
 
-      let rects = chart.selectAll("rect").data(this.processedData);
+      const gHeight = this.barHeight + this.labelHeight + 12;
 
       // Bars
-      rects
+      const rects = chart
+        .selectAll("bar")
+        .data(this.eventsPerRepo)
         .enter()
-        .append("rect")
-        .merge(rects)
-        .attr("x", this.xScale(0))
-        .attr("y", (e) => this.yScale(e.repo))
-        .attr("rx", 2)
-        .attr("ry", 2)
-        .attr("width", (e) => this.xScale(e.commits))
-        .attr("height", this.yScale.bandwidth())
-        .attr("fill", "#69b3a2");
+        .append("g")
+        .attr("class", "bar")
+        .attr("transform", (d, i) => {
+          return "translate(0," + gHeight * i + ")";
+        });
 
-      rects.exit().remove();
+      rects
+        .append("text")
+        .attr("x", 0)
+        .attr("y", 11)
+        .style("fill", "black")
+
+        .attr("font-size", 15)
+        .text((e) => e.repo);
+
+      rects
+        .append("rect")
+        .attr("class", "bar")
+        .attr("y", this.labelHeight)
+        .attr("rx", 4)
+        .attr("ry", 4)
+        .attr("width", (e) => this.xScale(e.commits))
+        .attr("height", this.barHeight)
+        .attr("fill", "#69b3a2")
+        .on("mouseover", function () {
+          d3.select(this).attr("fill", "#6bd1ba");
+        })
+        .on("mouseleave", function () {
+          d3.select(this).attr("fill", "#69b3a2");
+        });
+
+      rects
+        .append("text")
+        .attr("x", (e) => this.xScale(e.commits) + 4)
+        .attr("y", this.labelHeight + this.barHeight / 2)
+        .attr("dy", ".35em")
+        .attr("font-size", 12)
+        .attr("font-weight", "bold")
+
+        .style("fill", "black")
+        .text((e) => e.commits);
     },
   },
 };
