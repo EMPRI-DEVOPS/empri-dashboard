@@ -165,10 +165,12 @@ export default {
         tooltip.style("opacity", 0.7);
       };
       const mousemove = (event, d) => {
+        const xLimit = this.boundedWidth - 70;
+        const x = d3.min([d3.pointer(event)[0], xLimit]);
         tooltip
           //.html(`${d.events} commits on ${d.isoDate}`)
           .html(`${d.isoDate} - ${d.events} events`)
-          .style("left", d3.pointer(event)[0] + 20 + "px")
+          .style("left", x + "px")
           .style("top", d3.pointer(event)[1] + "px");
       };
       const mouseleave = function () {
