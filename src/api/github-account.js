@@ -32,6 +32,73 @@ export default class GithubAccount {
 
     }
 
+    async *pullRequests(from, to) {
+        let totalCount = 1;
+
+        let loadedCount = 0;
+        let endCursor = "";
+
+        const interval = Interval.fromDateTimes(
+            DateTime.fromISO(from, { zone: this.timeZone }),
+            DateTime.fromISO(to, { zone: this.timeZone })
+        );
+        while (loadedCount < totalCount) {
+            let response = await this.graphql(
+                `
+                query pullRequests($username: String!, $afterCursor: String="") {
+                    user(login: $username) {
+                        pullRequests(first:100, after: $afterCursor) {
+                            totalCount
+                            pageInfo {
+                                endCursor
+                            }
+                            nodes {
+                                author {
+                                    login
+                                }
+                                mergedBy {
+                                    login
+                                }
+                                closed
+                                number
+                                title
+                                createdAt
+                                lastEditedAt
+                                publishedAt
+                                repository {
+                                    nameWithOwner
+                                }
+                            }
+                        }
+                    }
+                }
+                `, {
+                username: this.username,
+                afterCursor: endCursor ? endCursor : null,
+            }
+            );
+            totalCount = response.user.pullRequests.totalCount;
+            endCursor = response.user.pullRequests.pageInfo.endCursor;
+            let pullRequests = response.user.pullRequests.nodes;
+            let pullRequestObjects = pullRequests
+                .filter((pullRequest) =>
+                    interval.contains(DateTime.fromISO(pullRequest.publishedAt, { zone: this.timeZone }))
+                )
+                .map((pullRequest) => (Object.freeze({
+                    tool: 'Github',
+                    type: 'pullRequest',
+                    timestamp: DateTime.fromISO(pullRequest.publishedAt, { zone: this.timeZone }).toISO(),
+                    title: pullRequest.title,
+                    repo: pullRequest.repository.nameWithOwner
+                })));
+            store.commit('addUserInteractions', pullRequestObjects);
+            loadedCount += pullRequests.length;
+            yield {
+                totalCount,
+                loadedCount
+            };
+        }
+    }
 
     async *userIssues(from, to) {
         let totalCount = 1;

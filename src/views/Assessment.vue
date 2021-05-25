@@ -241,6 +241,9 @@ export default {
         for await (const found of account.userIssues(this.from, this.to)) {
           this.statusMessage = `Loaded ${found.loadedCount}/${found.totalCount} published issues`;
         }
+        for await (const found of account.pullRequests(this.from, this.to)) {
+          this.statusMessage = `Loaded ${found.loadedCount}/${found.totalCount} pull requests`;
+        }
         for await (const found of account.loadCommits(this.from, this.to)) {
           this.statusMessage = `Found ${found.foundCount} commits in ${found.repo}`;
         }

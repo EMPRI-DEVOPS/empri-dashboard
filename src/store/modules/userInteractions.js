@@ -19,6 +19,14 @@ const getters = {
                     userInteraction.tool == 'Github' && userInteraction.type == 'commit'
             );
     },
+    types: (state) => {
+        let types = []; state.all.forEach(uI => {
+            let i = types.findIndex(type => type === uI.type);
+            if (i <= -1) {
+                types.push(uI.type);
+            }
+        }); return types
+    },
     byType: (state) => (type) => state.all
         .filter((userInteraction) => userInteraction.type == type)
     ,
