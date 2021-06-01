@@ -14,6 +14,10 @@
             <td>{{ completedAt }}</td>
           </tr>
           <tr>
+            <th>Time took</th>
+            <td>{{ duration }} seconds</td>
+          </tr>
+          <tr>
             <th>Time range used</th>
             <td>{{ fromDate }} - {{ toDate }}</td>
           </tr>
@@ -57,6 +61,8 @@ export default defineComponent({
     const completedAt = DateTime.fromISO(store.state.assessment.completedAt)
       .setZone(store.getters.timeZone)
       .toLocaleString(DateTime.DATETIME_MED);
+    const duration = store.getters["assessment/duration"];
+    console.log(duration);
     const fromDate = DateTime.fromISO(store.state.assessment.fromDate)
       .setZone(store.getters.timeZone)
       .toLocaleString(DateTime.DATE_MED);
@@ -64,16 +70,19 @@ export default defineComponent({
       .setZone(store.getters.timeZone)
       .toLocaleString(DateTime.DATE_MED);
     const timeZone = store.getters.timeZone;
-    const totalEventCount = store.getters['assessment/events/totalCount'];
+    const totalEventCount = store.getters["assessment/events/totalCount"];
     const username = store.state.assessment.githubUsername;
-    const userInteractionsByType = store.getters['assessment/events/types'].map((type) => ({
-      type,
-      count: store.getters['assessment/events/byType'](type).length,
-    }));
+    const userInteractionsByType = store.getters["assessment/events/types"].map(
+      (type) => ({
+        type,
+        count: store.getters["assessment/events/byType"](type).length,
+      })
+    );
     return {
       title: "Assessment",
       startedAt,
       completedAt,
+      duration,
       fromDate,
       toDate,
       timeZone,

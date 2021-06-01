@@ -40,9 +40,12 @@ const getters = {
             DateTime.fromISO(state.fromDate, { zone: rootGetters['timeZone'] }),
             DateTime.fromISO(state.toDate, { zone: rootGetters['timeZone'] })
         );
+    },
+    duration(state) {
+        return Interval.fromISO(state.startedAt + '/' + state.completedAt).count('seconds');
     }
 }
 
 export default {
-    namespaced: true, state, mutations, actions, getters, modules: {events}
+    namespaced: true, state, mutations, actions, getters, modules: { events }
 }
