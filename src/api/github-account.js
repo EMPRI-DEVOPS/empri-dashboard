@@ -4,7 +4,7 @@ import {
 import {
     graphql
 } from "@octokit/graphql";
-import { DateTime, Interval } from "luxon";
+import { DateTime } from "luxon";
 import store from '../store/index';
 
 export default class GithubAccount {
@@ -32,16 +32,13 @@ export default class GithubAccount {
 
     }
 
-    async *pullRequests(from, to) {
+    async *pullRequests() {
         let totalCount = 1;
 
         let loadedCount = 0;
         let endCursor = "";
 
-        const interval = Interval.fromDateTimes(
-            DateTime.fromISO(from, { zone: this.timeZone }),
-            DateTime.fromISO(to, { zone: this.timeZone })
-        );
+        const interval = store.getters['assessment/interval'];
         while (loadedCount < totalCount) {
             let response = await this.graphql(
                 `
@@ -91,7 +88,7 @@ export default class GithubAccount {
                     title: pullRequest.title,
                     repo: pullRequest.repository.nameWithOwner
                 })));
-            store.commit('addUserInteractions', pullRequestObjects);
+            store.commit('assessment/events/ADD', pullRequestObjects);
             loadedCount += pullRequests.length;
             yield {
                 totalCount,
@@ -100,17 +97,15 @@ export default class GithubAccount {
         }
     }
 
-    async *userIssues(from, to) {
+    async *userIssues() {
         let totalCount = 1;
 
         let loadedCount = 0;
         let endCursor = "";
 
-        const since = DateTime.fromISO(from).toISO();
-        const interval = Interval.fromDateTimes(
-            DateTime.fromISO(from, { zone: this.timeZone }),
-            DateTime.fromISO(to, { zone: this.timeZone })
-        );
+        const interval = store.getters['assessment/interval'];
+        const since = interval.start;
+
         while (loadedCount < totalCount) {
             let response = await this.graphql(
                 `
@@ -156,7 +151,7 @@ export default class GithubAccount {
                     title: issue.title,
                     repo: issue.repository.nameWithOwner
                 })));
-            store.commit('addUserInteractions', issueObjects);
+            store.commit('assessment/events/ADD', issueObjects);
             loadedCount += issues.length;
             yield {
                 totalCount,
@@ -165,17 +160,15 @@ export default class GithubAccount {
         }
     }
 
-    async *issueComments(from, to) {
+    async *issueComments() {
         let totalCount = 1;
 
         let loadedCount = 0;
         let endCursor = "";
 
-        const since = DateTime.fromISO(from).toISO();
-        const interval = Interval.fromDateTimes(
-            DateTime.fromISO(from, { zone: this.timeZone }),
-            DateTime.fromISO(to, { zone: this.timeZone })
-        );
+        const interval = store.getters['assessment/interval'];
+        const since = interval.start;
+
         while (loadedCount < totalCount) {
             let response = await this.graphql(
                 `
@@ -218,8 +211,7 @@ export default class GithubAccount {
                     title: issue.title,
                     repo: issue.repository.nameWithOwner
                 })));
-            console.log(issueCommentObjects);
-            store.commit('addUserInteractions', issueCommentObjects);
+            store.commit('assessment/events/ADD', issueCommentObjects);
             loadedCount += issueComments.length;
             yield {
                 totalCount,
@@ -275,19 +267,15 @@ export default class GithubAccount {
         }
     }
 
-    async *loadCommits(since, until) {
-        const sinceDate = DateTime.fromISO(since).setZone(this.timeZone);
-        const untilDate = DateTime.fromISO(until).setZone(this.timeZone);
+    async *loadCommits() {
         for (let i = 0; i < this.#repositoriesContributedTo.length; i++) {
             let repo = this.#repositoriesContributedTo[i];
             let foundCount = 0;
             for await (const repoCommitsPage of this.repoCommits(
                 repo.owner.login,
                 repo.name,
-                sinceDate.toISO(),
-                untilDate.toISO(),
             )) {
-                store.commit('addUserInteractions', repoCommitsPage);
+                store.commit('assessment/events/ADD', repoCommitsPage);
                 foundCount += repoCommitsPage.length;
                 yield {
                     foundCount, repo: repo.nameWithOwner
@@ -305,9 +293,12 @@ export default class GithubAccount {
      * @param {string} until
      * @returns 
      */
-    async *repoCommits(owner, name, since, until) {
+    async *repoCommits(owner, name) {
         let hasNextPage = true;
         let afterCursor = null;
+        const interval = store.getters['assessment/interval'];
+        const since = interval.start.toISO();
+        const until = interval.end.toISO();
         while (hasNextPage) {
             let response = await this.graphql(
                 `

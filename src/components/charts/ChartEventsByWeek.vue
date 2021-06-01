@@ -29,7 +29,7 @@
 <script>
 import * as d3 from "d3";
 import { useStore } from "vuex";
-import { Interval, DateTime } from "luxon";
+import { DateTime } from "luxon";
 import { computed, defineComponent } from "vue";
 import ActivityIcon from "../icons/ActivityIcon";
 import useResponsiveWidth from "../../composables/useResponsiveWidth";
@@ -45,7 +45,7 @@ export default defineComponent({
   mounted() {
     //this.updateChart();
   },
-  setup(props) {
+  setup() {
     const title = "User interactions per week";
     const { div, width } = useResponsiveWidth();
 
@@ -58,7 +58,7 @@ export default defineComponent({
     };
 
     const store = useStore();
-    const events = computed(() => store.state.userInteractions.all);
+    const events = computed(() => store.state.assessment.events.all);
 
     const boundedWidth = computed(
       () => width.value - margin.left - margin.right
@@ -73,10 +73,7 @@ export default defineComponent({
       }
     }
 
-    const interval = Interval.fromDateTimes(
-      DateTime.fromISO(props.from).setZone(store.getters.timeZone),
-      DateTime.fromISO(props.to).setZone(store.getters.timeZone)
-    );
+    const interval = store.getters['assessment/interval'];
     const preparedData = computed(() => {
       const eventsByWeek = Array.from(weeks(interval)).map((week) => {
         return { events: 0, week };
@@ -104,7 +101,7 @@ export default defineComponent({
     const xScale = computed(() =>
       d3
         .scaleTime()
-        .domain([new Date(props.from), new Date(props.to)])
+        .domain([interval.start.toJSDate(), interval.end.toJSDate()])
         .range([0, boundedWidth.value])
     );
 

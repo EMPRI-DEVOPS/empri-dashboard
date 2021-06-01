@@ -42,7 +42,7 @@ export default {
 
     const eventsPerRepo = computed(() => {
       let repos = [];
-      for (const event of store.getters.githubEvents) {
+      for (const event of store.getters['assessment/events/githubEvents']) {
         const repo = repos.filter((r) => r.repo === event.repo)[0];
         if (repo) {
           repo.commits++;
@@ -135,10 +135,10 @@ export default {
         .attr("height", this.barHeight)
         .attr("fill", "#69b3a2")
         .on("mouseover", function () {
-          d3.select(this).attr("fill", "#6bd1ba");
+          d3.select(this).attr("opacity", 0.7);
         })
         .on("mouseleave", function () {
-          d3.select(this).attr("fill", "#69b3a2");
+          d3.select(this).attr("opacity", 1);
         });
 
       rects
@@ -149,7 +149,7 @@ export default {
         .attr("font-size", 12)
         .attr("font-weight", "bold")
 
-        .style("fill", "black")
+        .style("fill", "#585858")
         .text((e) => e.commits);
     },
   },

@@ -33,7 +33,7 @@ export default {
   components: { ActivityIcon },
   setup() {
     const store = useStore();
-    const events = computed(() => store.state.userInteractions.all);
+    const events = computed(() => store.state.assessment.events.all);
     const { width, div } = useResponsiveWidth();
     const margin = {
       top: 10,

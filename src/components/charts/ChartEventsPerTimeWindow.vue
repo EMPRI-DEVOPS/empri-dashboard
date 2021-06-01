@@ -44,7 +44,7 @@ export default {
       height,
       margin,
       dayTimeRanges,
-      events: computed(() => store.state.userInteractions.all),
+      events: computed(() => store.state.assessment.events.all),
     };
   },
   watch: {

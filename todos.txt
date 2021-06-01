@@ -1,3 +1,6 @@
+- filter
+- vergröberung
+- rohdaten anzeigen
 - gedanken machen über weitere visualisierungen (github insights angucken)
 
 - untersuchen wie man vermeiden könnte die selben commits mehrfach zu ziehen mittels hash-prüfung
@@ -5,5 +8,4 @@
 - bessere Fehlerbehandlung bei allen DRF aufrufen
 - schauen wie sich das bootstrap css kleiner kompilieren lässt
 - google fonts vermeiden
-- https://github.com/jazzband/django-configurations einbauen
 - https://github.com/kimmobrunfeldt/git-hours/ angucken

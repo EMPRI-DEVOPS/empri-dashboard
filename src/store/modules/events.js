@@ -1,12 +1,12 @@
 const state = {
-    all: []
+    all: [],
 }
 
 const mutations = {
-    addUserInteractions(state, userInteractions) {
+    ADD(state, userInteractions) {
         state.all.push(...userInteractions);
     },
-    resetUserInteractions(state) {
+    RESET(state) {
         state.all = [];
     }
 }
@@ -30,11 +30,11 @@ const getters = {
     byType: (state) => (type) => state.all
         .filter((userInteraction) => userInteraction.type == type)
     ,
-    totalEventCount(state) {
+    totalCount(state) {
         return state.all.length;
     }
 }
 
 export default {
-    state, mutations, getters
+    namespaced: true, state, mutations, getters
 }

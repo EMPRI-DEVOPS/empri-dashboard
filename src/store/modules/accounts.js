@@ -25,6 +25,10 @@ const getters = {
             .filter((account) => account.tool == "Github")
             .filter((account) => account.credentials)
     },
+    githubAccount(state) {
+        return state.all
+            .find((account) => account.tool == "Github" && account.credentials)
+    },
     pendingAccountTypes(state) {
         return state.all
             .filter((account) => !account.credentials)

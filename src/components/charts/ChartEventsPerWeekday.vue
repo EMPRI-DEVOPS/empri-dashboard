@@ -66,7 +66,7 @@ export default {
   computed: {
     eventsPerWeekday() {
       const eventsPerWeekday = Array(7).fill(0);
-      for (const event of this.$store.state.userInteractions.all) {
+      for (const event of this.$store.state.assessment.events.all) {
         const weekday = DateTime.fromISO(event.timestamp).setZone(
           this.$store.getters.timeZone
         ).weekday;

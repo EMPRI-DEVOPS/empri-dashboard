@@ -26,19 +26,15 @@ import ActivityIcon from "../icons/ActivityIcon";
 import * as d3 from "d3";
 import { computed } from "vue";
 import { useStore } from "vuex";
-import { Interval, DateTime } from "luxon";
+import { DateTime } from "luxon";
 import useResponsiveWidth from "../../composables/useResponsiveWidth";
 
 export default {
   components: { ActivityIcon },
-  props: ["from", "to"],
-  setup(props) {
+  setup() {
     const store = useStore();
-    const interval = Interval.fromDateTimes(
-      DateTime.fromISO(props.from).setZone(store.getters.timeZone),
-      DateTime.fromISO(props.to).setZone(store.getters.timeZone)
-    );
-    const events = computed(() => store.state.userInteractions.all);
+    const interval = store.getters['assessment/interval'];
+    const events = computed(() => store.state.assessment.events.all);
     const margin = {
       top: 10,
       right: 10,
@@ -103,7 +99,7 @@ export default {
     const xTimeScale = computed(() =>
       d3
         .scaleTime()
-        .domain([new Date(props.from), new Date(props.to)])
+        .domain([interval.start.toJSDate(), interval.end.toJSDate()])
         .range([0, boundedWidth.value])
     );
 

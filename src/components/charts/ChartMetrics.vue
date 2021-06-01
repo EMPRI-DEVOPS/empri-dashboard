@@ -6,8 +6,12 @@
 
         <tbody>
           <tr>
-            <th>Created at</th>
-            <td>{{ assessmentDate }}</td>
+            <th>Started at</th>
+            <td>{{ startedAt }}</td>
+          </tr>
+          <tr>
+            <th>Completed at</th>
+            <td>{{ completedAt }}</td>
           </tr>
           <tr>
             <th>Time range used</th>
@@ -45,28 +49,31 @@ export default defineComponent({
   components: {
     InfoIcon,
   },
-  props: ["from", "to", "githubUsername"],
-  setup(props) {
+  setup() {
     const store = useStore();
-    const assessmentDate = DateTime.now()
+    const startedAt = DateTime.fromISO(store.state.assessment.startedAt, {
+      zone: store.getters.timeZone,
+    }).toLocaleString(DateTime.DATETIME_MED);
+    const completedAt = DateTime.fromISO(store.state.assessment.completedAt)
       .setZone(store.getters.timeZone)
       .toLocaleString(DateTime.DATETIME_MED);
-    const fromDate = DateTime.fromISO(props.from)
+    const fromDate = DateTime.fromISO(store.state.assessment.fromDate)
       .setZone(store.getters.timeZone)
       .toLocaleString(DateTime.DATE_MED);
-    const toDate = DateTime.fromISO(props.to)
+    const toDate = DateTime.fromISO(store.state.assessment.toDate)
       .setZone(store.getters.timeZone)
       .toLocaleString(DateTime.DATE_MED);
     const timeZone = store.getters.timeZone;
-    const totalEventCount = store.getters.totalEventCount;
-    const username = props.githubUsername.trim();
-    const userInteractionsByType = store.getters.types.map((type) => ({
+    const totalEventCount = store.getters['assessment/events/totalCount'];
+    const username = store.state.assessment.githubUsername;
+    const userInteractionsByType = store.getters['assessment/events/types'].map((type) => ({
       type,
-      count: store.getters.byType(type).length,
+      count: store.getters['assessment/events/byType'](type).length,
     }));
     return {
       title: "Assessment",
-      assessmentDate,
+      startedAt,
+      completedAt,
       fromDate,
       toDate,
       timeZone,
