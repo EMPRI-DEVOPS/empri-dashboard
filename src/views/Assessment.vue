@@ -55,14 +55,9 @@ export default {
       loader: () => import("../components/charts/ChartMetrics"),
       delay: 0,
     }),
-    EventsByDay: defineAsyncComponent({
+    EventsOverTime: defineAsyncComponent({
       loadingComponent: ChartLoader,
-      loader: () => import("../components/charts/ChartEventsByDayLine.vue"),
-      delay: 0,
-    }),
-    EventsByWeek: defineAsyncComponent({
-      loadingComponent: ChartLoader,
-      loader: () => import("../components/charts/ChartEventsByWeek"),
+      loader: () => import("../components/charts/ChartEventsOverTime.vue"),
       delay: 0,
     }),
     GithubRepos: defineAsyncComponent({
@@ -101,8 +96,7 @@ export default {
     const graphs = [
       "TypeDonut",
       "GithubRepos",
-      "EventsByDay",
-      "EventsByWeek",
+      "EventsOverTime",
       "DayHourHeatmap",
       "WeekdayHeatmap",
       "WeekdayChart",

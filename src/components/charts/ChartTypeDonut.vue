@@ -19,7 +19,7 @@
         <g
           id="legend"
           :transform="`translate(${
-            (width - margin.left - margin.right) / 2 + (radius/2) + 20
+            (width - margin.left - margin.right) / 2 + (radius/2) + 40
           }, ${(height - margin.top - margin.bottom) / 2})`"
         ></g>
       </svg>
@@ -30,7 +30,7 @@
 <script>
 import { computed, watchEffect } from "vue";
 import { useStore } from "vuex";
-import { scaleOrdinal, pie, select, arc } from "d3";
+import { pie, select, arc } from "d3";
 import { colors } from "../../const";
 import useResponsiveWidth from "../../composables/useResponsiveWidth";
 import ActivityIcon from "../icons/ActivityIcon";
@@ -38,7 +38,6 @@ import ActivityIcon from "../icons/ActivityIcon";
 export default {
   components: { ActivityIcon },
   setup() {
-    console.log({ colors });
     const store = useStore();
     const { width, div } = useResponsiveWidth();
     const margin = {
@@ -50,7 +49,7 @@ export default {
     const boundedWidth = computed(
       () => width.value - margin.left - margin.right
     );
-    const height = 400;
+    const height = 300;
     const boundedHeight = height - margin.top - margin.bottom;
 
     const userInteractionsByType = store.getters["assessment/events/types"].map(
@@ -59,11 +58,10 @@ export default {
         count: store.getters["assessment/events/byType"](type).length,
       })
     );
-    const color = scaleOrdinal()
-      .domain(userInteractionsByType)
-      .range(colors.slice(0, userInteractionsByType.length));
+    const eventTypes = store.getters["assessment/events/types"];
+    const color = (type) => colors[eventTypes.findIndex((eventType) => eventType === type)];      
 
-    const radius = computed(() => Math.min(width.value, height) / 2 -80);
+    const radius = computed(() => Math.min(width.value, height) / 2 -30);
 
     watchEffect(() => {
       const chart = select("#donut-chart");
@@ -85,7 +83,7 @@ export default {
         })
         .attr("stroke", "black")
         .style("stroke-width", "2px")
-        .style("opacity", 0.7);
+        .style("opacity", 0.9);
       chart
         .select("#total-events")
         .text(store.getters["assessment/events/totalCount"]);
