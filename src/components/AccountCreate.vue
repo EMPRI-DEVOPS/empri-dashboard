@@ -1,5 +1,5 @@
 <template>
-  <div v-for="tool in tools" class="col-sm-4" :key="tool.id">
+  <div v-for="tool in accountTypes" class="col-sm-4" :key="tool.id">
     <add-account-button
       :tool="tool.name"
       @click="add(tool.name)"
@@ -12,19 +12,18 @@
 import { computed, ref } from "vue";
 import { useStore } from "vuex";
 import AddAccountButton from "../components/AddAccountButton";
+import {accountTypes} from '../const'
 
 export default {
   components: { AddAccountButton },
-  //emits: ["account-added"],
   setup() {
     const store = useStore();
     const error = ref("");
-    const tools = computed(() => store.state.accounts.accountTypes);
     const pendingAccountTypes = computed(
       () => store.getters.pendingAccountTypes
     );
     return {
-      tools,
+      accountTypes,
       error,
       add: (name) => {
         store.dispatch("createAccount", name);

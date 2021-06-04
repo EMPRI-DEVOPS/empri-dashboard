@@ -22,12 +22,12 @@
 </template>
 
 <script>
-import ActivityIcon from "../icons/ActivityIcon";
 import * as d3 from "d3";
 import { computed } from "vue";
 import { useStore } from "vuex";
 import { DateTime } from "luxon";
 import useResponsiveWidth from "../../composables/useResponsiveWidth";
+import ActivityIcon from "../icons/ActivityIcon";
 
 export default {
   components: { ActivityIcon },

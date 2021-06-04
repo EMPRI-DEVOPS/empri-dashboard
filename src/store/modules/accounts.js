@@ -2,21 +2,6 @@ import api from '../../api/accounts';
 
 const state = {
     all: [],
-    /** accountTypes should be a constant and not reactive */
-    accountTypes: [
-        {
-            id: 1,
-            name: "Taiga",
-        },
-        {
-            id: 2,
-            name: "Github",
-        },
-        {
-            id: 3,
-            name: "Mattermost",
-        },
-    ]
 }
 
 const getters = {

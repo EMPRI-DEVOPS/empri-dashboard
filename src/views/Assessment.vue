@@ -45,6 +45,11 @@ import AssessmentCreator from "../components/AssessmentCreator";
 export default {
   components: {
     AssessmentCreator,
+    TypeDonut: defineAsyncComponent({
+      loadingComponent: ChartLoader,
+      loader: () => import("../components/charts/ChartTypeDonut"),
+      delay: 0,
+    }),
     Metrics: defineAsyncComponent({
       loadingComponent: ChartLoader,
       loader: () => import("../components/charts/ChartMetrics"),
@@ -94,7 +99,7 @@ export default {
     const creatingPdf = ref(false);
     const createdAssessment = computed(() => store.getters["assessment/done"]);
     const graphs = [
-      "Metrics",
+      "TypeDonut",
       "GithubRepos",
       "EventsByDay",
       "EventsByWeek",
@@ -102,6 +107,7 @@ export default {
       "WeekdayHeatmap",
       "WeekdayChart",
       "TimeWindow",
+      "Metrics",
     ];
     watchEffect(async () => {
       if (createdAssessment.value) {

@@ -62,7 +62,6 @@ export default defineComponent({
       .setZone(store.getters.timeZone)
       .toLocaleString(DateTime.DATETIME_MED);
     const duration = store.getters["assessment/duration"];
-    console.log(duration);
     const fromDate = DateTime.fromISO(store.state.assessment.fromDate)
       .setZone(store.getters.timeZone)
       .toLocaleString(DateTime.DATE_MED);
