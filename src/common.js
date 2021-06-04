@@ -6,6 +6,16 @@ export const colors = [
     '#025557', '#36AFB3', '#DB793B', '#632905', '#67898A'
 ];
 
+export const weekdays = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+];
+
 export const accountTypes = [
     {
         id: 1,
@@ -21,4 +31,4 @@ export const accountTypes = [
     },
 ];
 
-export const eventTypeColor = (type) => colors[eventTypes.findIndex((eventType) => eventType === type)];      
+export const eventTypeColor = (type) => colors[eventTypes.findIndex((eventType) => eventType === type)];

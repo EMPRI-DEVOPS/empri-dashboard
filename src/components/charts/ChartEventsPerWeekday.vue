@@ -21,13 +21,16 @@
 </template>
 
 <script>
-import { computed } from "vue";
+import { computed, watch } from "vue";
+import { useStore } from "vuex";
 import * as d3 from "d3";
 import { DateTime } from "luxon";
 import useResponsiveWidth from "../../composables/useResponsiveWidth";
+import { weekdays, eventTypeColor } from "../../common";
 
 export default {
   setup() {
+    const store = useStore();
     const height = 200;
     const margin = {
       top: 10,
@@ -35,91 +38,100 @@ export default {
       left: 70,
       bottom: 30,
     };
+    const boundedHeight = height - margin.top - margin.bottom;
+    const boundedWidth = computed(
+      () => width.value - margin.left - margin.right
+    );
     const { div, width } = useResponsiveWidth();
+
+    const eventTypes = store.getters["assessment/events/types"];
+
+    const eventsPerWeekday = computed(() => {
+      const weekdayObjects = weekdays.map((weekday) => {
+        const weekdayObject = {
+          weekday,
+          total: 0,
+          idx: weekdays.findIndex((wd) => wd === weekday) + 1,
+        };
+        eventTypes.forEach((et) => (weekdayObject[et] = 0));
+        return weekdayObject;
+      });
+      for (const event of store.state.assessment.events.all) {
+        const weekday = DateTime.fromISO(event.timestamp).setZone(
+          store.getters.timeZone
+        ).weekday;
+        const weekdayObject = weekdayObjects.find((obj) => obj.idx === weekday);
+        weekdayObject[event.type]++;
+        weekdayObject.total++;
+      }
+      return weekdayObjects;
+    });
+
+    const xScale = computed(() =>
+      d3
+        .scaleLinear()
+        .domain([0, d3.max(eventsPerWeekday.value, (d) => d.total)])
+        .range([0, boundedWidth.value])
+    );
+
+    const yScale = d3
+      .scaleBand()
+      .range([0, boundedHeight])
+      .domain(weekdays)
+      .padding(0.2);
+
+    watch([width, eventsPerWeekday], () => {
+      const chart = d3.select("#events-per-weekday-chart");
+      chart
+        .select(".yAxis")
+        .call(d3.axisLeft(yScale))
+        .call((g) => g.select(".domain").remove())
+        .call((g) => g.selectAll(".tick line").remove());
+
+      chart
+        .select(".xAxis")
+        .call(d3.axisBottom(xScale.value))
+        .call((g) => g.select(".domain").remove())
+        .call((g) => g.selectAll(".tick line").remove());
+
+      const stackedEvents = d3.stack().keys(eventTypes)(eventsPerWeekday.value);
+      chart.selectAll(".type").remove();
+
+      const rects = chart
+        .selectAll(".type")
+        .data(stackedEvents, (d) => d)
+        .join("g")
+        .attr("fill", (d) => eventTypeColor(d.key))
+        .attr("class", "type")
+        .selectAll("rect")
+        .data((d) => d)
+        .join("rect")
+        .attr("y", (d) => yScale(d.data.weekday))
+        .attr("height", () => yScale.bandwidth())
+        .attr("x", () => 0);
+      rects
+        .transition()
+        .duration(2000)
+        .attr("x", (d) => xScale.value(d[0]))
+        .attr("width", (d) => xScale.value(d[1] - d[0]));
+      rects
+        .on("mouseover", function () {
+          d3.select(this).attr("opacity", 0.7);
+        })
+        .on("mouseleave", function () {
+          d3.select(this).attr("opacity", 0.9);
+        });
+    });
+
     return {
       div,
       width,
       title: "User interactions per weekday",
       height,
       margin,
-      boundedHeight: height - margin.top - margin.bottom,
-      boundedWidth: computed(() => width.value - margin.left - margin.right),
-      weekdays: [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-        "Sunday",
-      ],
+      boundedHeight,
+      boundedWidth,
     };
-  },
-  mounted() {
-    this.updateChart();
-  },
-  watch: {
-    width() {
-      this.updateChart();
-    },
-  },
-  computed: {
-    eventsPerWeekday() {
-      const eventsPerWeekday = Array(7).fill(0);
-      for (const event of this.$store.state.assessment.events.all) {
-        const weekday = DateTime.fromISO(event.timestamp).setZone(
-          this.$store.getters.timeZone
-        ).weekday;
-        eventsPerWeekday[weekday - 1]++;
-      }
-      return eventsPerWeekday;
-    },
-    xScale() {
-      return d3
-        .scaleLinear()
-        .domain([0, d3.max(this.eventsPerWeekday)])
-        .range([0, this.boundedWidth]);
-    },
-    yScale() {
-      return d3
-        .scaleBand()
-        .range([0, this.boundedHeight])
-        .domain(this.weekdays)
-        .padding(0.2);
-    },
-  },
-  methods: {
-    updateChart() {
-      const chart = d3.select("#events-per-weekday-chart");
-      chart
-        .select(".yAxis")
-        .call(d3.axisLeft(this.yScale).ticks(10))
-        .call((g) => g.select(".domain").remove())
-        .call((g) => g.selectAll(".tick line").remove());
-
-      chart
-        .select(".xAxis")
-        .call(d3.axisBottom(this.xScale))
-        .call((g) => g.select(".domain").remove())
-        .call((g) => g.selectAll(".tick line").remove());
-
-      const rects = chart.selectAll("rect").data(this.eventsPerWeekday);
-
-      // Bars
-      rects
-        .enter()
-        .append("rect")
-        .merge(rects)
-        .attr("x", this.xScale(0))
-        .attr("y", (e, idx) => this.yScale(this.weekdays[idx]))
-        .attr("rx", 2)
-        .attr("ry", 2)
-        .attr("width", (e) => this.xScale(e))
-        .attr("height", this.yScale.bandwidth())
-        .attr("fill", "#69b3a2");
-
-      rects.exit().remove();
-    },
   },
 };
 </script>
