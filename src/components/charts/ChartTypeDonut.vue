@@ -31,7 +31,7 @@
 import { computed, watchEffect } from "vue";
 import { useStore } from "vuex";
 import { pie, select, arc } from "d3";
-import { colors } from "../../const";
+import { eventTypeColor } from "../../common";
 import useResponsiveWidth from "../../composables/useResponsiveWidth";
 import ActivityIcon from "../icons/ActivityIcon";
 
@@ -52,14 +52,13 @@ export default {
     const height = 300;
     const boundedHeight = height - margin.top - margin.bottom;
 
-    const userInteractionsByType = store.getters["assessment/events/types"].map(
+    const eventTypes = store.getters["assessment/events/types"];
+    const userInteractionsByType = eventTypes.map(
       (type) => ({
         type,
         count: store.getters["assessment/events/byType"](type).length,
       })
     );
-    const eventTypes = store.getters["assessment/events/types"];
-    const color = (type) => colors[eventTypes.findIndex((eventType) => eventType === type)];      
 
     const radius = computed(() => Math.min(width.value, height) / 2 -30);
 
@@ -79,7 +78,7 @@ export default {
             .outerRadius(radius.value)
         )
         .attr("fill", function (d) {
-          return color(d.data.type);
+          return eventTypeColor(d.data.type);
         })
         .attr("stroke", "black")
         .style("stroke-width", "2px")
@@ -94,7 +93,7 @@ export default {
         .join("circle")
         .attr("cy", (d, i) => i * 25)
         .attr("r", 7)
-        .style("fill", (d) => color(d.type));
+        .style("fill", (d) => eventTypeColor(d.type));
       legend
         .selectAll("text")
         .data(userInteractionsByType)

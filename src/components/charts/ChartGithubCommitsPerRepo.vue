@@ -18,7 +18,7 @@ import useResponsiveWidth from "../../composables/useResponsiveWidth";
 import { computed, watch } from "vue";
 import { useStore } from "vuex";
 import GithubIcon from "../icons/GithubIcon.vue";
-import { colors } from "../../const";
+import { eventTypeColor } from "../../common";
 
 export default {
   components: { GithubIcon },
@@ -81,9 +81,6 @@ export default {
 
     const eventTypes = store.getters["assessment/events/types"];
 
-    const color = (type) =>
-      colors[eventTypes.findIndex((eventType) => eventType === type)];
-
     watch([xScale, eventsPerRepo], () => {
       const chart = select("#commits-per-repo-chart");
 
@@ -132,7 +129,7 @@ export default {
           return res;
         })
         .attr("height", barHeight)
-        .attr("fill", (d) => color(d.type))
+        .attr("fill", (d) => eventTypeColor(d.type))
         .attr("opacity", 0.9)
         .on("mouseover", function () {
           select(this).attr("opacity", 0.7);

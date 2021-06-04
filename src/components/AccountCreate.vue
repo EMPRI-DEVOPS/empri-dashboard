@@ -12,7 +12,7 @@
 import { computed, ref } from "vue";
 import { useStore } from "vuex";
 import AddAccountButton from "../components/AddAccountButton";
-import {accountTypes} from '../const'
+import {accountTypes} from '../common'
 
 export default {
   components: { AddAccountButton },

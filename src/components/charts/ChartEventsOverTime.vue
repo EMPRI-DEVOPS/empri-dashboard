@@ -17,12 +17,6 @@
             fill="none"
             text-anchor="middle"
           ></g>
-          <path
-            class="area"
-            fill="#69b3a2"
-            stroke="steelblue"
-            stroke-width="0"
-          ></path>
         </g>
       </svg>
     </div>
@@ -36,6 +30,7 @@ import { DateTime } from "luxon";
 import { computed, defineComponent, watch, ref } from "vue";
 import ActivityIcon from "../icons/ActivityIcon";
 import useResponsiveWidth from "../../composables/useResponsiveWidth";
+import { eventTypeColor } from "../../common";
 
 export default defineComponent({
   components: { ActivityIcon },
@@ -84,16 +79,19 @@ export default defineComponent({
       }
     }
 
+    const eventTypes = store.getters["assessment/events/types"];
+
     const interval = store.getters["assessment/interval"];
     const preparedData = computed(() => {
+      const createDateObj = (date) => {
+        const dateObj = { date, total: 0 };
+        eventTypes.forEach((et) => (dateObj[et] = 0));
+        return dateObj;
+      };
       const dates =
         weeksOrDays.value === "Weeks"
-          ? Array.from(weeks(interval)).map((date) => {
-              return { events: 0, date };
-            })
-          : Array.from(days(interval)).map((date) => {
-              return { events: 0, date };
-            });
+          ? Array.from(weeks(interval)).map((date) => createDateObj(date))
+          : Array.from(days(interval)).map((date) => createDateObj(date));
       for (const event of events.value) {
         const eventDt = DateTime.fromISO(event.timestamp, {
           zone: store.getters.timeZone,
@@ -104,7 +102,8 @@ export default defineComponent({
           }
           return o.date === eventDt.toISODate();
         });
-        dateObj.events++;
+        dateObj[event.type]++;
+        dateObj.total++;
       }
       return dates;
     });
@@ -124,27 +123,30 @@ export default defineComponent({
         .range([0, boundedWidth.value])
     );
 
-    const yScale = computed(() => d3
-      .scaleLinear()
-      .range([boundedHeight, 0])
-      .domain([0, d3.max(preparedData.value, (d) => d.events)]));
+    const yScale = computed(() =>
+      d3
+        .scaleLinear()
+        .range([boundedHeight, 0])
+        .domain([0, d3.max(preparedData.value, (d) => d.total)])
+    );
 
     watch([preparedData, width], () => {
       const chart = d3.select("#events-over-time-chart");
-      const transitionDuration = 2000;
+      //const transitionDuration = 2000;
+      const t = d3.transition().duration(2000);
+      const stackedData = d3.stack().keys(eventTypes)(preparedData.value);
       chart
         .select(".yAxis")
-        .transition()
-        .duration(transitionDuration)
+        .transition(t)
         .call(d3.axisLeft(yScale.value).ticks(10));
 
       chart
         .select(".xAxis")
-        .transition()
-        .duration(transitionDuration)
+        .transition(t)
         .call(d3.axisBottom(xScale.value).ticks(boundedWidth.value / 80))
         .call((g) => g.selectAll(".tick line").remove());
 
+      /*
       chart
         .select(".area")
         .datum(preparedData.value)
@@ -161,6 +163,34 @@ export default defineComponent({
             .y1((e) => yScale.value(e.events))
             .curve(d3.curveMonotoneX)
         );
+        */
+      chart
+        .selectAll(".area")
+        .data(stackedData)
+        .join("path")
+        .attr("class", "area")
+        .attr(
+          "d",
+          d3
+            .area()
+            .x(() => boundedWidth.value)
+            .y0(() => yScale.value(0))
+            .y1(() => yScale.value(0))
+        )
+        .transition(t)
+        .attr(
+          "d",
+          d3
+            .area()
+            .x(
+              (d) =>
+                xBand.value(new Date(d.data.date)) + xBand.value.bandwidth() / 2
+            )
+            .y0((d) => yScale.value(d[0]))
+            .y1((d) => yScale.value(d[1]))
+            .curve(d3.curveMonotoneX)
+        )
+        .style("fill", (d) => eventTypeColor(d.key));
     });
 
     return {
