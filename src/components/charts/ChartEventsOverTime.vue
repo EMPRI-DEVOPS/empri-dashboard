@@ -2,7 +2,8 @@
   <div ref="div" class="card">
     <div class="card-body chart-card">
       <h6 v-if="title" class="card-title"><activity-icon /> {{ title }}</h6>
-      <button class="btn btn-outline-secondary" @click="toggleWeeksOrDays">
+      <label for="density" class="form-label">Density: </label> 
+      <button name="density" id="density" class="btn btn-outline-secondary" @click="toggleWeeksOrDays">
         {{ weeksOrDays }}
       </button>
       <svg :width="width" :height="height" :viewbox="`0 0 ${width} ${height}`">
@@ -146,37 +147,12 @@ export default defineComponent({
         .call(d3.axisBottom(xScale.value).ticks(boundedWidth.value / 80))
         .call((g) => g.selectAll(".tick line").remove());
 
-      /*
-      chart
-        .select(".area")
-        .datum(preparedData.value)
-        .transition()
-        .duration(transitionDuration)
-        .attr(
-          "d",
-          d3
-            .area()
-            .x(
-              (e) => xBand.value(new Date(e.date)) + xBand.value.bandwidth() / 2
-            )
-            .y0(() => yScale.value(0))
-            .y1((e) => yScale.value(e.events))
-            .curve(d3.curveMonotoneX)
-        );
-        */
-      chart
-        .selectAll(".area")
-        .data(stackedData)
+      const area = chart
+        .selectAll(".area");
+      area.data(stackedData)
         .join("path")
+        .merge(area)
         .attr("class", "area")
-        .attr(
-          "d",
-          d3
-            .area()
-            .x(() => boundedWidth.value)
-            .y0(() => yScale.value(0))
-            .y1(() => yScale.value(0))
-        )
         .transition(t)
         .attr(
           "d",

@@ -89,7 +89,7 @@ export default {
       const gHeight = barHeight + labelHeight + 12;
 
       // Bars
-      const rects = chart
+      const rectContainers = chart
         .selectAll("g")
         .data(eventsPerRepo.value)
         .join("g")
@@ -98,7 +98,7 @@ export default {
           return "translate(0," + gHeight * i + ")";
         });
 
-      rects
+      rectContainers
         .append("text")
         .attr("x", 0)
         .attr("y", 11)
@@ -106,31 +106,30 @@ export default {
         .attr("font-size", 15)
         .text((e) => e.repo);
 
-      rects
-        .selectAll("rect")
-        .data((d) => {
-          const dataPoint = [];
-          let prev = 0;
-          for (const type of eventTypes) {
-            dataPoint.push({ type, prev: prev, val: prev + d[type] ?? 0 });
-            prev += d[type] ?? 0;
-          }
-          return dataPoint;
-        })
+      const rects = rectContainers.selectAll("rect").data((d) => {
+        const dataPoint = [];
+        let prev = 0;
+        for (const type of eventTypes) {
+          dataPoint.push({ type, prev: prev, val: prev + d[type] ?? 0 });
+          prev += d[type] ?? 0;
+        }
+        return dataPoint;
+      })
         .join("rect")
         .attr("y", labelHeight)
+        .attr("x", () => xScale.value(0))
+        .attr("height", barHeight);
+      rects
+        .transition()
+        .duration(2000)
         .attr("x", (d) => xScale.value(d.prev))
-        /*
-        .attr("rx", 4)
-        .attr("ry", 4)
-        */
         .attr("width", (d) => {
           const res = xScale.value(d.val - d.prev);
           return res;
         })
-        .attr("height", barHeight)
         .attr("fill", (d) => eventTypeColor(d.type))
-        .attr("opacity", 0.9)
+        .attr("opacity", 0.9);
+      rects
         .on("mouseover", function () {
           select(this).attr("opacity", 0.7);
         })
@@ -138,7 +137,7 @@ export default {
           select(this).attr("opacity", 0.9);
         });
 
-      rects
+      rectContainers
         .append("text")
         .attr("x", (e) => xScale.value(e.total) + 4)
         .attr("y", labelHeight + barHeight / 2)

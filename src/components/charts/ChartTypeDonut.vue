@@ -13,7 +13,7 @@
             id="total-events"
             text-anchor="middle"
             dominant-baseline="central"
-            font-size="70"
+            font-size="10"
           ></text>
         </g>
         <g
@@ -71,6 +71,8 @@ export default {
         .selectAll("path")
         .data(arcs)
         .join("path")
+        .attr("d", arc().innerRadius(70).outerRadius(40))
+        .transition().duration(2000)
         .attr(
           "d",
           arc()
@@ -85,7 +87,12 @@ export default {
         .style("opacity", 0.9);
       chart
         .select("#total-events")
-        .text(store.getters["assessment/events/totalCount"]);
+        .text(store.getters["assessment/events/totalCount"])
+        .attr("font-size", 10)
+        .attr("opacity", 0.3)
+        .transition().duration(2000)
+        .attr("font-size", 70)
+        .attr("opacity", 1)
       const legend = select("#legend").data(userInteractionsByType);
       legend
         .selectAll("circle")

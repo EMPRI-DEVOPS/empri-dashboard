@@ -28,6 +28,7 @@ import { computed } from "vue";
 import { useStore } from "vuex";
 import { DateTime } from "luxon";
 import useResponsiveWidth from "../../composables/useResponsiveWidth";
+import {colors} from "../../common";
 
 export default {
   components: { ActivityIcon },
@@ -110,7 +111,7 @@ export default {
     const colorScale = computed(() =>
       d3
         .scaleLinear()
-        .range(["#cde6e0", "#69b3a2"])
+        .range(["#d8eaeb", colors[0]])
         .domain(d3.extent(heatmapData.value, (e) => e.events))
     );
 

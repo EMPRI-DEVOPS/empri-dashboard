@@ -96,9 +96,9 @@ export default {
     const graphs = [
       "TypeDonut",
       "GithubRepos",
-      "EventsOverTime",
       "DayHourHeatmap",
       "WeekdayHeatmap",
+      "EventsOverTime",
       "WeekdayChart",
       "TimeWindow",
       "Metrics",
