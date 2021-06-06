@@ -5,21 +5,21 @@
       <svg :width="width" :height="height" :viewbox="`0 0 ${width} ${height}`">
         <g
           id="donut-chart"
-          :transform="`translate(${(width - margin.left - margin.right) / 2 -(radius/2)}, ${
-            (height - margin.top - margin.bottom) / 2
-          })`"
+          :transform="`translate(${
+            (width - margin.left - margin.right) / 2 - radius / 2
+          }, ${(height - margin.top - margin.bottom) / 2})`"
         >
           <text
             id="total-events"
             text-anchor="middle"
             dominant-baseline="central"
             font-size="10"
-          ></text>
+          >{{totalCount}}</text>
         </g>
         <g
           id="legend"
           :transform="`translate(${
-            (width - margin.left - margin.right) / 2 + (radius/2) + 40
+            (width - margin.left - margin.right) / 2 + radius / 2 + 40
           }, ${(height - margin.top - margin.bottom) / 2})`"
         ></g>
       </svg>
@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import { computed, watchEffect } from "vue";
+import { computed, watch } from "vue";
 import { useStore } from "vuex";
 import { pie, select, arc } from "d3";
 import { eventTypeColor } from "../../common";
@@ -53,26 +53,28 @@ export default {
     const boundedHeight = height - margin.top - margin.bottom;
 
     const eventTypes = store.getters["assessment/events/types"];
-    const userInteractionsByType = eventTypes.map(
-      (type) => ({
+    const userInteractionsByType = computed(() =>
+      eventTypes.map((type) => ({
         type,
         count: store.getters["assessment/events/byType"](type).length,
-      })
+      }))
     );
+    const totalCount = computed(() => store.getters["assessment/events/totalCount"]);
 
-    const radius = computed(() => Math.min(width.value, height) / 2 -30);
+    const radius = computed(() => Math.min(width.value, height) / 2 - 30);
 
-    watchEffect(() => {
+    watch([width, userInteractionsByType, totalCount], () => {
       const chart = select("#donut-chart");
       const d3pie = pie().value((d) => d.count);
-      const arcs = d3pie(userInteractionsByType);
+      const arcs = d3pie(userInteractionsByType.value);
 
       chart
         .selectAll("path")
         .data(arcs)
         .join("path")
         .attr("d", arc().innerRadius(70).outerRadius(40))
-        .transition().duration(2000)
+        .transition()
+        .duration(2000)
         .attr(
           "d",
           arc()
@@ -87,23 +89,23 @@ export default {
         .style("opacity", 0.9);
       chart
         .select("#total-events")
-        .text(store.getters["assessment/events/totalCount"])
         .attr("font-size", 10)
         .attr("opacity", 0.3)
-        .transition().duration(2000)
+        .transition()
+        .duration(2000)
         .attr("font-size", 70)
-        .attr("opacity", 1)
-      const legend = select("#legend").data(userInteractionsByType);
+        .attr("opacity", 1);
+      const legend = select("#legend").data(userInteractionsByType.value);
       legend
         .selectAll("circle")
-        .data(userInteractionsByType)
+        .data(userInteractionsByType.value)
         .join("circle")
         .attr("cy", (d, i) => i * 25)
         .attr("r", 7)
         .style("fill", (d) => eventTypeColor(d.type));
       legend
         .selectAll("text")
-        .data(userInteractionsByType)
+        .data(userInteractionsByType.value)
         .join("text")
         .attr("x", 10)
         .attr("y", (d, i) => 5 + i * 25)
@@ -119,6 +121,7 @@ export default {
       radius,
       boundedHeight,
       boundedWidth,
+      totalCount
     };
   },
 };

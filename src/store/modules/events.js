@@ -1,5 +1,6 @@
 const state = {
     all: [],
+    filters: []
 }
 
 const mutations = {
@@ -8,12 +9,20 @@ const mutations = {
     },
     RESET(state) {
         state.all = [];
-    }
+    },
+    TOGGLE_TYPE_FILTER(state, type) {
+        const idx = state.filters.findIndex((filter) => filter.type === type);
+        if (idx === -1) {
+            state.filters.push({ type })
+        } else {
+            state.filters.splice(idx, 1);
+        }
+    },
 }
 
 const getters = {
-    githubEvents(state) {
-        return state.all
+    githubEvents(state, getters) {
+        return getters.filtered
             .filter(
                 (userInteraction) =>
                     userInteraction.tool == 'Github'
@@ -27,11 +36,17 @@ const getters = {
             }
         }); return types
     },
-    byType: (state) => (type) => state.all
+    byType: (state, getters) => (type) => getters.filtered
         .filter((userInteraction) => userInteraction.type == type)
     ,
-    totalCount(state) {
-        return state.all.length;
+    filtered(state) {
+        if (state.filters.length === 0 ) {
+            return state.all;
+        }
+        return state.all.filter((event) => state.filters.findIndex((filter) => filter.type === event.type) !== -1)
+    },
+    totalCount(state, getters) {
+        return getters.filtered.length;
     }
 }
 

@@ -2,6 +2,30 @@
   <div>
     <assessment-creator />
     <div class="container-fluid" v-if="createdAssessment">
+      <div class="row">
+        <div class="col">
+          <label class="form-label p-2">Event type filters:</label>
+          <div
+            v-for="eventType of eventTypes"
+            class="form-check form-check-inline"
+            :key="eventType.type"
+          >
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="eventType.type"
+              value="eventType.type"
+              :checked="
+                eventTypeFilters.find((type) => type.type === eventType.type)
+              "
+              @change="toggleFilter(eventType.type)"
+            />
+            <label class="form-check-label" for="inlineCheckbox1">{{
+              eventType.type
+            }}</label>
+          </div>
+        </div>
+      </div>
       <div id="assessment" class="row g-2">
         <transition-group name="chart-list">
           <div v-for="chart in charts" :key="chart" class="col-xl-6">
@@ -39,12 +63,14 @@ import { useStore } from "vuex";
 import { DateTime } from "luxon";
 import { jsPDF } from "jspdf";
 import * as html2canvas from "html2canvas";
+import Multiselect from "vue-multiselect";
 import ChartLoader from "../components/charts/ChartLoader";
 import AssessmentCreator from "../components/AssessmentCreator";
 
 export default {
   components: {
     AssessmentCreator,
+    Multiselect,
     TypeDonut: defineAsyncComponent({
       loadingComponent: ChartLoader,
       loader: () => import("../components/charts/ChartTypeDonut"),
@@ -93,6 +119,14 @@ export default {
     const charts = ref([]);
     const creatingPdf = ref(false);
     const createdAssessment = computed(() => store.getters["assessment/done"]);
+    const eventTypeFilters = computed(
+      () => store.state.assessment.events.filters
+    );
+    const eventTypes = computed(() =>
+      store.getters["assessment/events/types"].map((type) => ({ type }))
+    );
+    const toggleFilter = (type) =>
+      store.commit("assessment/events/TOGGLE_TYPE_FILTER", type);
     const graphs = [
       "TypeDonut",
       "GithubRepos",
@@ -118,6 +152,9 @@ export default {
       createdAssessment,
       charts,
       creatingPdf,
+      eventTypes,
+      eventTypeFilters,
+      toggleFilter,
     };
   },
   methods: {
