@@ -63,14 +63,12 @@ import { useStore } from "vuex";
 import { DateTime } from "luxon";
 import { jsPDF } from "jspdf";
 import * as html2canvas from "html2canvas";
-import Multiselect from "vue-multiselect";
 import ChartLoader from "../components/charts/ChartLoader";
 import AssessmentCreator from "../components/AssessmentCreator";
 
 export default {
   components: {
     AssessmentCreator,
-    Multiselect,
     TypeDonut: defineAsyncComponent({
       loadingComponent: ChartLoader,
       loader: () => import("../components/charts/ChartTypeDonut"),

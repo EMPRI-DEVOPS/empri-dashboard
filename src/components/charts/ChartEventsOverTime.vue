@@ -76,7 +76,7 @@ export default defineComponent({
     };
 
     const store = useStore();
-    const events = computed(() => store.state.assessment.events.all);
+    const events = computed(() => store.getters['assessment/events/filtered']);
 
     const boundedWidth = computed(
       () => width.value - margin.left - margin.right

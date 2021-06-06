@@ -29,14 +29,6 @@
             <th>Github username used</th>
             <td>{{ username }}</td>
           </tr>
-          <tr v-for="type in userInteractionsByType" :key="type.type">
-            <th>Interactions of type: {{ type.type }}</th>
-            <td>{{ type.count }}</td>
-          </tr>
-          <tr>
-            <th>Total user interactions found</th>
-            <td>{{ totalEventCount }}</td>
-          </tr>
         </tbody>
       </table>
     </div>
@@ -69,14 +61,7 @@ export default defineComponent({
       .setZone(store.getters.timeZone)
       .toLocaleString(DateTime.DATE_MED);
     const timeZone = store.getters.timeZone;
-    const totalEventCount = store.getters["assessment/events/totalCount"];
     const username = store.state.assessment.githubUsername;
-    const userInteractionsByType = store.getters["assessment/events/types"].map(
-      (type) => ({
-        type,
-        count: store.getters["assessment/events/byType"](type).length,
-      })
-    );
     return {
       title: "Assessment",
       startedAt,
@@ -85,9 +70,7 @@ export default defineComponent({
       fromDate,
       toDate,
       timeZone,
-      totalEventCount,
       username,
-      userInteractionsByType,
     };
   },
 });

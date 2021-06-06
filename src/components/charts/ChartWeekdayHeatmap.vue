@@ -28,14 +28,14 @@ import { computed } from "vue";
 import { useStore } from "vuex";
 import { DateTime } from "luxon";
 import useResponsiveWidth from "../../composables/useResponsiveWidth";
-import {colors} from "../../common";
+import { colors } from "../../common";
 
 export default {
   components: { ActivityIcon },
   setup() {
     const store = useStore();
-    const interval = store.getters['assessment/interval'];
-    const events = computed(() => store.state.assessment.events.all);
+    const interval = store.getters["assessment/interval"];
+    const events = computed(() => store.getters["assessment/events/filtered"]);
     const margin = {
       top: 10,
       right: 10,
@@ -136,6 +136,9 @@ export default {
   },
   watch: {
     width() {
+      this.updateChart();
+    },
+    events() {
       this.updateChart();
     },
   },

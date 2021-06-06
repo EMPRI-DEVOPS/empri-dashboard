@@ -7,7 +7,6 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import Collapse from "bootstrap/js/dist/collapse"
 import "./assets/app.css";
 import "nouislider/dist/nouislider.css";
-import "vue-multiselect/dist/vue-multiselect.css";
 
 createApp({})
     .use(router)

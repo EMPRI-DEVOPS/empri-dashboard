@@ -44,11 +44,14 @@ export default {
       height,
       margin,
       dayTimeRanges,
-      events: computed(() => store.state.assessment.events.all),
+      events: computed(() => store.getters["assessment/events/filtered"]),
     };
   },
   watch: {
     width() {
+      this.updateChart();
+    },
+    events() {
       this.updateChart();
     },
   },

@@ -56,7 +56,7 @@ export default {
         eventTypes.forEach((et) => (weekdayObject[et] = 0));
         return weekdayObject;
       });
-      for (const event of store.state.assessment.events.all) {
+      for (const event of store.getters['assessment/events/filtered']) {
         const weekday = DateTime.fromISO(event.timestamp).setZone(
           store.getters.timeZone
         ).weekday;
