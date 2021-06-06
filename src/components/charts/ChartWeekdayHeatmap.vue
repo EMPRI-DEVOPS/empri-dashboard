@@ -138,7 +138,7 @@ export default {
     width() {
       this.updateChart();
     },
-    events() {
+    heatmapData() {
       this.updateChart();
     },
   },
