@@ -111,7 +111,7 @@ export default {
     });
 
     return {
-      title: "Total user interactions",
+      title: "Total user interactions found",
       width,
       div,
       height,

@@ -2,10 +2,31 @@
   <div ref="div" class="card">
     <div class="card-body chart-card">
       <h6 v-if="title" class="card-title"><activity-icon /> {{ title }}</h6>
-      <label for="density" class="form-label">Density: </label> 
-      <button name="density" id="density" class="btn btn-outline-secondary" @click="toggleWeeksOrDays">
-        {{ weeksOrDays }}
-      </button>
+      <label class="form-label p-1">Density: </label>
+      <div class="btn-group" role="group" aria-label="Set density">
+        <input
+          type="radio"
+          class="btn-check"
+          name="weeks"
+          id="weeks"
+          autocomplete="off"
+          :checked="density === 'weeks'"
+          @click="toggleDensity"
+        />
+        <label class="btn btn-outline-secondary" for="weeks"> Weeks</label>
+
+        <input
+          type="radio"
+          class="btn-check"
+          name="days"
+          id="days"
+          autocomplete="off"
+          :checked="density === 'days'"
+          @click="toggleDensity"
+        />
+        <label class="btn btn-outline-secondary" for="days">Days</label>
+      </div>
+
       <svg :width="width" :height="height" :viewbox="`0 0 ${width} ${height}`">
         <g
           id="events-over-time-chart"
@@ -47,13 +68,11 @@ export default defineComponent({
       bottom: 20,
     };
 
-    const weeksOrDays = ref("Weeks");
-    const toggleWeeksOrDays = () => {
-      if (weeksOrDays.value === "Weeks") {
-        weeksOrDays.value = "Days";
-      } else {
-        weeksOrDays.value = "Weeks";
-      }
+    const density = ref("weeks");
+    const toggleDensity = async () => {
+      await (async () => {
+        density.value = density.value === "weeks" ? "days" : "weeks";
+      })();
     };
 
     const store = useStore();
@@ -90,7 +109,7 @@ export default defineComponent({
         return dateObj;
       };
       const dates =
-        weeksOrDays.value === "Weeks"
+        density.value === "weeks"
           ? Array.from(weeks(interval)).map((date) => createDateObj(date))
           : Array.from(days(interval)).map((date) => createDateObj(date));
       for (const event of events.value) {
@@ -98,7 +117,7 @@ export default defineComponent({
           zone: store.getters.timeZone,
         });
         const dateObj = dates.find((o) => {
-          if (weeksOrDays.value === "Weeks") {
+          if (density.value === "weeks") {
             return o.date === eventDt.startOf("week").toISODate();
           }
           return o.date === eventDt.toISODate();
@@ -147,9 +166,9 @@ export default defineComponent({
         .call(d3.axisBottom(xScale.value).ticks(boundedWidth.value / 80))
         .call((g) => g.selectAll(".tick line").remove());
 
-      const area = chart
-        .selectAll(".area");
-      area.data(stackedData)
+      const area = chart.selectAll(".area");
+      area
+        .data(stackedData)
         .join("path")
         .merge(area)
         .attr("class", "area")
@@ -177,8 +196,8 @@ export default defineComponent({
       margin,
       boundedWidth,
       boundedHeight,
-      weeksOrDays,
-      toggleWeeksOrDays,
+      density,
+      toggleDensity,
     };
   },
 });
