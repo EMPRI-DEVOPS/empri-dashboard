@@ -216,7 +216,6 @@ export default {
         let y = 20;
         const margin = 40;
         for (const canvas of data) {
-          //let pdfImage = canvas.toDataURL("image/jpeg", 1);
           let pdfImage = canvas.toDataURL("image/jpeg", 1);
 
           const pdfWidth = pdf.internal.pageSize.getWidth();
@@ -240,7 +239,7 @@ export default {
           );
           y += targetImgHeight + 5;
         }
-        pdf.save(this.githubUsername + DateTime.now().toISO());
+        pdf.save(this.$store.state.assessment.githubUsername + DateTime.now().toISO());
         this.creatingPdf = false;
       });
     },

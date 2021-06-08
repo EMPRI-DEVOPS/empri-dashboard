@@ -29,7 +29,7 @@ const mutations = {
 const actions = {
     new({ commit }, payload) {
         commit('NEW', payload);
-        commit('events/RESET');
+        commit('events/START_NEW');
     }
 }
 

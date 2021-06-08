@@ -11,6 +11,12 @@ const mutations = {
     ADD(state, userInteractions) {
         state.all.push(...userInteractions);
     },
+    START_NEW(state) {
+        state.all = [];
+        state.filters = [];
+        state.backup = [];
+        state.reductionLevel = 0;
+    },
     RESET(state) {
         state.all = [];
     },
