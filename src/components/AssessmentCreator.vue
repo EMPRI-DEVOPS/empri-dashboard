@@ -101,7 +101,6 @@ import PlayIcon from "./icons/PlayIcon";
 
 export default {
   components: { PlayIcon },
-  emits: ["creatingAssessment", "createdAssessment"],
   setup() {
     const store = useStore();
     store.dispatch("loadUser");

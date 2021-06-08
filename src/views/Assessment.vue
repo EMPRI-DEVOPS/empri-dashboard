@@ -1,7 +1,7 @@
 <template>
   <div>
-    <assessment-creator />
-    <div class="container-fluid" v-if="createdAssessment">
+    <assessment-creator v-show="!createdAssessment || startNew" />
+    <div class="container-fluid" v-if="createdAssessment && !startNew">
       <div class="row">
         <div class="col-lg-6">
           <assessment-post-filters />
@@ -17,8 +17,14 @@
           </div>
         </transition-group>
       </div>
-      <div class="row my-2">
-        <div class="col"><pdf-creator /></div>
+      <div class="d-flex flex-row justify-content-between my-2">
+          <pdf-creator />
+          <button
+            @click="startNew = true"
+            class="btn btn-lg btn-outline-secondary"
+          >
+            Start new
+          </button>
       </div>
     </div>
   </div>
@@ -87,6 +93,7 @@ export default {
   setup() {
     const store = useStore();
     const charts = ref([]);
+    const startNew = ref(false);
     const createdAssessment = computed(() => store.getters["assessment/done"]);
     const graphs = [
       "TypeDonut",
@@ -100,6 +107,7 @@ export default {
     ];
     watch(createdAssessment, async () => {
       if (createdAssessment.value) {
+        startNew.value = false;
         for (const graphName of graphs) {
           charts.value.push(graphName);
           await new Promise((res) => setTimeout(res, 500));
@@ -111,6 +119,7 @@ export default {
 
     return {
       createdAssessment,
+      startNew,
       charts,
     };
   },
