@@ -1,21 +1,27 @@
 <template>
-  <div ref="div" class="card">
-    <div class="card-body chart-card">
-      <h6 class="card-title">{{ title }}</h6>
-      <svg :width="width" :height="height" :viewbox="`0 0 ${width} ${height}`">
-        <g
-          id="events-per-weekday-chart"
-          :transform="`translate(${margin.left}, ${margin.top})`"
+  <div class="col-xl-6">
+    <div ref="div" class="card">
+      <div class="card-body chart-card">
+        <h6 class="card-title">{{ title }}</h6>
+        <svg
+          :width="width"
+          :height="height"
+          :viewbox="`0 0 ${width} ${height}`"
         >
-          <g class="yAxis" fill="none" text-anchor="end"></g>
           <g
-            class="xAxis"
-            :transform="`translate(0, ${boundedHeight})`"
-            fill="none"
-            text-anchor="middle"
-          ></g>
-        </g>
-      </svg>
+            id="events-per-weekday-chart"
+            :transform="`translate(${margin.left}, ${margin.top})`"
+          >
+            <g class="yAxis" fill="none" text-anchor="end"></g>
+            <g
+              class="xAxis"
+              :transform="`translate(0, ${boundedHeight})`"
+              fill="none"
+              text-anchor="middle"
+            ></g>
+          </g>
+        </svg>
+      </div>
     </div>
   </div>
 </template>
@@ -56,7 +62,7 @@ export default {
         eventTypes.forEach((et) => (weekdayObject[et] = 0));
         return weekdayObject;
       });
-      for (const event of store.getters['assessment/events/filtered']) {
+      for (const event of store.getters["assessment/events/filtered"]) {
         const weekday = DateTime.fromISO(event.timestamp).setZone(
           store.getters.timeZone
         ).weekday;

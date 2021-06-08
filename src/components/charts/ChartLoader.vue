@@ -1,10 +1,12 @@
 <template>
-  <div class="card">
-    <div class="card-body">
-      <div class="spinner-border" role="status">
-        <span class="visually-hidden">Rendering...</span>
+  <div class="col-xl-6">
+    <div class="card">
+      <div class="card-body">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">Rendering...</span>
+        </div>
+        Rendering..
       </div>
-      Rendering..
     </div>
   </div>
 </template>

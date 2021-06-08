@@ -1,13 +1,19 @@
 <template>
-  <div ref="div" class="card">
-    <div class="card-body chart-card">
-      <h6 class="card-title"><github-icon /> {{ title }}</h6>
-      <svg :width="width" :height="height" :viewbox="`0 0 ${width} ${height}`">
-        <g
-          id="commits-per-repo-chart"
-          :transform="`translate(${margin.left}, ${margin.top})`"
-        ></g>
-      </svg>
+  <div class="col-xl-8">
+    <div ref="div" class="card">
+      <div class="card-body chart-card">
+        <h6 class="card-title"><github-icon /> {{ title }}</h6>
+        <svg
+          :width="width"
+          :height="height"
+          :viewbox="`0 0 ${width} ${height}`"
+        >
+          <g
+            id="commits-per-repo-chart"
+            :transform="`translate(${margin.left}, ${margin.top})`"
+          ></g>
+        </svg>
+      </div>
     </div>
   </div>
 </template>
@@ -106,15 +112,17 @@ export default {
         .attr("font-size", 15)
         .text((e) => e.repo);
 
-      const rects = rectContainers.selectAll("rect").data((d) => {
-        const dataPoint = [];
-        let prev = 0;
-        for (const type of eventTypes) {
-          dataPoint.push({ type, prev: prev, val: prev + d[type] ?? 0 });
-          prev += d[type] ?? 0;
-        }
-        return dataPoint;
-      })
+      const rects = rectContainers
+        .selectAll("rect")
+        .data((d) => {
+          const dataPoint = [];
+          let prev = 0;
+          for (const type of eventTypes) {
+            dataPoint.push({ type, prev: prev, val: prev + d[type] ?? 0 });
+            prev += d[type] ?? 0;
+          }
+          return dataPoint;
+        })
         .join("rect")
         .attr("y", labelHeight)
         .attr("x", () => xScale.value(0))

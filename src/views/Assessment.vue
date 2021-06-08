@@ -12,19 +12,21 @@
       </div>
       <div id="assessment" class="row g-2">
         <transition-group name="chart-list">
-          <div v-for="chart in charts" :key="chart" class="col-xl-6">
-            <component :is="chart"></component>
-          </div>
+          <component
+            v-for="chart in charts"
+            :key="chart"
+            :is="chart"
+          ></component>
         </transition-group>
       </div>
       <div class="d-flex flex-row justify-content-between my-2">
-          <pdf-creator />
-          <button
-            @click="startNew = true"
-            class="btn btn-lg btn-outline-secondary"
-          >
-            Start new
-          </button>
+        <pdf-creator />
+        <button
+          @click="startNew = true"
+          class="btn btn-lg btn-outline-secondary"
+        >
+          Start new
+        </button>
       </div>
     </div>
   </div>

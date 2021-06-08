@@ -1,36 +1,38 @@
 <template>
-  <div ref="div" class="card">
-    <div class="card-body chart-card">
-      <table class="table table-borderless table-hover">
-        <h6 v-if="title" class="card-title"><info-icon /> {{ title }}</h6>
+  <div class="col-xl-6">
+    <div ref="div" class="card">
+      <div class="card-body chart-card">
+        <table class="table table-hover">
+          <h6 v-if="title" class="card-title"><info-icon /> {{ title }}</h6>
 
-        <tbody>
-          <tr>
-            <th>Started at</th>
-            <td>{{ startedAt }}</td>
-          </tr>
-          <tr>
-            <th>Completed at</th>
-            <td>{{ completedAt }}</td>
-          </tr>
-          <tr>
-            <th>Time took</th>
-            <td>{{ duration }} seconds</td>
-          </tr>
-          <tr>
-            <th>Time range used</th>
-            <td>{{ fromDate }} - {{ toDate }}</td>
-          </tr>
-          <tr>
-            <th>Timezone used</th>
-            <td>{{ timeZone }}</td>
-          </tr>
-          <tr>
-            <th>Github username used</th>
-            <td>{{ username }}</td>
-          </tr>
-        </tbody>
-      </table>
+          <tbody>
+            <tr>
+              <th>Started at</th>
+              <td>{{ startedAt }}</td>
+            </tr>
+            <tr>
+              <th>Completed at</th>
+              <td>{{ completedAt }}</td>
+            </tr>
+            <tr>
+              <th>Time took</th>
+              <td>{{ duration }} seconds</td>
+            </tr>
+            <tr>
+              <th>Time range used</th>
+              <td>{{ fromDate }} - {{ toDate }}</td>
+            </tr>
+            <tr>
+              <th>Timezone used</th>
+              <td>{{ timeZone }}</td>
+            </tr>
+            <tr>
+              <th>Github username used</th>
+              <td>{{ username }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </template>

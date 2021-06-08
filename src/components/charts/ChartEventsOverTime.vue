@@ -1,46 +1,52 @@
 <template>
-  <div ref="div" class="card">
-    <div class="card-body chart-card">
-      <h6 v-if="title" class="card-title"><activity-icon /> {{ title }}</h6>
-      <label class="form-label p-1">Density: </label>
-      <div class="btn-group" role="group" aria-label="Set density">
-        <input
-          type="radio"
-          class="btn-check"
-          name="weeks"
-          id="weeks"
-          autocomplete="off"
-          :checked="density === 'weeks'"
-          @click="toggleDensity"
-        />
-        <label class="btn btn-outline-secondary" for="weeks"> Weeks</label>
+  <div class="col-xl-12">
+    <div ref="div" class="card">
+      <div class="card-body chart-card">
+        <h6 v-if="title" class="card-title"><activity-icon /> {{ title }}</h6>
+        <label class="form-label p-1">Density: </label>
+        <div class="btn-group" role="group" aria-label="Set density">
+          <input
+            type="radio"
+            class="btn-check"
+            name="weeks"
+            id="weeks"
+            autocomplete="off"
+            :checked="density === 'weeks'"
+            @click="toggleDensity"
+          />
+          <label class="btn btn-outline-secondary" for="weeks"> Weeks</label>
 
-        <input
-          type="radio"
-          class="btn-check"
-          name="days"
-          id="days"
-          autocomplete="off"
-          :checked="density === 'days'"
-          @click="toggleDensity"
-        />
-        <label class="btn btn-outline-secondary" for="days">Days</label>
-      </div>
+          <input
+            type="radio"
+            class="btn-check"
+            name="days"
+            id="days"
+            autocomplete="off"
+            :checked="density === 'days'"
+            @click="toggleDensity"
+          />
+          <label class="btn btn-outline-secondary" for="days">Days</label>
+        </div>
 
-      <svg :width="width" :height="height" :viewbox="`0 0 ${width} ${height}`">
-        <g
-          id="events-over-time-chart"
-          :transform="`translate(${margin.left}, ${margin.top})`"
+        <svg
+          :width="width"
+          :height="height"
+          :viewbox="`0 0 ${width} ${height}`"
         >
-          <g class="yAxis" fill="none" text-anchor="end"></g>
           <g
-            class="xAxis"
-            :transform="`translate(0, ${boundedHeight})`"
-            fill="none"
-            text-anchor="middle"
-          ></g>
-        </g>
-      </svg>
+            id="events-over-time-chart"
+            :transform="`translate(${margin.left}, ${margin.top})`"
+          >
+            <g class="yAxis" fill="none" text-anchor="end"></g>
+            <g
+              class="xAxis"
+              :transform="`translate(0, ${boundedHeight})`"
+              fill="none"
+              text-anchor="middle"
+            ></g>
+          </g>
+        </svg>
+      </div>
     </div>
   </div>
 </template>

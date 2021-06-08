@@ -1,22 +1,28 @@
 <template>
-  <div ref="div" class="card">
-    <div class="card-body chart-card">
-      <h6 v-if="title" class="card-title"><activity-icon /> {{ title }}</h6>
-      <svg :width="width" :height="height" :viewbox="`0 0 ${width} ${height}`">
-        <g
-          id="day-hour-heatmap"
-          :transform="`translate(${margin.left}, ${margin.top})`"
+  <div class="col-xl-6">
+    <div ref="div" class="card">
+      <div class="card-body chart-card">
+        <h6 v-if="title" class="card-title"><activity-icon /> {{ title }}</h6>
+        <svg
+          :width="width"
+          :height="height"
+          :viewbox="`0 0 ${width} ${height}`"
         >
-          <g class="yAxis" text-anchor="end"></g>
           <g
-            class="xAxis"
-            :transform="`translate(0, ${boundedHeight})`"
-            fill="none"
-            text-anchor="middle"
-          ></g>
-        </g>
-      </svg>
-      <div class="chart-tooltip" id="dh-chart-tooltip"></div>
+            id="day-hour-heatmap"
+            :transform="`translate(${margin.left}, ${margin.top})`"
+          >
+            <g class="yAxis" text-anchor="end"></g>
+            <g
+              class="xAxis"
+              :transform="`translate(0, ${boundedHeight})`"
+              fill="none"
+              text-anchor="middle"
+            ></g>
+          </g>
+        </svg>
+        <div class="chart-tooltip" id="dh-chart-tooltip"></div>
+      </div>
     </div>
   </div>
 </template>
@@ -117,7 +123,7 @@ export default {
     },
     heatmapData() {
       this.updateChart();
-    }
+    },
   },
   methods: {
     updateChart() {

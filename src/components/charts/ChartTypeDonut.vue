@@ -1,28 +1,36 @@
 <template>
-  <div ref="div" class="card">
-    <div class="card-body chart-card">
-      <h6 v-if="title" class="card-title"><activity-icon /> {{ title }}</h6>
-      <svg :width="width" :height="height" :viewbox="`0 0 ${width} ${height}`">
-        <g
-          id="donut-chart"
-          :transform="`translate(${
-            (width - margin.left - margin.right) / 2 - radius / 2
-          }, ${(height - margin.top - margin.bottom) / 2})`"
+  <div class="col-xl-4">
+    <div ref="div" class="card">
+      <div class="card-body chart-card">
+        <h6 v-if="title" class="card-title"><activity-icon /> {{ title }}</h6>
+        <svg
+          :width="width"
+          :height="height"
+          :viewbox="`0 0 ${width} ${height}`"
         >
-          <text
-            id="total-events"
-            text-anchor="middle"
-            dominant-baseline="central"
-            font-size="10"
-          >{{totalCount}}</text>
-        </g>
-        <g
-          id="legend"
-          :transform="`translate(${
-            (width - margin.left - margin.right) / 2 + radius / 2 + 40
-          }, ${(height - margin.top - margin.bottom) / 2})`"
-        ></g>
-      </svg>
+          <g
+            id="donut-chart"
+            :transform="`translate(${
+              (width - margin.left - margin.right) / 2 - radius / 2
+            }, ${(height - margin.top - margin.bottom) / 2})`"
+          >
+            <text
+              id="total-events"
+              text-anchor="middle"
+              dominant-baseline="central"
+              font-size="10"
+            >
+              {{ totalCount }}
+            </text>
+          </g>
+          <g
+            id="legend"
+            :transform="`translate(${
+              (width - margin.left - margin.right) / 2 + radius / 2 + 40
+            }, ${(height - margin.top - margin.bottom) / 2})`"
+          ></g>
+        </svg>
+      </div>
     </div>
   </div>
 </template>
@@ -59,7 +67,9 @@ export default {
         count: store.getters["assessment/events/byType"](type).length,
       }))
     );
-    const totalCount = computed(() => store.getters["assessment/events/totalCount"]);
+    const totalCount = computed(
+      () => store.getters["assessment/events/totalCount"]
+    );
 
     const radius = computed(() => Math.min(width.value, height) / 2 - 30);
 
@@ -121,7 +131,7 @@ export default {
       radius,
       boundedHeight,
       boundedWidth,
-      totalCount
+      totalCount,
     };
   },
 };
