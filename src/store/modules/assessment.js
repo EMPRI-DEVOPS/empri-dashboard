@@ -6,20 +6,27 @@ const state = () => ({
     toDate: '',
     githubUsername: '',
     startedAt: '',
+    persistentMessages: [],
     statusMessage: '',
     completedAt: '',
 })
 
 const mutations = {
-    NEW(state, payload) {
+    NEW(state) {
+        state.persistentMessages = [];
+        state.completedAt = '';
+    },
+    START(state, payload) {
         state.fromDate = payload.fromDate;
         state.toDate = payload.toDate;
         state.githubUsername = payload.githubUsername;
         state.startedAt = new Date().toISOString();
-        state.completedAt = '';
     },
     COMPLETE(state) {
         state.completedAt = new Date().toISOString();
+    },
+    ADD_PERSISTENT_MESSAGE(state, msg) {
+        state.persistentMessages.push(msg);
     },
     SET_STATUS(state, msg) {
         state.statusMessage = msg;
@@ -28,7 +35,7 @@ const mutations = {
 
 const actions = {
     new({ commit }, payload) {
-        commit('NEW', payload);
+        commit('START', payload);
         commit('events/START_NEW');
     }
 }

@@ -76,16 +76,18 @@
             </div>
           </div>
         </form>
-        <div
-          class="d-flex align-items-center mt-4"
-          v-if="creatingAssessment"
-        >
-          <samp>{{ statusMessage }}</samp>
-          <div
-            class="spinner-border ms-auto"
-            role="status"
-            aria-hidden="true"
-          ></div>
+        <div v-if="creatingAssessment" class="mt-4">
+          <div v-for="msg of persistentMessages" :key="msg">
+            <samp>{{ msg }}</samp>
+          </div>
+          <div class="d-flex align-items-center">
+            <samp>{{ statusMessage }}</samp>
+            <div
+              class="spinner-border ms-auto"
+              role="status"
+              aria-hidden="true"
+            ></div>
+          </div>
         </div>
       </div>
     </div>
@@ -112,6 +114,9 @@ export default {
     const from = ref(now.minus({ year: 1 }).toISODate());
     const to = ref(now.toISODate());
     const githubUsername = ref("");
+    const persistentMessages = computed(
+      () => store.state.assessment.persistentMessages
+    );
     const statusMessage = computed(() => store.state.assessment.statusMessage);
     const start = async () => {
       creatingAssessment.value = true;
@@ -130,18 +135,27 @@ export default {
           `Found ${loaded.loadedCount}/${loaded.totalCount} repos where ${githubUsername.value} has contributed to..`
         );
       }
+      store.commit(
+        "assessment/ADD_PERSISTENT_MESSAGE",
+        "Done loading repositories with contributions."
+      );
       for await (const found of githubApiAccount.userIssues()) {
         store.commit(
           "assessment/SET_STATUS",
           `Loaded ${found.loadedCount}/${found.totalCount} published issues`
         );
       }
+      store.commit("assessment/ADD_PERSISTENT_MESSAGE", "Done loading issues.");
       for await (const found of githubApiAccount.pullRequests()) {
         store.commit(
           "assessment/SET_STATUS",
           `Loaded ${found.loadedCount}/${found.totalCount} pull requests`
         );
       }
+      store.commit(
+        "assessment/ADD_PERSISTENT_MESSAGE",
+        "Done loading pull requests."
+      );
       /*
       for await (const found of githubApiAccount.issueComments()) {
         store.commit(
@@ -156,6 +170,10 @@ export default {
           `Found ${found.foundCount} commits in ${found.repo}`
         );
       }
+      store.commit(
+        "assessment/ADD_PERSISTENT_MESSAGE",
+        "Done loading commits."
+      );
       store.commit("assessment/COMPLETE");
       creatingAssessment.value = false;
     };
@@ -167,6 +185,7 @@ export default {
       to,
       githubUsername,
       statusMessage,
+      persistentMessages,
       creatingAssessment,
       start,
     };
