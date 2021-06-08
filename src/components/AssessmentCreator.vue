@@ -28,6 +28,29 @@
                 </div>
               </div>
               <div class="row mb-3">
+                <label class="col-sm-5 col-form-label"
+                  >Github interaction types</label
+                >
+                <div class="col-sm-7">
+                  <div
+                    v-for="eventType of githubEventTypes"
+                    class="form-check form-check-inline"
+                    :key="eventType.type"
+                  >
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      :id="eventType.type"
+                      :value="eventType.type"
+                      v-model="selectedGithubEventTypes"
+                    />
+                    <label class="form-check-label" :for="eventType.type">{{
+                      eventType.name
+                    }}</label>
+                  </div>
+                </div>
+              </div>
+              <div class="row mb-3">
                 <label for="from" class="col-sm-5 col-form-label">From</label>
                 <div class="col-sm-7">
                   <input
@@ -95,7 +118,7 @@
 </template>
 
 <script>
-import { ref, computed } from "vue";
+import { ref, computed, unref } from "vue";
 import { useStore } from "vuex";
 import { DateTime } from "luxon";
 import GithubAccount from "../api/github-account";
@@ -108,12 +131,15 @@ export default {
     store.dispatch("loadUser");
     store.dispatch("loadAccounts");
 
+    const githubEventTypes = require("../common").githubEventTypes;
     const creatingAssessment = ref(false);
     const githubAccount = computed(() => store.getters.githubAccount);
     const now = DateTime.fromObject({ zone: store.getters.timeZone });
     const from = ref(now.minus({ year: 1 }).toISODate());
     const to = ref(now.toISODate());
     const githubUsername = ref("");
+    const selectedGithubEventTypes = ref([]);
+    selectedGithubEventTypes.value.push("commit", "issue", "pullRequest");
     const persistentMessages = computed(
       () => store.state.assessment.persistentMessages
     );
@@ -127,53 +153,11 @@ export default {
         fromDate: from.value,
         toDate: to.value,
         githubUsername: githubUsername.value,
+        githubEventTypes: unref(selectedGithubEventTypes),
       });
 
-      for await (const loaded of githubApiAccount.loadRepositoriesContributedTo()) {
-        store.commit(
-          "assessment/SET_STATUS",
-          `Found ${loaded.loadedCount}/${loaded.totalCount} repos where ${githubUsername.value} has contributed to..`
-        );
-      }
-      store.commit(
-        "assessment/ADD_PERSISTENT_MESSAGE",
-        "Done loading repositories with contributions."
-      );
-      for await (const found of githubApiAccount.userIssues()) {
-        store.commit(
-          "assessment/SET_STATUS",
-          `Loaded ${found.loadedCount}/${found.totalCount} published issues`
-        );
-      }
-      store.commit("assessment/ADD_PERSISTENT_MESSAGE", "Done loading issues.");
-      for await (const found of githubApiAccount.pullRequests()) {
-        store.commit(
-          "assessment/SET_STATUS",
-          `Loaded ${found.loadedCount}/${found.totalCount} pull requests`
-        );
-      }
-      store.commit(
-        "assessment/ADD_PERSISTENT_MESSAGE",
-        "Done loading pull requests."
-      );
-      /*
-      for await (const found of githubApiAccount.issueComments()) {
-        store.commit(
-          "assessment/SET_STATUS",
-          `Loaded ${found.loadedCount}/${found.totalCount} comments`
-        );
-      }
-      */
-      for await (const found of githubApiAccount.loadCommits()) {
-        store.commit(
-          "assessment/SET_STATUS",
-          `Found ${found.foundCount} commits in ${found.repo}`
-        );
-      }
-      store.commit(
-        "assessment/ADD_PERSISTENT_MESSAGE",
-        "Done loading commits."
-      );
+      await githubApiAccount.start();
+
       store.commit("assessment/COMPLETE");
       creatingAssessment.value = false;
     };
@@ -187,6 +171,8 @@ export default {
       statusMessage,
       persistentMessages,
       creatingAssessment,
+      githubEventTypes,
+      selectedGithubEventTypes,
       start,
     };
   },

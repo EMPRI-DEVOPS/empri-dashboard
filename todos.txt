@@ -1,5 +1,3 @@
-- angabe der datensätze die gezogen werden sollen
-
 - untersuchen wie man vermeiden könnte die selben commits mehrfach zu ziehen mittels hash-prüfung
 
 - bessere Fehlerbehandlung bei allen DRF aufrufen

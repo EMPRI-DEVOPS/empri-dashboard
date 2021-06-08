@@ -1,6 +1,9 @@
 import store from './store/index';
 
-const eventTypes = store.getters["assessment/events/types"];
+
+export const githubEventTypes = [
+    { name: 'Commits', type: 'commit' }, { name: 'Issues', type: 'issue' }, { name: 'Pull Requests', type: 'pullRequest' }, { name: 'Issue Comments', type: 'issueComment' }
+];
 
 export const colors = [
     '#025557', '#36AFB3', '#DB793B', '#632905', '#67898A'
@@ -31,4 +34,7 @@ export const accountTypes = [
     },
 ];
 
-export const eventTypeColor = (type) => colors[eventTypes.findIndex((eventType) => eventType === type)];
+export const eventTypeColor = (type) => {
+    const eventTypesFound = store.getters["assessment/events/types"];
+    return colors[eventTypesFound.findIndex((eventType) => eventType === type)]
+};

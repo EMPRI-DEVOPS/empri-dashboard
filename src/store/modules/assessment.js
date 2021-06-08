@@ -5,6 +5,7 @@ const state = () => ({
     fromDate: '',
     toDate: '',
     githubUsername: '',
+    githubEventTypes: [],
     startedAt: '',
     persistentMessages: [],
     statusMessage: '',
@@ -20,6 +21,7 @@ const mutations = {
         state.fromDate = payload.fromDate;
         state.toDate = payload.toDate;
         state.githubUsername = payload.githubUsername;
+        state.githubEventTypes = payload.githubEventTypes;
         state.startedAt = new Date().toISOString();
     },
     COMPLETE(state) {
@@ -50,7 +52,8 @@ const getters = {
     },
     duration(state) {
         return Interval.fromISO(state.startedAt + '/' + state.completedAt).count('seconds');
-    }
+    },
+    githubEventTypes(state) { return state.githubEventTypes }
 }
 
 export default {

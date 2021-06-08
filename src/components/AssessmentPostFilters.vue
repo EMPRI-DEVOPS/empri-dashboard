@@ -8,12 +8,11 @@
     <input
       class="form-check-input"
       type="checkbox"
-      :id="eventType.type"
-      :value="eventType.type"
+      :id="`p`+eventType.type"
       :checked="eventTypeFilters.find((type) => type.type === eventType.type)"
       @change="toggleFilter(eventType.type)"
     />
-    <label class="form-check-label" :for="eventType.type">{{
+    <label class="form-check-label" :for="`p`+eventType.type">{{
       eventType.type
     }}</label>
   </div>

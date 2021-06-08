@@ -30,6 +30,10 @@
               <th>Github username used</th>
               <td>{{ username }}</td>
             </tr>
+            <tr>
+              <th>Github interaction types pulled</th>
+              <td>{{ githubEventTypes }}</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -64,6 +68,7 @@ export default defineComponent({
       .toLocaleString(DateTime.DATE_MED);
     const timeZone = store.getters.timeZone;
     const username = store.state.assessment.githubUsername;
+    const githubEventTypes = store.state.assessment.githubEventTypes.join(", ");
     return {
       title: "Assessment",
       startedAt,
@@ -73,6 +78,7 @@ export default defineComponent({
       toDate,
       timeZone,
       username,
+      githubEventTypes,
     };
   },
 });
