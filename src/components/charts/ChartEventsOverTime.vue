@@ -76,7 +76,7 @@ export default defineComponent({
     };
 
     const store = useStore();
-    const events = computed(() => store.getters['assessment/events/filtered']);
+    const events = computed(() => store.getters["assessment/events/filtered"]);
 
     const boundedWidth = computed(
       () => width.value - margin.left - margin.right
@@ -116,12 +116,16 @@ export default defineComponent({
         const eventDt = DateTime.fromISO(event.timestamp, {
           zone: store.getters.timeZone,
         });
-        const dateObj = dates.find((o) => {
-          if (density.value === "weeks") {
-            return o.date === eventDt.startOf("week").toISODate();
-          }
-          return o.date === eventDt.toISODate();
+        const dateBin =
+          density.value === "weeks"
+            ? eventDt.startOf("week").toISODate()
+            : eventDt.toISODate();
+        let dateObj = dates.find((o) => {
+          return o.date === dateBin;
         });
+        if (!dateObj) {
+          dateObj = createDateObj(dateBin);
+        }
         dateObj[event.type]++;
         dateObj.total++;
       }

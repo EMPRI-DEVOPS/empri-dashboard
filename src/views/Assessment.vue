@@ -3,7 +3,7 @@
     <assessment-creator />
     <div class="container-fluid" v-if="createdAssessment">
       <div class="row">
-        <div class="col">
+        <div class="col-6">
           <label class="form-label p-2">Event type filters:</label>
           <div
             v-for="eventType of eventTypes"
@@ -23,6 +23,39 @@
             <label class="form-check-label" for="inlineCheckbox1">{{
               eventType.type
             }}</label>
+          </div>
+        </div>
+        <div class="col-6">
+          <label class="form-label p-2">Apply timestamp reduction:</label>
+          <div class="btn-group">
+            <button
+              class="btn btn-outline-secondary"
+              :disabled="reductionApplied >= 3"
+              @click="applyReduction(3)"
+            >
+              Months
+            </button>
+            <button
+              class="btn btn-outline-secondary"
+              :disabled="reductionApplied >= 2"
+              @click="applyReduction(2)"
+            >
+              Weeks
+            </button>
+            <button
+              class="btn btn-outline-secondary"
+              :disabled="reductionApplied >= 1"
+              @click="applyReduction(1)"
+            >
+              Days
+            </button>
+            <button
+              class="btn btn-outline-secondary"
+              v-if="reductionApplied > 0"
+              @click="applyReduction(0)"
+            >
+              Reset
+            </button>
           </div>
         </div>
       </div>
@@ -125,6 +158,11 @@ export default {
     );
     const toggleFilter = (type) =>
       store.commit("assessment/events/TOGGLE_TYPE_FILTER", type);
+    const reductionApplied = computed(
+      () => store.state.assessment.events.reductionLevel
+    );
+    const applyReduction = (level) =>
+      store.dispatch("assessment/events/applyReduction", level);
     const graphs = [
       "TypeDonut",
       "GithubRepos",
@@ -153,6 +191,8 @@ export default {
       eventTypes,
       eventTypeFilters,
       toggleFilter,
+      reductionApplied,
+      applyReduction,
     };
   },
   methods: {

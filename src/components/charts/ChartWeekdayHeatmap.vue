@@ -76,12 +76,21 @@ export default {
       }));
 
       for (const event of events.value) {
-        const timestamp = DateTime.fromISO(event.timestamp).setZone(
-          store.getters.timeZone
-        );
-        const dayObj = weekmap.find((day) => {
+        const timestamp = DateTime.fromISO(event.timestamp);
+        let dayObj = weekmap.find((day) => {
           return day.isoDate === timestamp.toISODate();
         });
+        if (!dayObj) {
+          dayObj = {
+            weekYear: timestamp.weekYear,
+            weekNumber: timestamp.weekNumber,
+            week: `${timestamp.weekYear} ${timestamp.weekNumber}`,
+            weekday: timestamp.weekday,
+            isoDate: timestamp.toISODate(),
+            events: 0,
+          };
+          weekmap.push(dayObj);
+        }
         dayObj.events++;
       }
 
