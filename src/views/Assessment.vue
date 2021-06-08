@@ -3,10 +3,10 @@
     <assessment-creator />
     <div class="container-fluid" v-if="createdAssessment">
       <div class="row">
-        <div class="col-6">
+        <div class="col-lg-6">
           <assessment-post-filters />
         </div>
-        <div class="col-6">
+        <div class="col-lg-6">
           <assessment-apply-reduction />
         </div>
       </div>
