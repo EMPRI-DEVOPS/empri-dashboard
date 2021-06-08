@@ -2,7 +2,7 @@
   <div class="col-xl-6">
     <div ref="div" class="card">
       <div class="card-body chart-card">
-        <h6 class="card-title">{{ title }}</h6>
+        <h6 class="card-title"><icon-calendar /> {{ title }}</h6>
         <svg
           :width="width"
           :height="height"
@@ -33,8 +33,10 @@ import * as d3 from "d3";
 import { DateTime } from "luxon";
 import useResponsiveWidth from "../../composables/useResponsiveWidth";
 import { weekdays, eventTypeColor } from "../../common";
+import IconCalendar from "../icons/IconCalendar.vue";
 
 export default {
+  components: { IconCalendar },
   setup() {
     const store = useStore();
     const height = 200;

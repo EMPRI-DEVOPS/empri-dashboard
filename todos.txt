@@ -1,5 +1,3 @@
-- rohdaten anzeigen
-- gedanken machen über weitere visualisierungen (github insights angucken)
 - angabe der datensätze die gezogen werden sollen
 
 - untersuchen wie man vermeiden könnte die selben commits mehrfach zu ziehen mittels hash-prüfung

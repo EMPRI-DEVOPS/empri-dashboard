@@ -2,7 +2,7 @@
   <div class="col-xl-6">
     <div ref="div" class="card">
       <div class="card-body chart-card">
-        <h6 v-if="title" class="card-title"><activity-icon /> {{ title }}</h6>
+        <h6 v-if="title" class="card-title"><icon-zap /> {{ title }}</h6>
         <svg
           :width="width"
           :height="height"
@@ -28,16 +28,16 @@
 </template>
 
 <script>
-import ActivityIcon from "../icons/ActivityIcon";
 import * as d3 from "d3";
 import { computed } from "vue";
 import { useStore } from "vuex";
 import { DateTime } from "luxon";
 import useResponsiveWidth from "../../composables/useResponsiveWidth";
 import { colors } from "../../common";
+import IconZap from "../icons/IconZap";
 
 export default {
-  components: { ActivityIcon },
+  components: { IconZap },
   setup() {
     const store = useStore();
     const interval = store.getters["assessment/interval"];

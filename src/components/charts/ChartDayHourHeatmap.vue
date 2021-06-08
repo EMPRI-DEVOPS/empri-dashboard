@@ -2,7 +2,7 @@
   <div class="col-xl-6">
     <div ref="div" class="card">
       <div class="card-body chart-card">
-        <h6 v-if="title" class="card-title"><activity-icon /> {{ title }}</h6>
+        <h6 v-if="title" class="card-title"><icon-zap /> {{ title }}</h6>
         <svg
           :width="width"
           :height="height"
@@ -33,11 +33,11 @@ import { computed } from "vue";
 import { useStore } from "vuex";
 import { DateTime } from "luxon";
 import useResponsiveWidth from "../../composables/useResponsiveWidth";
-import ActivityIcon from "../icons/ActivityIcon";
+import IconZap from "../icons/IconZap";
 import { colors } from "../../common";
 
 export default {
-  components: { ActivityIcon },
+  components: { IconZap },
   setup() {
     const store = useStore();
     const events = computed(() => store.getters["assessment/events/filtered"]);
