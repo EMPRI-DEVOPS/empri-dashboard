@@ -13,7 +13,7 @@
       >
       </span>
       Rendering PDF..</span
-    ><span v-else> Export to PDF</span>
+    ><span v-else> <icon-download /> Export to PDF</span>
   </button>
 </template>
 
@@ -23,8 +23,10 @@ import { ref } from "vue";
 import { jsPDF } from "jspdf";
 import * as html2canvas from "html2canvas";
 import { DateTime } from "luxon";
+import IconDownload from "./icons/IconDownload.vue";
 
 export default {
+  components: { IconDownload },
   setup() {
     const store = useStore();
     const creatingPdf = ref(false);

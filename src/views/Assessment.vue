@@ -25,6 +25,7 @@
           @click="startNew = true"
           class="btn btn-lg btn-outline-secondary"
         >
+          <icon-repeat />
           Start new
         </button>
       </div>
@@ -40,14 +41,21 @@ import ChartLoader from "../components/charts/ChartLoader";
 import AssessmentCreator from "../components/AssessmentCreator";
 import AssessmentPostFilters from "../components/AssessmentPostFilters.vue";
 import AssessmentApplyReduction from "../components/AssessmentApplyReduction.vue";
+import IconRepeat from "../components/icons/IconRepeat.vue"
 
 export default {
   components: {
     AssessmentCreator,
+    IconRepeat,
     AssessmentPostFilters,
     AssessmentApplyReduction,
     PdfCreator: defineAsyncComponent({
       loader: () => import("../components/AssessmentPdfCreator.vue"),
+    }),
+    RawData: defineAsyncComponent({
+      loadingComponent: ChartLoader,
+      loader: () => import("../components/charts/ChartRawData.vue"),
+      delay: 0,
     }),
     TypeDonut: defineAsyncComponent({
       loadingComponent: ChartLoader,
@@ -102,6 +110,7 @@ export default {
       "GithubRepos",
       "DayHourHeatmap",
       "WeekdayHeatmap",
+      "RawData",
       "EventsOverTime",
       "WeekdayChart",
       "TimeWindow",

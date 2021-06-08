@@ -107,6 +107,12 @@ const getters = {
         }
         return state.all.filter((event) => state.filters.findIndex((filter) => filter.type === event.type) !== -1)
     },
+    getPaginated: (state, getters) => (begin, end) => {
+        const filteredEvents = [...getters.filtered];
+        filteredEvents.sort((a, b) => a.timestamp < b.timestamp ? -1 : ((a.timestamp > b.timestamp) ? 1 : 0))
+        return filteredEvents.slice(begin, end)
+    }
+    ,
     totalCount(state, getters) {
         return getters.filtered.length;
     }
