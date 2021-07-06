@@ -47,7 +47,7 @@ const getters = {
     interval(state, getters, rootState, rootGetters) {
         return Interval.fromDateTimes(
             DateTime.fromISO(state.fromDate, { zone: rootGetters['timeZone'] }),
-            DateTime.fromISO(state.toDate, { zone: rootGetters['timeZone'] })
+            DateTime.fromISO(state.toDate, { zone: rootGetters['timeZone'] }).plus({days: 1})
         );
     },
     duration(state) {
