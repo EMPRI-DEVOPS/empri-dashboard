@@ -19,8 +19,16 @@
               <td>{{ duration }} seconds</td>
             </tr>
             <tr>
-              <th>Time range used</th>
-              <td>{{ fromDate }} - {{ toDate }}</td>
+              <th>Observation period</th>
+              <td>{{ fromDate }} to {{ toDate }} - {{observationDays}} days</td>
+            </tr>
+            <tr>
+              <th>Total interactions</th>
+              <td>{{totalCount}}</td>
+            </tr>
+            <tr>
+              <th>Interactions per day avg.</th>
+              <td>{{interactionsPerDay}}</td>
             </tr>
             <tr>
               <th>Timezone used</th>
@@ -42,7 +50,7 @@
 </template>
 
 <script>
-import { defineComponent } from "vue";
+import { computed, defineComponent } from "vue";
 import { useStore } from "vuex";
 import { DateTime } from "luxon";
 import InfoIcon from "../icons/InfoIcon.vue";
@@ -59,13 +67,17 @@ export default defineComponent({
     const completedAt = DateTime.fromISO(store.state.assessment.completedAt)
       .setZone(store.getters.timeZone)
       .toLocaleString(DateTime.DATETIME_MED);
+
+    const interval = store.getters['assessment/interval'];
+
     const duration = store.getters["assessment/duration"];
-    const fromDate = DateTime.fromISO(store.state.assessment.fromDate)
-      .setZone(store.getters.timeZone)
-      .toLocaleString(DateTime.DATE_MED);
-    const toDate = DateTime.fromISO(store.state.assessment.toDate)
-      .setZone(store.getters.timeZone)
-      .toLocaleString(DateTime.DATE_MED);
+    const fromDate = interval.start.toLocaleString(DateTime.DATE_MED);
+    const toDate = interval.end.minus({days : 1}).toLocaleString(DateTime.DATE_MED);
+    const observationDays = interval.length('days');
+    const totalCount = computed(
+      () => store.getters["assessment/events/totalCount"]
+    );
+    const interactionsPerDay = computed(() => (totalCount.value / observationDays).toPrecision(4) );
     const timeZone = store.getters.timeZone;
     const username = store.state.assessment.githubUsername;
     const githubEventTypes = store.state.assessment.githubEventTypes.join(", ");
@@ -79,6 +91,9 @@ export default defineComponent({
       timeZone,
       username,
       githubEventTypes,
+      observationDays,
+      totalCount,
+      interactionsPerDay
     };
   },
 });

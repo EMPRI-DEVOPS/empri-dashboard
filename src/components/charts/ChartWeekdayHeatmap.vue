@@ -64,22 +64,19 @@ export default {
       "Sunday",
     ];
     const heatmapData = computed(() => {
-      function* days(interval) {
-        let cursor = interval.start.startOf("day").setLocale("en-US");
-        while (cursor <= interval.end) {
-          yield cursor;
-          cursor = cursor.plus({ days: 1 });
+      const weekmap = store.getters["assessment/observedDays"].map(
+        (isoDate) => {
+          const dt = DateTime.fromISO(isoDate);
+          return {
+            weekYear: dt.weekYear,
+            weekNumber: dt.weekNumber,
+            week: `${dt.weekYear} ${dt.weekNumber}`,
+            weekday: dt.weekday,
+            isoDate: dt.toISODate(),
+            events: 0,
+          };
         }
-      }
-
-      const weekmap = Array.from(days(interval)).map((day) => ({
-        weekYear: day.weekYear,
-        weekNumber: day.weekNumber,
-        week: `${day.weekYear} ${day.weekNumber}`,
-        weekday: day.weekday,
-        isoDate: day.toISODate(),
-        events: 0,
-      }));
+      );
 
       for (const event of events.value) {
         const timestamp = DateTime.fromISO(event.timestamp);
@@ -115,7 +112,10 @@ export default {
     const xTimeScale = computed(() =>
       d3
         .scaleTime()
-        .domain([interval.start.toJSDate(), interval.end.toJSDate()])
+        .domain([
+          interval.start.toJSDate(),
+          interval.end.minus({ days: 1 }).toJSDate(),
+        ])
         .range([0, boundedWidth.value])
     );
 

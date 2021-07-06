@@ -50,6 +50,28 @@ const getters = {
             DateTime.fromISO(state.toDate, { zone: rootGetters['timeZone'] }).plus({days: 1})
         );
     },
+    observedDays(state, getters) {
+        let interval = getters['interval'];
+        function* days(interval) {
+            let cursor = interval.start.startOf("day");
+            while (cursor < interval.end) {
+              yield cursor.toISODate();
+              cursor = cursor.plus({ days: 1 });
+            }
+          }
+        return Array.from(days(interval));
+    },
+    observedWeeks(state, getters) {
+        let interval = getters['interval'];
+        function* weeks(interval) {
+            let cursor = interval.start.startOf("week");
+            while (cursor < interval.end) {
+              yield cursor.toISODate();
+              cursor = cursor.plus({ week: 1 });
+            }
+          }
+        return Array.from(weeks(interval));
+    },
     duration(state) {
         return Interval.fromISO(state.startedAt + '/' + state.completedAt).count('seconds');
     },

@@ -89,22 +89,6 @@ export default defineComponent({
     );
     const boundedHeight = height - margin.top - margin.bottom;
 
-    function* days(interval) {
-      let cursor = interval.start.startOf("day");
-      while (cursor <= interval.end) {
-        yield cursor.toISODate();
-        cursor = cursor.plus({ days: 1 });
-      }
-    }
-
-    function* weeks(interval) {
-      let cursor = interval.start.startOf("week");
-      while (cursor <= interval.end) {
-        yield cursor.toISODate();
-        cursor = cursor.plus({ week: 1 });
-      }
-    }
-
     const eventTypes = store.getters["assessment/events/types"];
 
     const interval = store.getters["assessment/interval"];
@@ -116,8 +100,8 @@ export default defineComponent({
       };
       const dates =
         density.value === "weeks"
-          ? Array.from(weeks(interval)).map((date) => createDateObj(date))
-          : Array.from(days(interval)).map((date) => createDateObj(date));
+          ? store.getters["assessment/observedWeeks"].map((date) => createDateObj(date))
+          : store.getters["assessment/observedDays"].map((date) => createDateObj(date));
       for (const event of events.value) {
         const eventDt = DateTime.fromISO(event.timestamp, {
           zone: store.getters.timeZone,
@@ -149,7 +133,7 @@ export default defineComponent({
     const xScale = computed(() =>
       d3
         .scaleTime()
-        .domain([interval.start.toJSDate(), interval.end.toJSDate()])
+        .domain([interval.start.toJSDate(), interval.end.minus({days:1}).toJSDate()])
         .range([0, boundedWidth.value])
     );
 
