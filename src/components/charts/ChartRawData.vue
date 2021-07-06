@@ -142,7 +142,9 @@ export default defineComponent({
       )
     );
     const githubEventTypes = require("../../common").githubEventTypes;
-    const formatTypeName = (type) => githubEventTypes.find((eventType) => eventType.type === type).name;
+    const formatTypeName = (type) => githubEventTypes.find((eventType) => eventType.type === type).name.replace(
+      new RegExp(`(s)$`), ''
+    );
     watch([totalCount, pageLimit], () => {
       if (page.value * pageLimit.value - 1 > totalCount.value) {
         page.value = pageCount.value;
