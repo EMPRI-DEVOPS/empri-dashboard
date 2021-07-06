@@ -14,7 +14,7 @@
         <form @submit.prevent="start">
           <div class="row g-4">
             <div class="col-12">
-              <div class="row mb-3">
+              <div v-if="debug" class="row mb-3">
                 <label for="username" class="col-sm-5 col-form-label"
                   >Github Username
                 </label>
@@ -131,6 +131,7 @@ export default {
     store.dispatch("loadUser");
     store.dispatch("loadAccounts");
 
+    const debug = computed(() => store.state.user.settings.username === "test");
     const githubEventTypes = require("../common").githubEventTypes;
     const creatingAssessment = ref(false);
     const githubAccount = computed(() => store.getters.githubAccount);
@@ -174,6 +175,7 @@ export default {
       githubEventTypes,
       selectedGithubEventTypes,
       start,
+      debug,
     };
   },
 };
