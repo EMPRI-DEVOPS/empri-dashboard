@@ -1,6 +1,6 @@
 {
   "name": "psad",
-  "version": "0.7.0",
+  "version": "0.9.1",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve & python manage.py runserver",

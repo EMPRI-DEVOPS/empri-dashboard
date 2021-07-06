@@ -77,6 +77,7 @@ export default {
       const chart = select("#donut-chart");
       const d3pie = pie().value((d) => d.count);
       const arcs = d3pie(userInteractionsByType.value);
+      const githubEventTypes = require("../../common").githubEventTypes;
 
       chart
         .selectAll("path")
@@ -119,7 +120,10 @@ export default {
         .join("text")
         .attr("x", 10)
         .attr("y", (d, i) => 5 + i * 25)
-        .text((d) => `${d.type}: ${d.count}`);
+        .text((d) => {
+          const type = githubEventTypes.find((eventType) => eventType.type === d.type).name;
+          return `${type}: ${d.count}`
+        });
     });
 
     return {

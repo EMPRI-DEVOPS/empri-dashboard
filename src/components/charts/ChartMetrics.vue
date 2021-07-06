@@ -28,7 +28,7 @@
             </tr>
             <tr>
               <th>Github interaction types pulled</th>
-              <td>{{ githubEventTypes }}</td>
+              <td>{{ usedEventTypes }}</td>
             </tr>
             <tr>
               <th>Total interactions</th>
@@ -92,7 +92,10 @@ export default defineComponent({
       return days.length;
     })
     const timeZone = store.getters.timeZone;
-    const githubEventTypes = store.state.assessment.githubEventTypes.join(", ");
+    const githubEventTypes = require("../../common").githubEventTypes;
+    const usedEventTypes = store.state.assessment.githubEventTypes.map((type) => {
+      return githubEventTypes.find((eventType) => eventType.type === type).name;
+    }).join(", ");
     return {
       title: "Assessment",
       startedAt,
@@ -101,7 +104,7 @@ export default defineComponent({
       fromDate,
       toDate,
       timeZone,
-      githubEventTypes,
+      usedEventTypes,
       observationDays,
       totalCount,
       interactionsPerDay,

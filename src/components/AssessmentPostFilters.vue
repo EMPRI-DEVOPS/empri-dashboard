@@ -13,7 +13,7 @@
       @change="toggleFilter(eventType.type)"
     />
     <label class="form-check-label" :for="`p`+eventType.type">{{
-      eventType.type
+      formatTypeName(eventType.type)
     }}</label>
   </div>
 </template>
@@ -27,6 +27,9 @@ export default {
     const eventTypeFilters = computed(
       () => store.state.assessment.events.filters
     );
+    const githubEventTypes = require("../common").githubEventTypes;
+    const formatTypeName = (type) => githubEventTypes.find((eventType) => eventType.type === type).name;
+
     const eventTypes = computed(() =>
       store.getters["assessment/events/types"].map((type) => ({ type }))
     );
@@ -37,6 +40,7 @@ export default {
       eventTypes,
       toggleFilter,
       eventTypeFilters,
+      formatTypeName
     };
   },
 };

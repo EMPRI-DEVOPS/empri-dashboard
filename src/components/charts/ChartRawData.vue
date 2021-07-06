@@ -44,7 +44,7 @@
               >
                 {{ event.tool }}
               </td>
-              <td>{{ event.type }}</td>
+              <td>{{ formatTypeName(event.type) }}</td>
               <td
                 nowrap="nowrap"
                 style="
@@ -141,6 +141,8 @@ export default defineComponent({
         endIdx.value
       )
     );
+    const githubEventTypes = require("../../common").githubEventTypes;
+    const formatTypeName = (type) => githubEventTypes.find((eventType) => eventType.type === type).name;
     watch([totalCount, pageLimit], () => {
       if (page.value * pageLimit.value - 1 > totalCount.value) {
         page.value = pageCount.value;
@@ -157,6 +159,7 @@ export default defineComponent({
       page,
       pageCount,
       eventsPage,
+      formatTypeName
     };
   },
 });
