@@ -23,6 +23,14 @@
               <td>{{ fromDate }} to {{ toDate }} - {{observationDays}} days</td>
             </tr>
             <tr>
+              <th>Timezone used</th>
+              <td>{{ timeZone }}</td>
+            </tr>
+            <tr>
+              <th>Github interaction types pulled</th>
+              <td>{{ githubEventTypes }}</td>
+            </tr>
+            <tr>
               <th>Total interactions</th>
               <td>{{totalCount}}</td>
             </tr>
@@ -31,16 +39,8 @@
               <td>{{interactionsPerDay}}</td>
             </tr>
             <tr>
-              <th>Timezone used</th>
-              <td>{{ timeZone }}</td>
-            </tr>
-            <tr>
-              <th>Github username used</th>
-              <td>{{ username }}</td>
-            </tr>
-            <tr>
-              <th>Github interaction types pulled</th>
-              <td>{{ githubEventTypes }}</td>
+              <th>Days with no Interactions</th>
+              <td>{{idleDays}}</td>
             </tr>
           </tbody>
         </table>
@@ -78,8 +78,20 @@ export default defineComponent({
       () => store.getters["assessment/events/totalCount"]
     );
     const interactionsPerDay = computed(() => (totalCount.value / observationDays).toPrecision(4) );
+    const idleDays = computed(() => {
+      const days = store.getters["assessment/observedDays"];
+      for (const event of store.getters["assessment/events/filtered"]) {
+        const eventDay = DateTime.fromISO(event.timestamp, {
+          zone: store.getters.timeZone,
+        }).toISODate();
+        const index = days.indexOf(eventDay);
+        if (index > -1) {
+          days.splice(index, 1);
+        }
+      }
+      return days.length;
+    })
     const timeZone = store.getters.timeZone;
-    const username = store.state.assessment.githubUsername;
     const githubEventTypes = store.state.assessment.githubEventTypes.join(", ");
     return {
       title: "Assessment",
@@ -89,11 +101,11 @@ export default defineComponent({
       fromDate,
       toDate,
       timeZone,
-      username,
       githubEventTypes,
       observationDays,
       totalCount,
-      interactionsPerDay
+      interactionsPerDay,
+      idleDays
     };
   },
 });
