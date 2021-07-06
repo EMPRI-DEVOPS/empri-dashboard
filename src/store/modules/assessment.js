@@ -53,7 +53,7 @@ const getters = {
     observedDays(state, getters) {
         let interval = getters['interval'];
         function* days(interval) {
-            let cursor = interval.start.startOf("day");
+            let cursor = interval.start;
             while (cursor < interval.end) {
               yield cursor.toISODate();
               cursor = cursor.plus({ days: 1 });
