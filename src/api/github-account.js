@@ -242,9 +242,6 @@ export default class GithubAccount {
                                 endCursor
                             }
                             nodes {
-                                author {
-                                    login
-                                }
                                 publishedAt
                                 repository {
                                     nameWithOwner

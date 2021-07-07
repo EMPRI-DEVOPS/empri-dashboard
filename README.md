@@ -1,8 +1,12 @@
 # dashboard
 
+## Requirements
+Node.js
+Python 3
+
 ## Project setup (in a python venv or virtualenv)
 ```
-npm install
+npm ci
 pip install -r requirements.txt
 ```
 
