@@ -1,8 +1,10 @@
 # dashboard
 
 ## Requirements
-Node.js
-Python 3
+
+- Node.js 
+- Vue CLI 3
+- Python 3
 
 ## Project setup (in a python venv or virtualenv)
 ```
