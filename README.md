@@ -1,4 +1,4 @@
-# dashboard
+# DevOps Privacy Self-Assessment Dashboard
 
 ## Requirements
 
