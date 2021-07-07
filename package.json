@@ -1,6 +1,6 @@
 {
-  "name": "psad",
-  "version": "0.9.1",
+  "name": "dopsad",
+  "version": "0.9.2",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve & python manage.py runserver",
