@@ -80,11 +80,13 @@ export default {
       loadingComponent: ChartLoader,
       delay: 0,
     }),
+    /*
     TimeWindow: defineAsyncComponent({
       loader: () => import("../components/charts/ChartEventsPerTimeWindow.vue"),
       loadingComponent: ChartLoader,
       delay: 0,
     }),
+    */
     WeekdayHeatmap: defineAsyncComponent({
       loader: () => import("../components/charts/ChartWeekdayHeatmap.vue"),
       loadingComponent: ChartLoader,
@@ -110,7 +112,7 @@ export default {
       "RawData",
       "EventsOverTime",
       "WeekdayChart",
-      "TimeWindow",
+      //"TimeWindow",
       "Metrics",
     ];
     watch(createdAssessment, async () => {
