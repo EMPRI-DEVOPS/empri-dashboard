@@ -1,17 +1,17 @@
 # Privacy Self-Assessment Dashboard for DevOps Tools
 
-## What is project about?
+## What is this project about?
 
-The EMPRI (Employee Privacy) Dashboard is intended to inform about privacy sensitivity of interaction metadata collected by collaborative DevOps software.
-The dashboard is designed to support multiple data sources (DevOps tools) which are aggregated to provide a complete picture.
-Various visualisations and statistics inform users about the density and sensitivity of their traces on those tools.
+The EMPRI (Employee Privacy) Dashboard is intended to inform about the privacy sensitivity of interaction metadata collected by collaborative DevOps software.
+The dashboard is designed to support multiple data sources (DevOps tools) which are combined to provide a complete picture.
+Various visualisations and statistics inform users about the density, distribution and sensitivity of their traces on those tools.
 
 Our dashboard is design for self-assessment and will therefore only collect data for authenticated users.
 It is _not_ intended for monitoring and assessing other users.
 
 ### Features
 
-- Client-side only collection and processing of interaction data
+- Pure client-side collection and processing of interaction data
 - Various visualisations of temporal distributions of interactions
 - Simulation of data minimisation effects for interaction timestamps
 
