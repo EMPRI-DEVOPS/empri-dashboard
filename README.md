@@ -9,6 +9,9 @@ Various visualisations and statistics inform users about the density, distributi
 Our dashboard is design for self-assessment and will therefore only collect data for authenticated users.
 It is _not_ intended for monitoring and assessing other users.
 
+_Note_: Please be aware that this is (still) an academic demonstrator with a lot of unfinished edges.
+
+
 ### Features
 
 - Pure client-side collection and processing of interaction data
@@ -24,7 +27,7 @@ Currently supported sources:
 Planned further sources:
 
 - Mattermost
-- …
+- … (open for contributions)
 
 For information about how to contribute further source adapters see _Contributing_.
 
@@ -53,6 +56,28 @@ npm run serve
 ```
 npm run build
 ```
+
+### Deployment
+
+**Warning:** This has not been thoroughly tested. Please treat it with caution!
+
+1. Install dependencies
+    ```
+    npm ci
+    pip install -r requirements.txt
+    ```
+2. Create a `.env` file from the `.env.example` template
+    1. Set the settings module to production
+        ```
+        DJANGO_SETTINGS_MODULE="dashboard_backend.settings.production"
+        ```
+    2. Set `SECRET_KEY`
+3. Adapt allowed hosts under `dashboard_backend/settings/production.py`
+4. Run `python manage.py migrate`
+5. `npm run build`
+6. Configure Django to be run via gunicorn
+7. Configure the server to serve `/static` directly under `{url}/static`
+8. Go through Django's [deployment checklist](https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/)
 
 ## Contributing
 
